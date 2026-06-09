@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>INSEQ CMS Open API</title>
+  <style>
+    :root {
+      --bg: #000;
+      --ink: #fff;
+      --muted: #8b95a1;
+      --line: #23262d;
+      --panel: #121316;
+      --panel-2: #191b20;
+      --blue: #3182f6;
+      --blue-2: #5da2ff;
+      --green: #4ee5a1;
+      --light: #f7f8fa;
+      --light-ink: #191f28;
+      --light-muted: #6b7684;
+      --light-line: #e5e8eb;
+      --radius: 8px;
+      --font-sans: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "SFMono-Regular", "Menlo", "Consolas", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      letter-spacing: 0;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .site-header {
+      position: fixed;
+      top: 0;
+      z-index: 20;
+      width: 100%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.76);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1200px, calc(100% - 48px));
+      height: 68px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 25px;
+      height: 25px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--blue), #1f3fe5 62%, #11d69c);
+      box-shadow: 0 0 24px rgba(49, 130, 246, 0.45);
+      transform: rotate(-13deg);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .pill-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 25px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(70, 151, 255, 0.95), rgba(37, 99, 235, 0.72));
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34), 0 14px 42px rgba(49, 130, 246, 0.32);
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .pill-button:hover {
+      transform: translateY(-1px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 18px 46px rgba(49, 130, 246, 0.42);
+    }
+
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 23px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: 760px;
+      place-items: center;
+      overflow: hidden;
+      padding: 140px 24px 72px;
+      text-align: center;
+    }
+
+    .hero::before,
+    .hero::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+    }
+
+    .hero::before {
+      background:
+        radial-gradient(circle at 28% 72%, rgba(49, 130, 246, 0.38), transparent 21%),
+        radial-gradient(circle at 72% 62%, rgba(78, 229, 161, 0.22), transparent 19%),
+        radial-gradient(circle at 50% 42%, rgba(49, 130, 246, 0.22), transparent 24%),
+        #000;
+    }
+
+    .hero::after {
+      opacity: 0.58;
+      background-image:
+        radial-gradient(circle, rgba(178, 211, 255, 0.74) 0 1px, transparent 1.7px),
+        linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.72) 22%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.72) 78%, transparent);
+      background-size: 17px 17px, 100% 100%;
+      mask-image: radial-gradient(ellipse at center, transparent 0 20%, #000 34%, transparent 68%);
+      transform: perspective(620px) rotateX(58deg) translateY(120px) scale(1.45);
+      animation: fieldDrift 18s linear infinite;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: min(900px, 100%);
+    }
+
+    .hero-kicker {
+      margin: 0 0 22px;
+      color: #a8c7ff;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.16;
+      font-weight: 900;
+    }
+
+    .hero-copy {
+      max-width: 620px;
+      margin: 24px auto 0;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 19px;
+      line-height: 1.72;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 38px;
+    }
+
+    .hero-note {
+      margin-top: 132px;
+      color: rgba(255, 255, 255, 0.34);
+      font-size: 13px;
+    }
+
+    .sticky-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      min-height: 56px;
+      padding: 10px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(14px);
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .sticky-bar .mini-cta {
+      min-height: 34px;
+      padding: 0 18px;
+      font-size: 13px;
+    }
+
+    .dark-section {
+      background: #000;
+      padding: 104px 24px 126px;
+    }
+
+    .section-inner {
+      width: min(1040px, 100%);
+      margin: 0 auto;
+    }
+
+    .dark-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+      gap: 56px;
+      align-items: center;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 48px);
+      line-height: 1.24;
+      font-weight: 900;
+    }
+
+    .feature-list {
+      display: grid;
+      margin-top: 54px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .feature-item {
+      padding: 24px 0;
+      border: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.32);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .feature-item strong {
+      display: block;
+      margin-bottom: 10px;
+      color: inherit;
+      font-size: 21px;
+      font-weight: 850;
+    }
+
+    .feature-item span {
+      display: none;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .feature-item.active { color: #fff; }
+    .feature-item.active span { display: block; }
+
+    .code-card {
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      background: #141518;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
+    }
+
+    .code-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 48px;
+      padding: 0 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.46);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .method { color: var(--green); }
+    .copy-button {
+      width: 30px;
+      height: 30px;
+      border: 0;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.62);
+      cursor: pointer;
+    }
+
+    pre {
+      margin: 0;
+      padding: 22px 22px 26px;
+      overflow: auto;
+      color: #d7dbe2;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .line-no { color: rgba(255, 255, 255, 0.25); }
+    .blue { color: #89bbff; }
+    .green { color: #78e9b2; }
+    .violet { color: #c9a7ff; }
+
+    .light-section {
+      background: var(--light);
+      color: var(--light-ink);
+      padding: 116px 24px;
+    }
+
+    .section-lead {
+      max-width: 560px;
+      margin: 18px 0 0;
+      color: var(--light-muted);
+      font-size: 18px;
+      line-height: 1.72;
+      font-weight: 500;
+    }
+
+    .dashboard-preview {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+      margin-top: 52px;
+      border: 1px solid var(--light-line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 64px rgba(25, 31, 40, 0.08);
+      overflow: hidden;
+    }
+
+    .preview-main { padding: 26px; }
+    .preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .preview-title { font-size: 19px; font-weight: 850; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #14a06f;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .status::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 110px;
+      padding: 18px;
+      border: 1px solid var(--light-line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .metric span {
+      color: var(--light-muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 13px;
+      font-family: var(--font-mono);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .bars {
+      display: grid;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 128px 1fr 64px;
+      gap: 16px;
+      align-items: center;
+      color: var(--light-muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .track {
+      height: 10px;
+      border-radius: 999px;
+      background: #eef1f4;
+      overflow: hidden;
+    }
+
+    .fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), #47d8a8);
+    }
+
+    .preview-side {
+      padding: 26px;
+      border-left: 1px solid var(--light-line);
+      background: #fbfcfd;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 9px 1fr;
+      gap: 12px;
+      color: var(--light-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .use-card {
+      min-height: 170px;
+      padding: 24px;
+      border: 1px solid var(--light-line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .use-card h3 {
+      margin: 18px 0 10px;
+      font-size: 20px;
+    }
+
+    .use-card p {
+      margin: 0;
+      color: var(--light-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .icon {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .faq-section {
+      background: #fff;
+      color: var(--light-ink);
+      padding: 108px 24px;
+    }
+
+    .faq-wrap {
+      width: min(840px, 100%);
+      margin: 0 auto;
+    }
+
+    .faq {
+      margin-top: 42px;
+      border-top: 1px solid var(--light-line);
+    }
+
+    .faq details {
+      border-bottom: 1px solid var(--light-line);
+    }
+
+    .faq summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+      color: var(--light-ink);
+      cursor: pointer;
+      font-size: 19px;
+      font-weight: 850;
+      list-style: none;
+    }
+
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      color: var(--light-muted);
+      content: "+";
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .faq details[open] summary::after { content: "-"; }
+
+    .faq p {
+      margin: 0;
+      padding: 0 0 26px;
+      color: var(--light-muted);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .final-cta {
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      padding: 106px 24px;
+      text-align: center;
+    }
+
+    .final-cta::before {
+      position: absolute;
+      inset: -40% 0 0;
+      background:
+        radial-gradient(circle at 40% 30%, rgba(49, 130, 246, 0.38), transparent 26%),
+        radial-gradient(circle at 62% 50%, rgba(78, 229, 161, 0.2), transparent 22%);
+      content: "";
+    }
+
+    .final-cta .section-inner {
+      position: relative;
+    }
+
+    .final-cta p {
+      margin: 0 0 16px;
+      color: #a8c7ff;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: #000;
+      padding: 28px 24px;
+      color: rgba(255, 255, 255, 0.42);
+      font-size: 13px;
+    }
+
+    footer .section-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    @keyframes fieldDrift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 0 170px, 0 0; }
+    }
+
+    @media (max-width: 900px) {
+      .nav { width: min(100% - 32px, 1200px); }
+      .nav-links { display: none; }
+      .nav-actions a:first-child { display: none; }
+      .hero { min-height: 690px; }
+      .hero-note { margin-top: 82px; }
+      .sticky-bar { display: none; }
+      .dark-grid,
+      .dashboard-preview {
+        grid-template-columns: 1fr;
+      }
+      .preview-side {
+        border-top: 1px solid var(--light-line);
+        border-left: 0;
+      }
+      .cards-grid,
+      .metric-row {
+        grid-template-columns: 1fr;
+      }
+      .bar {
+        grid-template-columns: 92px 1fr 48px;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .nav { height: 60px; }
+      .brand span { font-size: 14px; }
+      .nav-actions .pill-button { min-height: 38px; padding: 0 14px; font-size: 13px; }
+      .hero { padding-top: 118px; }
+      h1 { font-size: 38px; }
+      .hero-copy { font-size: 16px; }
+      .hero-actions { align-items: stretch; flex-direction: column; }
+      .dark-section,
+      .light-section,
+      .faq-section,
+      .final-cta { padding: 76px 18px; }
+      pre {
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      footer .section-inner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="brand" href="#top" aria-label="INSEQ CMS 홈">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>INSEQ CMS</span>
+      </a>
+      <div class="nav-links">
+        <a href="#product">제품</a>
+        <a href="#api">API</a>
+        <a href="#ops">운영</a>
+        <a href="#faq">문서</a>
+        <a href="#contact">문의</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#faq">한국어</a>
+        <a class="pill-button" href="#contact">데모 시작하기</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <p class="hero-kicker">CMS Upgrade Open API</p>
+        <h1 id="hero-title">콘텐츠 운영을<br />API처럼 빠르게</h1>
+        <p class="hero-copy">CMS 업그레이드와 데이터 연동을 한 화면에서 관리하세요. 등록, 배포, 장애 대응까지 운영자가 놓치기 쉬운 흐름을 자동화합니다.</p>
+        <div class="hero-actions">
+          <a class="pill-button" href="#contact">데모 시작하기</a>
+          <a class="ghost-button" href="#api">문서 보기</a>
+        </div>
+        <p class="hero-note">* 운영계 반영 전 승인, 권한, 로그 정책을 함께 검증할 수 있어요.</p>
+      </div>
+    </section>
+
+    <div class="sticky-bar" aria-label="현재 페이지 요약">
+      <span>INSEQ CMS Open API - 운영 자동화와 안정적인 데이터 연동</span>
+      <a class="pill-button mini-cta" href="#contact">데모 시작하기</a>
+    </div>
+
+    <section class="dark-section" id="api" aria-labelledby="benefit-title">
+      <div class="section-inner dark-grid">
+        <div>
+          <h2 id="benefit-title">이런 장점이 있어요</h2>
+          <div class="feature-list" role="tablist" aria-label="API 장점">
+            <button class="feature-item active" type="button" data-code="content" role="tab" aria-selected="true">
+              <strong>콘텐츠 등록을 API로 쉽게</strong>
+              <span>페이지, 배너, 공지, 첨부파일을 하나의 엔드포인트 규칙으로 다뤄요. 운영 화면과 외부 시스템의 데이터가 같은 흐름으로 움직입니다.</span>
+            </button>
+            <button class="feature-item" type="button" data-code="workflow" role="tab" aria-selected="false">
+              <strong>승인과 배포 흐름 자동화</strong>
+              <span>검수 요청, 승인, 예약 배포, 롤백까지 표준 이벤트로 연결해 반복 업무를 줄이고 변경 이력을 남겨요.</span>
+            </button>
+            <button class="feature-item" type="button" data-code="monitor" role="tab" aria-selected="false">
+              <strong>장애 대응을 더 빠르게</strong>
+              <span>응답 지연, 실패율, 배포 이벤트를 한 화면에서 확인하고 알림 정책에 따라 담당자에게 바로 전달합니다.</span>
+            </button>
+            <button class="feature-item" type="button" data-code="security" role="tab" aria-selected="false">
+              <strong>권한과 감사 로그까지</strong>
+              <span>서비스 계정별 권한, 토큰 만료, 접근 IP, 변경 로그를 운영 정책에 맞게 분리해 관리할 수 있어요.</span>
+            </button>
+          </div>
+        </div>
+
+        <article class="code-card" aria-label="API 코드 예시">
+          <div class="code-head">
+            <span><span class="method" id="code-method">POST</span> <span id="code-path">/api/v1/content</span></span>
+            <button class="copy-button" type="button" aria-label="코드 복사" id="copy-code">□</button>
+          </div>
+          <pre><code id="code-block"><span class="line-no">1</span> BASE = <span class="blue">"https://cms.inseq.io/open/v1"</span>
+<span class="line-no">2</span> HEADERS = {<span class="blue">"Authorization"</span>: <span class="green">f"Bearer {token}"</span>}
+<span class="line-no">3</span>
+<span class="line-no">4</span> payload = {
+<span class="line-no">5</span>   <span class="blue">"siteId"</span>: <span class="green">"keis-ko"</span>,
+<span class="line-no">6</span>   <span class="blue">"contentType"</span>: <span class="green">"notice"</span>,
+<span class="line-no">7</span>   <span class="blue">"status"</span>: <span class="green">"review"</span>
+<span class="line-no">8</span> }
+<span class="line-no">9</span>
+<span class="line-no">10</span> requests.post(<span class="violet">f"{BASE}/content"</span>, json=payload)</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="light-section" id="ops" aria-labelledby="ops-title">
+      <div class="section-inner">
+        <h2 id="ops-title">운영 현황부터 연동 품질까지<br />대시보드로 충분해요</h2>
+        <p class="section-lead">API 상태, 배포 이벤트, 콘텐츠 변경량을 한 화면에서 추적합니다. 운영자는 장애와 승인 대기 건을 빠르게 확인하고 바로 조치할 수 있어요.</p>
+
+        <div class="dashboard-preview" aria-label="운영 대시보드 미리보기">
+          <div class="preview-main">
+            <div class="preview-top">
+              <div class="preview-title">사이트별 API 운영 현황</div>
+              <div class="status">정상 운영 중</div>
+            </div>
+            <div class="metric-row">
+              <div class="metric"><span>오늘 요청</span><strong>128K</strong></div>
+              <div class="metric"><span>평균 응답</span><strong>84ms</strong></div>
+              <div class="metric"><span>승인 대기</span><strong>17</strong></div>
+            </div>
+            <div class="bars">
+              <div class="bar"><span>콘텐츠 등록</span><div class="track"><span class="fill" style="width: 84%"></span></div><span>84%</span></div>
+              <div class="bar"><span>배너 배포</span><div class="track"><span class="fill" style="width: 66%"></span></div><span>66%</span></div>
+              <div class="bar"><span>첨부 동기화</span><div class="track"><span class="fill" style="width: 92%"></span></div><span>92%</span></div>
+            </div>
+          </div>
+          <aside class="preview-side">
+            <div class="preview-title">최근 이벤트</div>
+            <div class="timeline">
+              <div class="event"><span class="dot"></span><span>국문 사이트 공지 3건 검수 요청</span></div>
+              <div class="event"><span class="dot"></span><span>팝업존 예약 배포 완료</span></div>
+              <div class="event"><span class="dot"></span><span>API Monitor 응답 지연 알림 해소</span></div>
+              <div class="event"><span class="dot"></span><span>첨부파일 스토리지 동기화 성공</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="light-section" id="product" aria-labelledby="use-title">
+      <div class="section-inner">
+        <h2 id="use-title">INSEQ CMS API<br />이렇게 사용해보세요</h2>
+        <div class="cards-grid">
+          <article class="use-card">
+            <div class="icon">C</div>
+            <h3>콘텐츠</h3>
+            <p>공지, 게시글, 메뉴, 첨부파일을 외부 업무 시스템과 안정적으로 연동해요.</p>
+          </article>
+          <article class="use-card">
+            <div class="icon">B</div>
+            <h3>배너/팝업</h3>
+            <p>캠페인 일정과 노출 조건을 API로 등록하고 예약 배포할 수 있어요.</p>
+          </article>
+          <article class="use-card">
+            <div class="icon">A</div>
+            <h3>승인</h3>
+            <p>검수자, 승인 단계, 반려 사유를 표준 이벤트로 남겨 변경 관리를 단순화해요.</p>
+          </article>
+          <article class="use-card">
+            <div class="icon">L</div>
+            <h3>로그</h3>
+            <p>요청 이력, 토큰 사용량, 배포 결과를 감사 로그로 추적할 수 있어요.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section" id="faq" aria-labelledby="faq-title">
+      <div class="faq-wrap">
+        <h2 id="faq-title">자주 묻는 질문</h2>
+        <div class="faq">
+          <details open>
+            <summary>기존 CMS를 교체해야 사용할 수 있나요?</summary>
+            <p>아니요. 기존 운영 화면은 유지하면서 API Gateway, 모니터링, 승인 흐름을 단계적으로 붙일 수 있도록 구성했습니다.</p>
+          </details>
+          <details>
+            <summary>운영계 배포 전 검수 단계를 둘 수 있나요?</summary>
+            <p>가능합니다. 사이트별 승인자, 예약 배포 시간, 반려 사유, 변경 비교 화면을 정책에 맞게 분리할 수 있어요.</p>
+          </details>
+          <details>
+            <summary>API 사용량과 장애 알림은 어디서 보나요?</summary>
+            <p>대시보드에서 요청량, 실패율, 응답 시간, 최근 장애 이력을 확인하고 임계치 기반 알림을 설정할 수 있습니다.</p>
+          </details>
+          <details>
+            <summary>권한 관리는 어떻게 하나요?</summary>
+            <p>서비스 계정별 토큰, 역할 기반 권한, 접근 허용 IP, 만료 정책을 나눠 관리합니다. 모든 변경은 감사 로그로 남습니다.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" id="contact" aria-labelledby="contact-title">
+      <div class="section-inner">
+        <p>INSEQ CMS Open API로</p>
+        <h2 id="contact-title">운영 속도를 바꿔보세요</h2>
+        <div class="hero-actions">
+          <a class="pill-button" href="mailto:contact@inseq.co.kr">데모 시작하기</a>
+          <a class="ghost-button" href="#api">문서 보기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="section-inner">
+      <span>INSEQ CMS Open API</span>
+      <span>Demo landing page for CMS upgrade</span>
+    </div>
+  </footer>
+
+  <script>
+    const snippets = {
+      content: {
+        method: "POST",
+        path: "/api/v1/content",
+        code: `<span class="line-no">1</span> BASE = <span class="blue">"https://cms.inseq.io/open/v1"</span>
+<span class="line-no">2</span> HEADERS = {<span class="blue">"Authorization"</span>: <span class="green">f"Bearer {token}"</span>}
+<span class="line-no">3</span>
+<span class="line-no">4</span> payload = {
+<span class="line-no">5</span>   <span class="blue">"siteId"</span>: <span class="green">"keis-ko"</span>,
+<span class="line-no">6</span>   <span class="blue">"contentType"</span>: <span class="green">"notice"</span>,
+<span class="line-no">7</span>   <span class="blue">"status"</span>: <span class="green">"review"</span>
+<span class="line-no">8</span> }
+<span class="line-no">9</span>
+<span class="line-no">10</span> requests.post(<span class="violet">f"{BASE}/content"</span>, json=payload)`
+      },
+      workflow: {
+        method: "PATCH",
+        path: "/api/v1/workflows/review",
+        code: `<span class="line-no">1</span> review = cms.workflow(<span class="green">"notice-4821"</span>)
+<span class="line-no">2</span> review.assign(<span class="blue">role</span>=<span class="green">"publisher"</span>)
+<span class="line-no">3</span> review.schedule(<span class="blue">at</span>=<span class="green">"2026-06-12 09:00"</span>)
+<span class="line-no">4</span>
+<span class="line-no">5</span> if review.approved:
+<span class="line-no">6</span>   cms.deploy(review.id, <span class="blue">channel</span>=<span class="green">"production"</span>)
+<span class="line-no">7</span> else:
+<span class="line-no">8</span>   cms.comment(review.id, <span class="green">"문구 확인 필요"</span>)`
+      },
+      monitor: {
+        method: "GET",
+        path: "/api/v1/monitor/events",
+        code: `<span class="line-no">1</span> events = cms.monitor.events(
+<span class="line-no">2</span>   <span class="blue">site</span>=<span class="green">"keis-ko"</span>,
+<span class="line-no">3</span>   <span class="blue">level</span>=<span class="green">"warning"</span>
+<span class="line-no">4</span> )
+<span class="line-no">5</span>
+<span class="line-no">6</span> for event in events:
+<span class="line-no">7</span>   notify.send(event.owner, event.message)
+<span class="line-no">8</span>   if event.recovered:
+<span class="line-no">9</span>     cms.monitor.close(event.id)`
+      },
+      security: {
+        method: "POST",
+        path: "/api/v1/service-accounts",
+        code: `<span class="line-no">1</span> account = cms.security.create_account({
+<span class="line-no">2</span>   <span class="blue">"name"</span>: <span class="green">"banner-sync"</span>,
+<span class="line-no">3</span>   <span class="blue">"roles"</span>: [<span class="green">"content.write"</span>, <span class="green">"deploy.read"</span>],
+<span class="line-no">4</span>   <span class="blue">"allowIps"</span>: [<span class="green">"10.20.0.0/24"</span>]
+<span class="line-no">5</span> })
+<span class="line-no">6</span>
+<span class="line-no">7</span> audit.log(<span class="green">"service_account.created"</span>, account.id)`
+      }
+    };
+
+    const tabs = document.querySelectorAll(".feature-item");
+    const codeBlock = document.querySelector("#code-block");
+    const codeMethod = document.querySelector("#code-method");
+    const codePath = document.querySelector("#code-path");
+    const copyButton = document.querySelector("#copy-code");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((item) => {
+          item.classList.remove("active");
+          item.setAttribute("aria-selected", "false");
+        });
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        const selected = snippets[tab.dataset.code];
+        codeMethod.textContent = selected.method;
+        codePath.textContent = selected.path;
+        codeBlock.innerHTML = selected.code;
+      });
+    });
+
+    copyButton.addEventListener("click", async () => {
+      const text = codeBlock.innerText.replace(/^\d+\s/gm, "");
+      try {
+        await navigator.clipboard.writeText(text);
+        copyButton.textContent = "✓";
+        setTimeout(() => { copyButton.textContent = "□"; }, 1200);
+      } catch {
+        copyButton.textContent = "!";
+      }
+    });
+  </script>
+</body>
+</html>

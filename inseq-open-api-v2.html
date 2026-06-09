@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="INSEQ CMS Open API - 콘텐츠 운영을 API처럼 빠르고 유연하게 자동화하고 대시보드로 실시간 추적하세요." />
+  <title>INSEQ CMS Open API v2</title>
+  <style>
+    :root {
+      /* Base Transition */
+      --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      /* Font Family */
+      --font-sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+      --font-mono: "SFMono-Regular", "Menlo", "Consolas", ui-monospace, monospace;
+      --radius: 12px;
+    }
+
+    /* Dark Theme (Default) */
+    html[data-theme="dark"] {
+      --bg: #0b0f19;
+      --ink: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(255, 255, 255, 0.08);
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --blue: #3b82f6;
+      --blue-glow: rgba(59, 130, 246, 0.15);
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.15);
+      --purple: #8b5cf6;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --header-bg: rgba(11, 15, 25, 0.8);
+      --shadow-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Light Theme */
+    html[data-theme="light"] {
+      --bg: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: rgba(15, 23, 42, 0.08);
+      --panel: #ffffff;
+      --panel-2: #f1f5f9;
+      --blue: #2563eb;
+      --blue-glow: rgba(37, 99, 235, 0.1);
+      --green: #059669;
+      --green-glow: rgba(5, 150, 105, 0.1);
+      --purple: #7c3aed;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --header-bg: rgba(248, 250, 252, 0.8);
+      --shadow-color: rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      letter-spacing: -0.01em;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; background: none; border: none; cursor: pointer; }
+
+    /* Site Header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      border-bottom: 1px solid var(--line);
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      transition: var(--transition-base);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1200px, calc(100% - 48px));
+      height: 72px;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--blue), var(--purple), #10b981);
+      box-shadow: 0 0 20px var(--blue-glow);
+      transform: rotate(-10deg);
+      transition: var(--transition-base);
+    }
+    .brand:hover .brand-mark {
+      transform: rotate(0deg) scale(1.1);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .nav-links a {
+      transition: var(--transition-base);
+    }
+    .nav-links a:hover {
+      color: var(--ink);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Theme Toggle Switch */
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      transition: var(--transition-base);
+    }
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: var(--line);
+    }
+    .theme-toggle svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .pill-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 4px 14px var(--blue-glow);
+      cursor: pointer;
+      transition: var(--transition-base);
+    }
+
+    .pill-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--blue-glow);
+    }
+
+    .ghost-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 20px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      transition: var(--transition-base);
+    }
+    .ghost-button:hover {
+      background: var(--line);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: 760px;
+      place-items: center;
+      overflow: hidden;
+      padding: 160px 24px 80px;
+      text-align: center;
+    }
+
+    .hero::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        radial-gradient(circle at 20% 30%, var(--blue-glow), transparent 25%),
+        radial-gradient(circle at 80% 70%, var(--green-glow), transparent 25%),
+        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.1), transparent 30%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: min(840px, 100%);
+    }
+
+    .hero-kicker {
+      margin: 0 0 16px;
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.15;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--ink) 40%, var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-copy {
+      max-width: 580px;
+      margin: 24px auto 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    /* Info Grid section */
+    .section-inner {
+      width: min(1140px, 100%);
+      margin: 0 auto;
+    }
+
+    .dark-section {
+      padding: 100px 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .dark-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .feature-list {
+      display: grid;
+      margin-top: 40px;
+      border-top: 1px solid var(--line);
+    }
+
+    .feature-item {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      text-align: left;
+      transition: var(--transition-base);
+    }
+
+    .feature-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .feature-item span {
+      display: none;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .feature-item.active {
+      padding-left: 8px;
+      border-left: 3px solid var(--blue);
+    }
+    .feature-item.active span {
+      display: block;
+    }
+
+    /* Code Card System */
+    .code-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 20px 40px var(--shadow-color);
+      transition: var(--transition-base);
+    }
+    .code-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .code-tabs {
+      display: flex;
+      background: var(--panel-2);
+      border-bottom: 1px solid var(--line);
+      padding: 0 16px;
+    }
+
+    .code-tab-btn {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      transition: var(--transition-base);
+    }
+
+    .code-tab-btn.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+
+    .code-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 48px;
+      padding: 0 20px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .method {
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .method.post { background: var(--green-glow); color: var(--green); }
+    .method.patch { background: var(--blue-glow); color: var(--blue); }
+    .method.get { background: rgba(139, 92, 246, 0.1); color: var(--purple); }
+
+    .copy-button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      transition: var(--transition-base);
+    }
+    .copy-button:hover {
+      color: var(--ink);
+      background: var(--line);
+    }
+
+    pre {
+      margin: 0;
+      padding: 24px;
+      overflow: auto;
+      background: var(--panel);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+
+    /* Code Highlighting classes */
+    .line-no { color: var(--muted); opacity: 0.5; margin-right: 12px; display: inline-block; width: 18px; text-align: right; }
+    .keyword { color: var(--purple); font-weight: 600; }
+    .string { color: var(--green); }
+    .param { color: #f59e0b; }
+    .builtin { color: var(--blue); }
+    .comment { color: var(--muted); font-style: italic; }
+
+    /* Dashboard Preview Section */
+    .dashboard-preview {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      margin-top: 48px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 30px 60px var(--shadow-color);
+      overflow: hidden;
+      transition: var(--transition-base);
+    }
+    .dashboard-preview:hover {
+      box-shadow: 0 40px 80px var(--shadow-color);
+    }
+
+    .preview-main { padding: 32px; }
+    .preview-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .preview-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .status::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .metric {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      transition: var(--transition-base);
+    }
+    .metric:hover {
+      transform: translateY(-2px);
+      border-color: var(--blue);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .bars {
+      display: grid;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: 100px 1fr 48px;
+      gap: 16px;
+      align-items: center;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .bar-label { color: var(--muted); }
+
+    .track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+
+    .fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      width: 0; /* Animated dynamically */
+      transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+
+    .preview-side {
+      padding: 32px;
+      border-left: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 12px 1fr;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 6px var(--blue);
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .use-card {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      transition: var(--transition-base);
+    }
+    .use-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--blue);
+      box-shadow: 0 12px 30px var(--shadow-color);
+    }
+
+    .use-card h3 {
+      margin: 16px 0 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .use-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .icon-box {
+      display: inline-flex;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--blue);
+      transition: var(--transition-base);
+    }
+    .use-card:hover .icon-box {
+      background: var(--blue);
+      color: white;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      padding: 100px 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .faq-wrap {
+      width: min(800px, 100%);
+      margin: 0 auto;
+    }
+
+    .faq {
+      margin-top: 40px;
+      border-top: 1px solid var(--line);
+    }
+
+    .faq details {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .faq summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 700;
+      list-style: none;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    
+    .faq summary::after {
+      content: "+";
+      font-size: 24px;
+      color: var(--muted);
+      transition: var(--transition-base);
+    }
+    .faq details[open] summary::after {
+      transform: rotate(45deg);
+    }
+
+    .faq p {
+      margin: 0;
+      padding: 0 0 24px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* Final CTA */
+    .final-cta {
+      position: relative;
+      overflow: hidden;
+      padding: 100px 24px;
+      text-align: center;
+      border-top: 1px solid var(--line);
+    }
+    .final-cta::before {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, var(--blue-glow), transparent 40%);
+      content: "";
+      z-index: 0;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 32px 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer .section-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .dark-grid { grid-template-columns: 1fr; gap: 40px; }
+      .dashboard-preview { grid-template-columns: 1fr; }
+      .preview-side { border-left: none; border-top: 1px solid var(--line); }
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .metric-row { grid-template-columns: 1fr; }
+      footer .section-inner { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <nav class="nav" aria-label="메인 메뉴">
+      <a class="brand" href="#top" aria-label="INSEQ CMS 홈">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>INSEQ CMS</span>
+      </a>
+      <div class="nav-links">
+        <a href="#product">제품</a>
+        <a href="#api">API</a>
+        <a href="#ops">운영</a>
+        <a href="#faq">문서</a>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-btn" aria-label="테마 전환">
+          <svg viewBox="0 0 24 24" id="theme-icon">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.38 5.38 0 0 1-4.4 2.26 5.4 5.4 0 0 1-4.14-9.5A9 9 0 0 0 12 3z"/>
+          </svg>
+        </button>
+        <a class="pill-button" href="#contact">데모 신청</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <p class="hero-kicker">CMS Upgrade Open API</p>
+        <h1 id="hero-title">콘텐츠 운영을<br />API처럼 유연하게</h1>
+        <p class="hero-copy">CMS 업그레이드와 복잡한 데이터 동기화를 한 화면에서 모니터링하세요. 배포 및 예외 발생 알람 정책까지 자동으로 검증합니다.</p>
+        <div class="hero-actions">
+          <a class="pill-button" href="#contact">데모 시작하기</a>
+          <a class="ghost-button" href="#api">문서 보기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dark Section (Features & Code Card) -->
+    <section class="dark-section" id="api" aria-labelledby="benefit-title">
+      <div class="section-inner dark-grid">
+        <div>
+          <h2 id="benefit-title">이런 장점이 있어요</h2>
+          <div class="feature-list" role="tablist" aria-label="API 장점">
+            <button class="feature-item active" type="button" data-code="content" role="tab" aria-selected="true">
+              <strong>콘텐츠 등록을 API로 쉽게</strong>
+              <span>페이지, 배너, 공지사항, 파일 업로드를 규격화된 하나의 RESTful API로 신속하게 동기화합니다.</span>
+            </button>
+            <button class="feature-item" type="button" data-code="workflow" role="tab" aria-selected="false">
+              <strong>승인과 배포 흐름 자동화</strong>
+              <span>예약 배포, 승인 검수, 승인 반려 사유 비교 및 다중 계정 롤백 체인 등을 직관적인 이벤트로 체계화합니다.</span>
+            </button>
+            <button class="feature-item" type="button" data-code="monitor" role="tab" aria-selected="false">
+              <strong>실시간 모니터링 알림</strong>
+              <span>요청량, 응답 지연율, 배포 에러 등을 실시간으로 수집하고 임계치 통과 시 담당자 슬랙/이메일로 라우팅합니다.</span>
+            </button>
+            <button class="feature-item" type="button" data-code="security" role="tab" aria-selected="false">
+              <strong>보안 및 감사 로그</strong>
+              <span>역할 기반 토큰 스코프, IP 화이트리스트 검사 등 까다로운 기업 보안 정책을 완전히 충족합니다.</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Code Playground Card -->
+        <article class="code-card" aria-label="API 코드 예시">
+          <div class="code-tabs">
+            <button class="code-tab-btn active" data-lang="python">Python</button>
+            <button class="code-tab-btn" data-lang="curl">cURL</button>
+            <button class="code-tab-btn" data-lang="nodejs">Node.js</button>
+          </div>
+          <div class="code-head">
+            <span><span class="method post" id="code-method">POST</span> <span id="code-path">/api/v1/content</span></span>
+            <button class="copy-button" type="button" aria-label="코드 복사" id="copy-code">Copy</button>
+          </div>
+          <pre><code id="code-block"></code></pre>
+        </article>
+      </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="light-section" id="ops" aria-labelledby="ops-title" style="padding: 100px 24px; border-top: 1px solid var(--line);">
+      <div class="section-inner">
+        <h2 id="ops-title">운영 현황부터 연동 품질까지<br />대시보드로 추적하세요</h2>
+        <div class="dashboard-preview">
+          <div class="preview-main">
+            <div class="preview-top">
+              <div class="preview-title">API 실시간 연동 현황</div>
+              <div class="status">정상 운영 중</div>
+            </div>
+            <div class="metric-row">
+              <div class="metric"><span>오늘 요청량</span><strong class="count-up" data-target="128500">0</strong></div>
+              <div class="metric"><span>평균 응답 속도</span><strong><span class="count-up" data-target="84">0</span>ms</strong></div>
+              <div class="metric"><span>승인 대기 건</span><strong class="count-up" data-target="17">0</strong></div>
+            </div>
+            <div class="bars">
+              <div class="bar">
+                <span class="bar-label">콘텐츠 등록</span>
+                <div class="track"><span class="fill" data-width="84%"></span></div>
+                <span>84%</span>
+              </div>
+              <div class="bar">
+                <span class="bar-label">배너 배포</span>
+                <div class="track"><span class="fill" data-width="66%"></span></div>
+                <span>66%</span>
+              </div>
+              <div class="bar">
+                <span class="bar-label">첨부 동기화</span>
+                <div class="track"><span class="fill" data-width="92%"></span></div>
+                <span>92%</span>
+              </div>
+            </div>
+          </div>
+          <aside class="preview-side">
+            <div class="preview-title">최근 이벤트 로그</div>
+            <div class="timeline">
+              <div class="event"><span class="dot"></span><span>공지사항 3건 검수 요청 수신</span></div>
+              <div class="event"><span class="dot"></span><span>메인 비주얼 배너 예약 배포 완료</span></div>
+              <div class="event"><span class="dot"></span><span>API Monitor 응답 지연 경고 해제</span></div>
+              <div class="event"><span class="dot"></span><span>첨부파일 스토리지 동기화 완료</span></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Uses -->
+    <section class="light-section" id="product" aria-labelledby="use-title" style="padding: 100px 24px; border-top: 1px solid var(--line);">
+      <div class="section-inner">
+        <h2 id="use-title">INSEQ CMS API 사용 시나리오</h2>
+        <div class="cards-grid">
+          <article class="use-card">
+            <div class="icon-box">📁</div>
+            <h3>콘텐츠 동기화</h3>
+            <p>외부 ERP, 인트라넷 게시판의 정보를 실시간으로 대량 업로드 및 동기화합니다.</p>
+          </article>
+          <article class="use-card">
+            <div class="icon-box">⚡</div>
+            <h3>예약 캠페인</h3>
+            <p>시즌별 마케팅 팝업이나 배너 활성 상태를 API로 간편하게 예약해 변경을 자동화합니다.</p>
+          </article>
+          <article class="use-card">
+            <div class="icon-box">✔</div>
+            <h3>워크플로우 검수</h3>
+            <p>검수 권한 분리 및 결재선 구조를 이벤트 기반으로 통제하여 실수 없는 운영을 보장합니다.</p>
+          </article>
+          <article class="use-card">
+            <div class="icon-box">🔒</div>
+            <h3>감사 추적</h3>
+            <p>모든 데이터 변경 시점의 토큰 발급 및 사용 IP 로그를 안전하게 보관하여 감사를 대비합니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section" id="faq" aria-labelledby="faq-title">
+      <div class="faq-wrap">
+        <h2 id="faq-title">자주 묻는 질문</h2>
+        <div class="faq">
+          <details open>
+            <summary>기존 레거시 CMS를 교체해야 하나요?</summary>
+            <p>아니요, 기존 운영 시스템에 지장을 주지 않으며 API Gateway 및 래퍼 형태로 가볍고 안전하게 계층을 추가해 연동할 수 있습니다.</p>
+          </details>
+          <details>
+            <summary>승인 전 스테이징 환경이 별도로 지원되나요?</summary>
+            <p>네, API Sandbox 및 별도 도메인 기반의 스테이징 타겟 배포 검수를 완벽히 매핑해 제공합니다.</p>
+          </details>
+          <details>
+            <summary>오류 발생 시 자동 복구(Auto-retry) 정책이 있나요?</summary>
+            <p>지수 백오프(Exponential Backoff)를 적용한 큐 관리 로직이 탑재되어 장애 시 일시 손실을 예방합니다.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta" id="contact" aria-labelledby="contact-title">
+      <div class="section-inner" style="position: relative; z-index: 1;">
+        <p style="color: var(--blue); font-weight: 700; text-transform: uppercase;">INSEQ CMS Open API</p>
+        <h2 id="contact-title" style="margin-bottom: 24px;">콘텐츠 관리의 새로운 생산성 기준</h2>
+        <div class="hero-actions">
+          <a class="pill-button" href="mailto:contact@inseq.co.kr">데모 신청하기</a>
+          <a class="ghost-button" href="#api">기술 가이드 보기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="section-inner">
+      <span>© 2026 INSEQ CMS Open API. All rights reserved.</span>
+      <span>v2.0 Premium Edition</span>
+    </div>
+  </footer>
+
+  <script>
+    // Code Snippets Data Store
+    const snippets = {
+      content: {
+        method: "POST",
+        path: "/api/v1/content",
+        python: `<span class="line-no">1</span><span class="keyword">import</span> requests
+<span class="line-no">2</span>
+<span class="line-no">3</span>url = <span class="string">"https://cms.inseq.io/open/v1/content"</span>
+<span class="line-no">4</span>headers = {<span class="string">"Authorization"</span>: <span class="string">"Bearer YOUR_TOKEN"</span>}
+<span class="line-no">5</span>payload = {
+<span class="line-no">6</span>    <span class="string">"siteId"</span>: <span class="string">"keis-ko"</span>,
+<span class="line-no">7</span>    <span class="string">"contentType"</span>: <span class="string">"notice"</span>,
+<span class="line-no">8</span>    <span class="string">"status"</span>: <span class="string">"review"</span>
+<span class="line-no">9</span>}
+<span class="line-no">10</span>res = requests.post(url, json=payload, headers=headers)`,
+        curl: `<span class="line-no">1</span>curl -X POST <span class="string">"https://cms.inseq.io/open/v1/content"</span> \\
+<span class="line-no">2</span>  -H <span class="string">"Authorization: Bearer YOUR_TOKEN"</span> \\
+<span class="line-no">3</span>  -H <span class="string">"Content-Type: application/json"</span> \\
+<span class="line-no">4</span>  -d <span class="string">'{
+<span class="line-no">5</span>    "siteId": "keis-ko",
+<span class="line-no">6</span>    "contentType": "notice",
+<span class="line-no">7</span>    "status": "review"
+<span class="line-no">8</span>  }'</span>`,
+        nodejs: `<span class="line-no">1</span><span class="keyword">const</span> axios = require(<span class="string">'axios'</span>);
+<span class="line-no">2</span>
+<span class="line-no">3</span>axios.post(<span class="string">'https://cms.inseq.io/open/v1/content'</span>, {
+<span class="line-no">4</span>  siteId: <span class="string">'keis-ko'</span>,
+<span class="line-no">5</span>  contentType: <span class="string">'notice'</span>,
+<span class="line-no">6</span>  status: <span class="string">'review'</span>
+<span class="line-no">7</span>}, {
+<span class="line-no">8</span>  headers: { Authorization: <span class="string">'Bearer YOUR_TOKEN'</span> }
+<span class="line-no">9</span>});`
+      },
+      workflow: {
+        method: "PATCH",
+        path: "/api/v1/workflows/review",
+        python: `<span class="line-no">1</span><span class="keyword">import</span> requests
+<span class="line-no">2</span>
+<span class="line-no">3</span>url = <span class="string">"https://cms.inseq.io/open/v1/workflows/review"</span>
+<span class="line-no">4</span>payload = {<span class="string">"status"</span>: <span class="string">"approved"</span>, <span class="string">"targetId"</span>: <span class="string">"notice-4821"</span>}
+<span class="line-no">5</span>requests.patch(url, json=payload)`,
+        curl: `<span class="line-no">1</span>curl -X PATCH <span class="string">"https://cms.inseq.io/open/v1/workflows/review"</span> \\
+<span class="line-no">2</span>  -H <span class="string">"Content-Type: application/json"</span> \\
+<span class="line-no">3</span>  -d <span class="string">'{"status": "approved", "targetId": "notice-4821"}'</span>`,
+        nodejs: `<span class="line-no">1</span><span class="keyword">const</span> fetch = require(<span class="string">'node-fetch'</span>);
+<span class="line-no">2</span>
+<span class="line-no">3</span>fetch(<span class="string">'https://cms.inseq.io/open/v1/workflows/review'</span>, {
+<span class="line-no">4</span>  method: <span class="string">'PATCH'</span>,
+<span class="line-no">5</span>  body: JSON.stringify({ status: <span class="string">'approved'</span>, targetId: <span class="string">'notice-4821'</span> })
+<span class="line-no">6</span>});`
+      },
+      monitor: {
+        method: "GET",
+        path: "/api/v1/monitor/events",
+        python: `<span class="line-no">1</span><span class="keyword">import</span> requests
+<span class="line-no">2</span>
+<span class="line-no">3</span>url = <span class="string">"https://cms.inseq.io/open/v1/monitor/events?site=keis-ko"</span>
+<span class="line-no">4</span>res = requests.get(url).json()`,
+        curl: `<span class="line-no">1</span>curl -X GET <span class="string">"https://cms.inseq.io/open/v1/monitor/events?site=keis-ko"</span>`,
+        nodejs: `<span class="line-no">1</span><span class="keyword">const</span> axios = require(<span class="string">'axios'</span>);
+<span class="line-no">2</span>
+<span class="line-no">3</span>axios.get(<span class="string">'https://cms.inseq.io/open/v1/monitor/events?site=keis-ko'</span>)
+<span class="line-no">4</span>  .then(res => console.log(res.data));`
+      },
+      security: {
+        method: "POST",
+        path: "/api/v1/service-accounts",
+        python: `<span class="line-no">1</span><span class="keyword">import</span> requests
+<span class="line-no">2</span>
+<span class="line-no">3</span>payload = {<span class="string">"name"</span>: <span class="string">"banner-sync"</span>, <span class="string">"roles"</span>: [<span class="string">"content.write"</span>]}
+<span class="line-no">4</span>requests.post(<span class="string">"https://cms.inseq.io/open/v1/service-accounts"</span>, json=payload)`,
+        curl: `<span class="line-no">1</span>curl -X POST <span class="string">"https://cms.inseq.io/open/v1/service-accounts"</span> \\
+<span class="line-no">2</span>  -d <span class="string">'{"name": "banner-sync", "roles": ["content.write"]}'</span>`,
+        nodejs: `<span class="line-no">1</span><span class="keyword">const</span> axios = require(<span class="string">'axios'</span>);
+<span class="line-no">2</span>axios.post(<span class="string">'https://cms.inseq.io/open/v1/service-accounts'</span>, {
+<span class="line-no">3</span>  name: <span class="string">'banner-sync'</span>,
+<span class="line-no">4</span>  roles: [<span class="string">'content.write'</span>]
+<span class="line-no">5</span>});`
+      }
+    };
+
+    let activeFeature = 'content';
+    let activeLang = 'python';
+
+    // Update Code UI
+    const codeBlock = document.getElementById("code-block");
+    const codeMethod = document.getElementById("code-method");
+    const codePath = document.getElementById("code-path");
+
+    function renderCode() {
+      const selected = snippets[activeFeature];
+      codeMethod.textContent = selected.method.toUpperCase();
+      // Class adjustment for color
+      codeMethod.className = `method ${selected.method.toLowerCase()}`;
+      codePath.textContent = selected.path;
+      codeBlock.innerHTML = selected[activeLang];
+    }
+
+    // Feature tabs
+    const featureItems = document.querySelectorAll(".feature-item");
+    featureItems.forEach(item => {
+      item.addEventListener("click", () => {
+        featureItems.forEach(f => {
+          f.classList.remove("active");
+          f.setAttribute("aria-selected", "false");
+        });
+        item.classList.add("active");
+        item.setAttribute("aria-selected", "true");
+        activeFeature = item.dataset.code;
+        renderCode();
+      });
+    });
+
+    // Language tabs
+    const langBtns = document.querySelectorAll(".code-tab-btn");
+    langBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        langBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeLang = btn.dataset.lang;
+        renderCode();
+      });
+    });
+
+    // Copy Code Utility
+    const copyBtn = document.getElementById("copy-code");
+    copyBtn.addEventListener("click", async () => {
+      const text = codeBlock.innerText.replace(/^\d+\s/gm, "");
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => { copyBtn.textContent = "Copy"; }, 1500);
+      } catch {
+        copyBtn.textContent = "Error";
+      }
+    });
+
+    // Theme Switch
+    const themeBtn = document.getElementById("theme-btn");
+    const themeIcon = document.getElementById("theme-icon");
+    const docHtml = document.documentElement;
+
+    themeBtn.addEventListener("click", () => {
+      const isDark = docHtml.getAttribute("data-theme") === "dark";
+      docHtml.setAttribute("data-theme", isDark ? "light" : "dark");
+      
+      // Update toggle icon
+      if (isDark) {
+        // Sun Icon
+        themeIcon.innerHTML = `<path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1zm0 16a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zM5.64 4.22a1 1 0 0 1 1.41 0l.7.7a1 1 0 0 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zm11.31 11.31a1 1 0 0 1 1.41 0l.7.7a1 1 0 0 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zM2 12a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1zm16 0a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2h-1a1 1 0 0 1-1-1zM5.64 19.78a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 0 1-1.41 0zm11.31-11.31a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 0 1-1.41 0z"/>`;
+      } else {
+        // Moon Icon
+        themeIcon.innerHTML = `<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.38 5.38 0 0 1-4.4 2.26 5.4 5.4 0 0 1-4.14-9.5A9 9 0 0 0 12 3z"/>`;
+      }
+    });
+
+    // Dashboard Animation Observer (Gauge Fill & Counter)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Fill animation
+          const fills = entry.target.querySelectorAll(".fill");
+          fills.forEach(fill => {
+            fill.style.width = fill.dataset.width;
+          });
+
+          // Counters animation
+          const counters = entry.target.querySelectorAll(".count-up");
+          counters.forEach(counter => {
+            const target = parseInt(counter.dataset.target, 10);
+            const duration = 1200; // ms
+            const start = 0;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const easeOutQuad = progress * (2 - progress);
+              const currentVal = Math.floor(easeOutQuad * (target - start) + start);
+              
+              if (target >= 1000) {
+                // Formatting for large numbers (e.g., 128.5K)
+                counter.textContent = (currentVal / 1000).toFixed(1) + "K";
+              } else {
+                counter.textContent = currentVal;
+              }
+
+              if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+              }
+            }
+            requestAnimationFrame(updateCounter);
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    observer.observe(document.querySelector(".dashboard-preview"));
+
+    // Initial load
+    renderCode();
+  </script>
+</body>
+</html>

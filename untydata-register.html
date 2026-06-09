@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<meta name="format-detection" content="telephone=no" />
+		<title id="neibisTopTitle">사이트별 운영관리 | 한국고용정보원-국문 | 테스트 메뉴 | 자료 통합 관리(등록)</title>
+		
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+		
+		<!-- FontAwesome Icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+		
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+						},
+						colors: {
+							primary: {
+								50: '#f0f5ff',
+								100: '#e0ebff',
+								500: '#2563eb',
+								600: '#1d4ed8',
+								700: '#1e40af',
+							},
+							sidebar: {
+								bg: '#ffffff',
+								hover: '#f3f4f6',
+								active: '#eff6ff',
+								text: '#374151',
+								textMuted: '#9ca3af',
+								border: '#e5e7eb',
+							}
+						}
+					}
+				}
+			}
+		</script>
+		
+		<style>
+			body {
+				font-family: 'Inter', 'Noto Sans KR', sans-serif;
+				background-color: #f8fafc;
+			}
+			/* Custom scrollbar */
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e1;
+				border-radius: 3px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #94a3b8;
+			}
+
+			/* Sidebar Collapsed State Styles */
+			#sidebar.collapsed {
+				width: 4rem; /* w-16 */
+			}
+			#sidebar.collapsed .logo-text,
+			#sidebar.collapsed .toolbar button:not(#sidebar-toggle),
+			#sidebar.collapsed hr,
+			#sidebar.collapsed .px-3.mb-2,
+			#sidebar.collapsed span,
+			#sidebar.collapsed p,
+			#sidebar.collapsed select,
+			#sidebar.collapsed input,
+			#sidebar.collapsed button:not(#sidebar-toggle),
+			#sidebar.collapsed details ul,
+			#sidebar.collapsed ul ul,
+			#sidebar.collapsed details summary i.fa-chevron-down,
+			#sidebar.collapsed .flex-1.overflow-y-auto > div:first-child, /* 즐겨찾기 영역 */
+			#sidebar.collapsed .flex-1.overflow-y-auto > div:nth-child(3) > div:first-child { /* 메뉴 탐색 타이틀 */
+				display: none !important;
+			}
+			#sidebar.collapsed .sidebar-header {
+				justify-content: center;
+				padding: 1.25rem 0.5rem;
+			}
+			#sidebar.collapsed .sidebar-header a {
+				justify-content: center;
+			}
+			#sidebar.collapsed nav a, 
+			#sidebar.collapsed nav summary,
+			#sidebar.collapsed .flex-1.overflow-y-auto a,
+			#sidebar.collapsed .flex-1.overflow-y-auto summary {
+				justify-content: center;
+				padding-left: 0;
+				padding-right: 0;
+			}
+			#sidebar.collapsed .flex-1.overflow-y-auto li a i {
+				margin-right: 0 !important;
+			}
+			#sidebar.collapsed div.p-4.border-t {
+				padding: 1rem 0.5rem;
+				justify-content: center;
+			}
+			#sidebar.collapsed div.p-4.border-t .flex {
+				justify-content: center;
+			}
+		</style>
+	</head>
+	<body class="overflow-hidden">
+		<!-- Main Layout Shell -->
+		<div class="flex h-screen w-screen bg-slate-50 text-slate-800">
+			
+			<!-- SIDEBAR -->
+			<aside id="sidebar" class="w-64 bg-sidebar-bg border-r border-sidebar-border flex flex-col flex-shrink-0 z-20 transition-all duration-300">
+				<!-- Sidebar Header -->
+				<div class="p-5 border-b border-sidebar-border flex items-center justify-between">
+					<a href="dashboard.html" class="flex items-center gap-2">
+						<img src="img-logo.png" alt="로고" class="h-6 object-contain" />
+						<span class="logo-text text-sm font-semibold text-slate-700 tracking-wide">관리시스템</span>
+					</a>
+					<button type="button" id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition" title="메뉴 접기">
+						<i class="fa-solid fa-angles-left text-xs"></i>
+					</button>
+				</div>
+
+				<!-- Sidebar Content -->
+				<div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+					<!-- Favorites -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-star text-amber-400"></i>
+							<span>즐겨찾기</span>
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="#" class="flex items-center px-3 py-2 text-xs font-medium text-slate-600 hover:bg-sidebar-hover rounded-lg transition">
+									팝업/배너 관리 &gt; 프로모션 영역 관리
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- GNB Menu -->
+					<div>
+						<div class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+							메뉴 탐색
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-line w-5 text-center text-slate-400"></i>
+									<span>대시보드</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-sliders w-5 text-center text-slate-400"></i>
+											<span>운영</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">웹콘텐츠 관리</a></li>
+										<li>
+											<details class="group">
+												<summary class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>팝업/배너 관리</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">프로모션 영역 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">레이어 팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업존 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">설문조사 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">조직 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">일정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-laptop-code w-5 text-center text-slate-400"></i>
+									<span>시스템</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-desktop w-5 text-center text-slate-400"></i>
+											<span>API Monitor</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="api-monitor-dashboard_light.html?tab=overview" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">전체현황</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=traffic" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">트래픽 분석</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=log" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">장애이력</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=alert" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">알림 설정</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=apiregister" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">API 등록</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-robot w-5 text-center text-slate-400"></i>
+											<span>Chatbot 관리</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="chatbot-dashboard.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">실시간 통계</a></li>
+										<li><a href="chatbot-settings.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 설정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
+									<span>로그</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
+									<span>통계</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- Site Management Section -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-globe"></i>
+							<span>사이트 관리</span>
+						</div>
+						<div class="px-3 mb-2">
+							<div class="relative">
+								<input type="text" placeholder="사이트 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition">
+								<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[10px] text-slate-400"></i>
+							</div>
+						</div>
+						<ul class="space-y-1 ml-2 text-xs">
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between px-3 py-1.5 text-slate-700 hover:bg-sidebar-hover rounded-lg cursor-pointer list-none font-medium">
+										<span class="truncate">한국고용정보원-국문</span>
+										<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+										<li>
+											<details open class="group">
+												<summary class="flex items-center justify-between px-2 py-1 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>테스트 메뉴</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-400 border-l border-slate-100 pl-2">
+													<li><a href="api-monitor-dashboard.html" class="block px-2 py-1 hover:text-slate-900 rounded">게시판 - 일반형(기본)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(민원)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(답글)</a></li>
+													<li><a href="untydata-list.html" class="block px-2 py-1 text-primary-600 bg-primary-50 font-semibold rounded">자료 통합 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">지능형 공문서 검색</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">FX 이슈노트</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">환위험관리 가이드</a></li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<!-- Sidebar Footer User Profile -->
+				<div class="p-4 border-t border-sidebar-border bg-slate-50/50">
+					<div class="flex items-center gap-3">
+						<div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-semibold shadow-inner">
+							<i class="fa-solid fa-user-tie"></i>
+						</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-semibold text-slate-800 truncate">홍길동</p>
+							<p class="text-xs text-slate-400 truncate">시스템관리자</p>
+						</div>
+						<div class="text-right">
+							<span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">60:00</span>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-2 mt-4">
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="시간연장">
+							<i class="fa-solid fa-clock-rotate-left text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">연장</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="정보수정">
+							<i class="fa-solid fa-user-gear text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">정보수정</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600 transition" title="로그아웃">
+							<i class="fa-solid fa-power-off text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">로그아웃</span>
+						</button>
+					</div>
+				</div>
+			</aside>
+
+			<!-- MAIN CONTENT AREA -->
+			<div class="flex-1 flex flex-col overflow-hidden">
+				
+				<!-- Header (Topbar) -->
+				<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+					<div class="flex items-center gap-4">
+						<button class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" onclick="history.back(); return false;">
+							<i class="fa-solid fa-arrow-left"></i>
+						</button>
+						<div class="flex flex-col">
+							<!-- Breadcrumb -->
+							<ol class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+								<li>사이트별 운영관리</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>한국고용정보원-국문</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>테스트 메뉴</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>자료 통합 관리(전체)</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li class="text-slate-600 font-semibold">자료 등록</li>
+							</ol>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<button type="button" id="ai-agent-toggle-top" class="px-3 py-1.5 text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition flex items-center gap-1.5">
+							<i class="fa-solid fa-wand-magic-sparkles"></i>
+							<span>AI 에이전트</span>
+						</button>
+						<a href="untydata-list.html" class="px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition">
+							취소
+						</a>
+						<button type="submit" form="saveForm" class="px-3 py-1.5 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition shadow-sm shadow-primary-500/10 flex items-center gap-1.5">
+							<i class="fa-solid fa-floppy-disk"></i>
+							<span>등록</span>
+						</button>
+					</div>
+				</header>
+
+				<!-- Scrollable Content Body -->
+				<main class="flex-1 overflow-y-auto p-6 space-y-6">
+					
+					<!-- Content Header Title Card -->
+					<div class="bg-white rounded-2xl p-6 border border-slate-200 flex items-center justify-between shadow-sm">
+						<div>
+							<h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+								<span>자료 통합 등록</span>
+								<span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100">운영관리</span>
+							</h2>
+							<p class="text-sm text-slate-400 mt-1">새로운 통합 운영관리 자료를 등록합니다. 필수 입력 항목(*)을 빠짐없이 기입해주세요.</p>
+						</div>
+					</div>
+
+					<!-- REGISTER FORM -->
+					<form id="saveForm" class="space-y-6">
+						<!-- Hidden Inputs -->
+						<input type="hidden" name="dataSclsfMltiplIdVl" id="dataSclsfMltiplIdVl" value="0" />
+						<input type="hidden" name="dataSrcCd" id="dataSrcCd" value="1" />
+						<input type="hidden" name="dataPstgSttsCd" value="1" />
+						<input type="hidden" name="pstgPrdCd" value="1" />
+
+						<!-- Card 1: 자료 기초 설정 -->
+						<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+							<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+								<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+									<i class="fa-solid fa-gear text-slate-400"></i>
+									<span>자료 기초 설정 (공개범위, 제약사항 등)</span>
+								</h3>
+							</div>
+							<div class="p-6 space-y-6">
+								<!-- 공개범위 설정 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<label class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">
+										공개범위 설정 <span class="text-red-500 font-bold">*</span>
+									</label>
+									<div class="flex-1 space-y-3">
+										<div class="flex flex-wrap gap-3">
+											<label class="cursor-pointer">
+												<input type="checkbox" id="insdDataRlsScopeCd_1" name="insdDataRlsScopeCd" value="1" checked class="sr-only peer" onchange="updateScopeStatus()">
+												<span class="px-4 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 peer-checked:bg-primary-50 peer-checked:text-primary-600 peer-checked:border-primary-500 transition block font-bold">
+													전체공개
+												</span>
+											</label>
+											<label class="cursor-pointer">
+												<input type="checkbox" id="insdDataRlsScopeCd_2" name="insdDataRlsScopeCd" value="2" class="sr-only peer" onchange="updateScopeStatus()">
+												<span class="px-4 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 peer-checked:bg-primary-50 peer-checked:text-primary-600 peer-checked:border-primary-500 transition block font-bold">
+													제한공개(부서기반)
+												</span>
+											</label>
+											<label class="cursor-pointer">
+												<input type="checkbox" id="insdDataRlsScopeCd_3" name="insdDataRlsScopeCd" value="3" class="sr-only peer" onchange="updateScopeStatus()">
+												<span class="px-4 py-2 text-xs rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 peer-checked:bg-primary-50 peer-checked:text-primary-600 peer-checked:border-primary-500 transition block font-bold">
+													제한공개(직원기반)
+												</span>
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 공개범위 설정 현황 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<label class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-1">
+										공개범위 설정 현황
+									</label>
+									<div class="flex-1">
+										<div id="dataRlsScopeCdTextArea" class="flex flex-wrap gap-2">
+											<span class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 border border-primary-100 rounded-xl" id="scope-status-item-1">
+												<span>모두 공개</span>
+												<button type="button" class="text-slate-400 hover:text-red-500 transition" onclick="removeScope(1)" title="삭제">
+													<i class="fa-solid fa-xmark text-[10px]"></i>
+												</button>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Card 2: 기본 정보 -->
+						<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+							<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+								<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+									<i class="fa-solid fa-circle-info text-slate-400"></i>
+									<span>기본 정보</span>
+								</h3>
+							</div>
+							<div class="p-6 space-y-6">
+								<!-- 자료명 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-center">
+									<label for="dataNm" class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">
+										자료명 <span class="text-red-500 font-bold">*</span>
+									</label>
+									<div class="flex-1">
+										<input type="text" name="dataNm" id="dataNm" placeholder="자료명을 입력해주세요." class="w-full border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white">
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 자료 소유권(출처) -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-center">
+									<span class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">
+										자료 소유권(출처) <span class="text-red-500 font-bold">*</span>
+									</span>
+									<div class="flex-1 text-xs text-slate-600 font-medium bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-100 inline-block max-w-max">
+										한국고용노동교육원 보유자료
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 자료구분 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<label class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">
+										자료구분 <span class="text-red-500 font-bold">*</span>
+									</label>
+									<div class="flex-1 space-y-3">
+										<div class="flex flex-wrap gap-3">
+											<select class="border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 w-full max-w-[240px] bg-white" name="dataLclsfCd" id="dataLclsfCd" onchange="handleCategoryChange()">
+												<option value="" selected>대분류를 선택해주세요</option>
+												<option value="1">교육자료</option>
+												<option value="3">연구자료</option>
+												<option value="4">홍보자료</option>
+											</select>
+
+											<div id="dataMclsfCdArea" class="hidden">
+												<select class="border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 w-full max-w-[240px] bg-white" name="dataMclsfCd" id="dataMclsfCd">
+													<option value="">중분류를 선택해주세요</option>
+												</select>
+											</div>
+										</div>
+										<!-- 소분류 체크박스 영역 -->
+										<div id="dataSclsfMltiplCdArea" class="hidden flex-wrap gap-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+											<!-- Dynamic child checkboxes will go here -->
+										</div>
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 대상 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<span class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">
+										대상 <span class="text-red-500 font-bold">*</span>
+									</span>
+									<div class="flex-1 flex flex-wrap gap-4 pt-1">
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_0" name="dataTrgtMltiplCd" value="0" class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500" onchange="toggleAllTargets(this)">
+											<span>전체(무관)</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_1" name="dataTrgtMltiplCd" value="1" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>일반</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_2" name="dataTrgtMltiplCd" value="2" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>학생</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_4" name="dataTrgtMltiplCd" value="4" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>공무원</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_8" name="dataTrgtMltiplCd" value="8" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>공공부문종사자</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_16" name="dataTrgtMltiplCd" value="16" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>민간부문종사자</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_32" name="dataTrgtMltiplCd" value="32" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>소규모사업장</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_64" name="dataTrgtMltiplCd" value="64" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>전문강사</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+											<input type="checkbox" id="dataTrgtMltiplCd_128" name="dataTrgtMltiplCd" value="128" class="target-chk w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+											<span>기타</span>
+										</label>
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 자료유형 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<span class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">
+										자료유형 <span class="text-red-500 font-bold">*</span>
+									</span>
+									<div class="flex-1 space-y-4">
+										<div class="flex flex-wrap gap-4 pt-1">
+											<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+												<input type="radio" name="dataTypeCd" id="dataTypeCd_1" value="1" checked class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500" onchange="handleDataTypeChange(1)">
+												<span>일반(사진/텍스트)</span>
+											</label>
+											<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+												<input type="radio" name="dataTypeCd" id="dataTypeCd_2" value="2" class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500" onchange="handleDataTypeChange(2)">
+												<span>YouTube 영상</span>
+											</label>
+											<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+												<input type="radio" name="dataTypeCd" id="dataTypeCd_3" value="3" class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500" onchange="handleDataTypeChange(3)">
+												<span>E-book</span>
+											</label>
+											<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+												<input type="radio" name="dataTypeCd" id="dataTypeCd_4" value="4" class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500" onchange="handleDataTypeChange(4)">
+												<span>동영상</span>
+											</label>
+										</div>
+
+										<!-- 동영상 업로드 영역 (dataTypeCd == 4) -->
+										<div id="movieArea" class="hidden space-y-2 max-w-2xl">
+											<input type="hidden" name="atchFileTypeCd" id="movietchFileTypeCd" value="M" />
+											<div class="border-2 border-dashed border-slate-200 hover:border-primary-400 rounded-2xl p-6 bg-slate-50/50 hover:bg-slate-50 transition cursor-pointer text-center group">
+												<i class="fa-solid fa-video text-slate-300 group-hover:text-primary-500 text-3xl mb-2 transition"></i>
+												<p class="text-xs font-bold text-slate-600">동영상 파일을 드래그하여 업로드하거나 클릭하여 선택하세요.</p>
+												<p class="text-[10px] text-slate-400 mt-1">허용 확장자: mp4, wmv, avi (최대용량 200MB)</p>
+												<input type="file" class="hidden" accept=".mp4,.wmv,.avi">
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- 영상/E-Book URL (dataTypeCd == 2 or 3) -->
+								<div id="urlAddrArea" class="hidden flex-col lg:flex-row gap-2 lg:items-center">
+									<label for="urlAddr" class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">
+										영상/E-Book URL <span class="text-red-500 font-bold">*</span>
+									</label>
+									<div class="flex-1">
+										<input type="text" name="urlAddr" id="urlAddr" placeholder="영상 URL 또는 E-Book URI를 입력해주세요. (예: https://...)" class="w-full border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white">
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 썸네일 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<span class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">
+										썸네일 <span class="text-red-500 font-bold">*</span>
+									</span>
+									<div class="flex-1 space-y-4">
+										<div class="flex flex-col sm:flex-row gap-4 pt-1">
+											<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+												<input type="radio" name="thmbYn" id="thmbYnY" value="N" checked class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500" onchange="handleThmbChange('N')">
+												<span>썸네일 없음(기본 이미지로 대체되어 게시됩니다.)</span>
+											</label>
+											<label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium">
+												<input type="radio" name="thmbYn" id="thmbYnN" value="Y" class="w-4 h-4 text-primary-600 border-slate-300 focus:ring-primary-500" onchange="handleThmbChange('Y')">
+												<span>썸네일 있음</span>
+											</label>
+										</div>
+
+										<!-- 썸네일 업로드 영역 (thmbYn == Y) -->
+										<div id="thmbArea" class="hidden space-y-2 max-w-2xl">
+											<input type="hidden" name="atchFileTypeCd" id="thumbAtchFileTypeCd" value="T" />
+											<div class="border-2 border-dashed border-slate-200 hover:border-primary-400 rounded-2xl p-6 bg-slate-50/50 hover:bg-slate-50 transition cursor-pointer text-center group">
+												<i class="fa-solid fa-image text-slate-300 group-hover:text-primary-500 text-3xl mb-2 transition"></i>
+												<p class="text-xs font-bold text-slate-600">썸네일 이미지 파일을 드래그하여 업로드하거나 클릭하여 선택하세요.</p>
+												<p class="text-[10px] text-slate-400 mt-1">허용 확장자: gif, bmp, jpg, png, jpeg, jfif, svg</p>
+												<input type="file" class="hidden" accept=".gif,.bmp,.jpg,.png,.jpeg,.jfif,.svg">
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 저자 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-center">
+									<label for="autNm" class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">저자</label>
+									<div class="flex-1">
+										<input type="text" name="autNm" id="autNm" placeholder="저자가 명시되어야 하는 경우 입력해주세요." class="w-full border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white">
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 자료생성연도 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-center">
+									<label for="pblsYr" class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">
+										자료생성연도 <span class="text-red-500 font-bold">*</span>
+									</label>
+									<div class="flex-1">
+										<select id="pblsYr" name="pblsYr" class="border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 w-full max-w-[240px] bg-white">
+											<option value="" selected>연도 선택</option>
+											<option value="2026">2026</option>
+											<option value="2025">2025</option>
+											<option value="2024">2024</option>
+											<option value="2023">2023</option>
+											<option value="2022">2022</option>
+											<option value="2021">2021</option>
+											<option value="2020">2020</option>
+											<option value="2019">2019</option>
+											<option value="2018">2018</option>
+											<option value="2017">2017</option>
+											<option value="2016">2016</option>
+											<option value="2015">2015</option>
+											<option value="2014">2014</option>
+											<option value="2013">2013</option>
+											<option value="2012">2012</option>
+											<option value="2011">2011</option>
+											<option value="2010">2010</option>
+											<option value="2009">2009</option>
+											<option value="2008">2008</option>
+											<option value="2007">2007</option>
+											<option value="2006">2006</option>
+											<option value="2005">2005</option>
+											<option value="2004">2004</option>
+											<option value="2003">2003</option>
+											<option value="2002">2002</option>
+											<option value="2001">2001</option>
+											<option value="2000">2000</option>
+											<option value="1999">1999</option>
+											<option value="1998">1998</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Card 3: 자료설명 에디터 영역 -->
+						<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+							<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+								<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+									<i class="fa-solid fa-file-lines text-slate-400"></i>
+									<span>자료설명</span>
+								</h3>
+							</div>
+							<div class="p-6 space-y-4">
+								<!-- Tab Menu -->
+								<div class="flex border-b border-slate-200 text-xs font-bold">
+									<button type="button" id="tab-code" class="px-5 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition" onclick="switchEditorTab('code')">코드(CodeMirror)로 수정</button>
+									<button type="button" id="tab-editor" class="px-5 py-2.5 border-b-2 border-primary-500 text-primary-600 transition" onclick="switchEditorTab('editor')">웹 에디터(CKEditor)로 수정</button>
+								</div>
+								
+								<!-- Editor Contents -->
+								<div>
+									<!-- Code Editor (Hidden by default) -->
+									<div id="editor-code-container" class="hidden">
+										<textarea id="codeText" class="w-full h-80 font-mono text-xs p-4 bg-slate-900 text-slate-300 rounded-2xl border border-slate-800 focus:outline-none focus:ring-1 focus:ring-primary-500" placeholder="<!-- HTML 코드를 작성하세요 -->"></textarea>
+									</div>
+
+									<!-- Web Editor Mockup (Visible by default) -->
+									<div id="editor-web-container" class="border border-slate-200 rounded-2xl overflow-hidden shadow-inner">
+										<!-- Editor Toolbar -->
+										<div class="bg-slate-50 border-b border-slate-200 p-2 flex flex-wrap gap-1.5 items-center text-slate-500 text-xs">
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="되돌리기"><i class="fa-solid fa-rotate-left"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="다시실행"><i class="fa-solid fa-rotate-right"></i></button>
+											<div class="h-4 w-px bg-slate-300 mx-1"></div>
+											<select class="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none">
+												<option>본문</option>
+												<option>제목 1</option>
+												<option>제목 2</option>
+												<option>제목 3</option>
+											</select>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center font-bold" title="굵게">B</button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center italic" title="기울임">I</button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center underline" title="밑줄">U</button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center line-through" title="취소선">S</button>
+											<div class="h-4 w-px bg-slate-300 mx-1"></div>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="좌측정렬"><i class="fa-solid fa-align-left"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="가운데정렬"><i class="fa-solid fa-align-center"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="우측정렬"><i class="fa-solid fa-align-right"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="양끝정렬"><i class="fa-solid fa-align-justify"></i></button>
+											<div class="h-4 w-px bg-slate-300 mx-1"></div>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="번호매기기"><i class="fa-solid fa-list-ol"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="글머리기호"><i class="fa-solid fa-list-ul"></i></button>
+											<div class="h-4 w-px bg-slate-300 mx-1"></div>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="링크삽입"><i class="fa-solid fa-link"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="이미지삽입"><i class="fa-solid fa-image"></i></button>
+											<button type="button" class="w-7 h-7 hover:bg-slate-200 rounded flex items-center justify-center" title="표삽입"><i class="fa-solid fa-table"></i></button>
+											<div class="h-4 w-px bg-slate-300 mx-1 flex-1"></div>
+											<div class="flex items-center gap-1.5 text-[10px] text-slate-400">
+												<i class="fa-solid fa-display"></i>
+												<span>기기별 미리보기</span>
+												<i class="fa-solid fa-chevron-down text-[8px]"></i>
+											</div>
+										</div>
+										<!-- Content editable editor body -->
+										<div class="min-h-[300px] p-6 focus:outline-none bg-white text-sm" contenteditable="true">
+											<p class="text-slate-400">여기에 자료설명을 입력해 주세요...</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Card 4: 첨부파일 및 작성 정보 -->
+						<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+							<div class="p-6 space-y-6">
+								<!-- 첨부파일 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<span class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">첨부파일</span>
+									<div class="flex-1 max-w-4xl">
+										<div class="border-2 border-dashed border-slate-200 hover:border-primary-400 rounded-2xl p-8 bg-slate-50/50 hover:bg-slate-50 transition cursor-pointer text-center group">
+											<i class="fa-solid fa-cloud-arrow-up text-slate-300 group-hover:text-primary-500 text-3xl mb-2 transition"></i>
+											<p class="text-xs font-bold text-slate-600">여러개 파일을 마우스로 끌어오거나, <span class="text-primary-600 hover:underline">파일을 선택</span>해주세요.</p>
+											<p class="text-[10px] text-slate-400 mt-1.5">최대 20000MB 이하의 파일을 등록할 수 있습니다.</p>
+											<input type="file" class="hidden" multiple>
+										</div>
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 작성자 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-center">
+									<label class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">
+										작성자 <span class="text-red-500 font-bold">*</span>
+									</label>
+									<div class="flex-1 text-xs text-slate-600 font-medium bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-100 inline-block max-w-max">
+										관리자(neibis)
+									</div>
+								</div>
+
+								<hr class="border-slate-100">
+
+								<!-- 작성부서 -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-center">
+									<label for="regDept" class="text-xs font-bold text-slate-600 w-44 flex-shrink-0">작성부서</label>
+									<div class="flex-1">
+										<input type="text" name="regDept" id="regDept" placeholder="작성부서명을 입력해주세요." class="w-full max-w-[300px] border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Card 5: 메타정보 -->
+						<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+							<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+								<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+									<i class="fa-solid fa-tags text-slate-400"></i>
+									<span>메타정보</span>
+								</h3>
+							</div>
+							<div class="p-6 space-y-6">
+								<!-- 자료주제(테마) -->
+								<div class="flex flex-col lg:flex-row gap-2 lg:items-start">
+									<span class="text-xs font-bold text-slate-600 w-44 flex-shrink-0 pt-2">
+										자료주제(테마) <span class="text-red-500 font-bold">*</span>
+									</span>
+									<div class="flex-1">
+										<div class="flex flex-wrap gap-2.5 max-w-5xl">
+											<!-- 태그 리스트 (button 및 hidden input 구조로 변경하여 더블 클릭 및 페이지 에러 예방) -->
+											<button type="button" onclick="toggleTag(this, 'tag_nosagwan')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">노사관계</button>
+											<input type="checkbox" id="tag_nosagwan" name="searchMultiIemArrayHashTag" value="노사관계" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_danchegyo')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">단체교섭</button>
+											<input type="checkbox" id="tag_danchegyo" name="searchMultiIemArrayHashTag" value="단체교섭" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_insanomu')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">인사노무관리</button>
+											<input type="checkbox" id="tag_insanomu" name="searchMultiIemArrayHashTag" value="인사노무관리" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_galdeung')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">갈등관리</button>
+											<input type="checkbox" id="tag_galdeung" name="searchMultiIemArrayHashTag" value="갈등관리" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_jozigmun')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">조직문화</button>
+											<input type="checkbox" id="tag_jozigmun" name="searchMultiIemArrayHashTag" value="조직문화" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_leadership')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">리더십</button>
+											<input type="checkbox" id="tag_leadership" name="searchMultiIemArrayHashTag" value="리더십" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_sangsang')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">상생협력</button>
+											<input type="checkbox" id="tag_sangsang" name="searchMultiIemArrayHashTag" value="상생협력" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_nodongbup')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">노동법</button>
+											<input type="checkbox" id="tag_nodongbup" name="searchMultiIemArrayHashTag" value="노동법" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_nodongjung')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">노동정책</button>
+											<input type="checkbox" id="tag_nodongjung" name="searchMultiIemArrayHashTag" value="노동정책" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_workshop')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">워크숍</button>
+											<input type="checkbox" id="tag_workshop" name="searchMultiIemArrayHashTag" value="워크숍" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_gwonri')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">권리보호</button>
+											<input type="checkbox" id="tag_gwonri" name="searchMultiIemArrayHashTag" value="권리보호" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_cheongnyeon')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">청년고용</button>
+											<input type="checkbox" id="tag_cheongnyeon" name="searchMultiIemArrayHashTag" value="청년고용" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_platform')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">플랫폼노동</button>
+											<input type="checkbox" id="tag_platform" name="searchMultiIemArrayHashTag" value="플랫폼노동" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_jungso')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">중소사업장</button>
+											<input type="checkbox" id="tag_jungso" name="searchMultiIemArrayHashTag" value="중소사업장" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_jaehae')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">재해예방</button>
+											<input type="checkbox" id="tag_jaehae" name="searchMultiIemArrayHashTag" value="재해예방" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_gongmuwon')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">공무원</button>
+											<input type="checkbox" id="tag_gongmuwon" name="searchMultiIemArrayHashTag" value="공무원" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_gongmuzig')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">공무직</button>
+											<input type="checkbox" id="tag_gongmuzig" name="searchMultiIemArrayHashTag" value="공무직" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_gyoyuggong')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">교육공무원</button>
+											<input type="checkbox" id="tag_gyoyuggong" name="searchMultiIemArrayHashTag" value="교육공무원" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_gonggong')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">공공기관</button>
+											<input type="checkbox" id="tag_gonggong" name="searchMultiIemArrayHashTag" value="공공기관" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_cheongso')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">청소년/청년</button>
+											<input type="checkbox" id="tag_cheongso" name="searchMultiIemArrayHashTag" value="청소년/청년" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_gangsa')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">강사용성</button>
+											<input type="checkbox" id="tag_gangsa" name="searchMultiIemArrayHashTag" value="강사용성" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_online')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">온라인교육</button>
+											<input type="checkbox" id="tag_online" name="searchMultiIemArrayHashTag" value="온라인교육" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_sarye')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">사례해설</button>
+											<input type="checkbox" id="tag_sarye" name="searchMultiIemArrayHashTag" value="사례해설" class="hidden">
+
+											<button type="button" onclick="toggleTag(this, 'tag_goyong')" class="px-3.5 py-1.5 text-xs rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition font-medium">고용</button>
+											<input type="checkbox" id="tag_goyong" name="searchMultiIemArrayHashTag" value="고용" class="hidden">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Form Action Buttons -->
+						<div class="flex items-center justify-between">
+							<a href="untydata-list.html" class="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+								<i class="fa-solid fa-chevron-left text-[10px]"></i>
+								<span>목록</span>
+							</a>
+							
+							<div class="flex gap-2">
+								<button type="button" id="ai-agent-toggle" class="px-6 py-2.5 text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition flex items-center gap-1.5">
+									<i class="fa-solid fa-wand-magic-sparkles"></i>
+									<span>AI 에이전트</span>
+								</button>
+								<a href="untydata-list.html" class="px-6 py-2.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition">
+									취소
+								</a>
+								<button type="submit" class="px-6 py-2.5 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition shadow-md shadow-primary-500/10 flex items-center gap-1.5">
+									<i class="fa-solid fa-floppy-disk"></i>
+									<span>등록</span>
+								</button>
+							</div>
+						</div>
+					</form>
+				</main>
+
+				<!-- Footer Bar -->
+				<footer class="h-9 bg-white border-t border-slate-200 flex items-center justify-between px-6 text-[10px] text-slate-400 font-medium z-10 flex-shrink-0">
+					<span>NEIBIS 시스템 &copy; 2026. All rights reserved.</span>
+					<span>v2.4.1 · 행정서비스망</span>
+				</footer>
+			</div>
+		</div>
+
+		<script>
+			// 태그(자료주제) 온/오프 토글 함수
+			function toggleTag(btn, inputId) {
+				const input = document.getElementById(inputId);
+				if (!input) return;
+				
+				input.checked = !input.checked;
+				
+				if (input.checked) {
+					btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+					btn.classList.add('bg-primary-50', 'text-primary-600', 'border-primary-500');
+				} else {
+					btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+					btn.classList.remove('bg-primary-50', 'text-primary-600', 'border-primary-500');
+				}
+			}
+
+			// 1. 공개범위 설정 변경 시 현황에 반영
+			function updateScopeStatus() {
+				const container = document.getElementById('dataRlsScopeCdTextArea');
+				container.innerHTML = '';
+				
+				const scopes = [
+					{ id: 'insdDataRlsScopeCd_1', name: '전체공개', val: 1 },
+					{ id: 'insdDataRlsScopeCd_2', name: '제한공개(부서기반)', val: 2 },
+					{ id: 'insdDataRlsScopeCd_3', name: '제한공개(직원기반)', val: 3 }
+				];
+				
+				let checkedCount = 0;
+				scopes.forEach(scope => {
+					const el = document.getElementById(scope.id);
+					if (el && el.checked) {
+						checkedCount++;
+						const chip = document.createElement('span');
+						chip.className = 'inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 border border-primary-100 rounded-xl';
+						chip.id = `scope-status-item-${scope.val}`;
+						chip.innerHTML = `
+							<span>${scope.val === 1 ? '모두 공개' : scope.name}</span>
+							<button type="button" class="text-slate-400 hover:text-red-500 transition" onclick="removeScope(${scope.val})" title="삭제">
+								<i class="fa-solid fa-xmark text-[10px]"></i>
+							</button>
+						`;
+						container.appendChild(chip);
+					}
+				});
+				
+				if (checkedCount === 0) {
+					container.innerHTML = '<span class="text-xs text-slate-400">선택된 공개범위가 없습니다.</span>';
+				}
+			}
+
+			function removeScope(val) {
+				const el = document.getElementById(`insdDataRlsScopeCd_${val}`);
+				if (el) {
+					el.checked = false;
+					updateScopeStatus();
+				}
+			}
+
+			// 2. 대분류 변경 시 중분류/소분류 토글
+			function handleCategoryChange() {
+				const lclsf = document.getElementById('dataLclsfCd').value;
+				const mclsfArea = document.getElementById('dataMclsfCdArea');
+				const mclsfSelect = document.getElementById('dataMclsfCd');
+				const sclsfArea = document.getElementById('dataSclsfMltiplCdArea');
+
+				// Reset
+				mclsfSelect.innerHTML = '<option value="">중분류를 선택해주세요</option>';
+				sclsfArea.innerHTML = '';
+				mclsfArea.classList.add('hidden');
+				sclsfArea.classList.add('hidden');
+
+				if (!lclsf) return;
+
+				mclsfArea.classList.remove('hidden');
+
+				// 대분류에 따라 임시 중분류 생성 (데모 구현)
+				if (lclsf === '1') { // 교육자료
+					const options = [
+						{ val: '11', text: '기초노동법 교육' },
+						{ val: '12', text: '인사노무 실무' },
+						{ val: '13', text: '갈등 예방 교육' }
+					];
+					options.forEach(opt => {
+						const o = document.createElement('option');
+						o.value = opt.val;
+						o.textContent = opt.text;
+						mclsfSelect.appendChild(o);
+					});
+				} else if (lclsf === '3') { // 연구자료
+					const options = [
+						{ val: '31', text: '정책 연구보고서' },
+						{ val: '32', text: '동향 및 통계' }
+					];
+					options.forEach(opt => {
+						const o = document.createElement('option');
+						o.value = opt.val;
+						o.textContent = opt.text;
+						mclsfSelect.appendChild(o);
+					});
+				} else if (lclsf === '4') { // 홍보자료
+					const options = [
+						{ val: '41', text: '리플릿/브로슈어' },
+						{ val: '42', text: '홍보 영상' }
+					];
+					options.forEach(opt => {
+						const o = document.createElement('option');
+						o.value = opt.val;
+						o.textContent = opt.text;
+						mclsfSelect.appendChild(o);
+					});
+				}
+
+				// 중분류 선택에 따른 소분류 체크박스 표시 동작 설정
+				mclsfSelect.onchange = function() {
+					const mval = this.value;
+					sclsfArea.innerHTML = '';
+					
+					if (mval) {
+						sclsfArea.classList.remove('hidden');
+						// 임시 소분류 추가
+						const subs = ['기초 공통', '심화 트랙', '사례 분석', '일반 실무'];
+						subs.forEach((sub, idx) => {
+							const label = document.createElement('label');
+							label.className = 'flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-medium';
+							label.innerHTML = `
+								<input type="checkbox" name="dataSclsfMltiplCd" value="${mval}_${idx+1}" class="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+								<span>${sub}</span>
+							`;
+							sclsfArea.appendChild(label);
+						});
+					} else {
+						sclsfArea.classList.add('hidden');
+					}
+				};
+			}
+
+			// 3. 대상 전체 체크/해제
+			function toggleAllTargets(master) {
+				const chks = document.querySelectorAll('.target-chk');
+				chks.forEach(chk => {
+					chk.checked = master.checked;
+				});
+			}
+
+			// 4. 자료유형 라디오 선택 시 토글
+			function handleDataTypeChange(type) {
+				const urlArea = document.getElementById('urlAddrArea');
+				const movieArea = document.getElementById('movieArea');
+
+				urlArea.classList.add('hidden');
+				movieArea.classList.add('hidden');
+
+				if (type === 2 || type === 3) {
+					urlArea.classList.remove('hidden');
+				} else if (type === 4) {
+					movieArea.classList.remove('hidden');
+				}
+			}
+
+			// 5. 썸네일 여부 라디오 선택 시 토글
+			function handleThmbChange(val) {
+				const thmbArea = document.getElementById('thmbArea');
+				if (val === 'Y') {
+					thmbArea.classList.remove('hidden');
+				} else {
+					thmbArea.classList.add('hidden');
+				}
+			}
+
+			// 6. 에디터 탭 스위칭 스크립트
+			function switchEditorTab(mode) {
+				const btnCode = document.getElementById('tab-code');
+				const btnEditor = document.getElementById('		<!-- AI AGENT SLIDE PANEL -->
+		<div id="ai-agent-panel" class="fixed top-0 right-0 h-screen w-96 bg-white border-l border-slate-200 shadow-xl transform translate-x-full transition-transform duration-300 z-30 flex flex-col overflow-hidden">
+			<!-- Panel Header -->
+			<div class="bg-gradient-to-r from-purple-50 to-purple-100 border-b border-purple-200 px-6 py-4 flex items-center justify-between">
+				<div class="flex items-center gap-2">
+					<i class="fa-solid fa-wand-magic-sparkles text-purple-600 text-lg"></i>
+					<h3 class="text-sm font-bold text-slate-800">AI 에이전트</h3>
+				</div>
+				<button id="ai-agent-close" type="button" class="text-slate-400 hover:text-slate-600 transition" title="닫기">
+					<i class="fa-solid fa-xmark text-lg"></i>
+				</button>
+			</div>
+
+			<!-- Model Selection Section -->
+			<div class="border-b border-slate-200 px-4 py-3 bg-slate-50">
+				<div class="flex items-center gap-2 mb-2">
+					<i class="fa-solid fa-microchip text-purple-600 text-xs"></i>
+					<span class="text-[10px] font-semibold text-slate-600">로컬 AI 모델</span>
+				</div>
+				<select id="ai-model-select" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+					<option value="gemma4:e4b">🤖 Gemma4 e4b (추천) - 8.0B</option>
+					<option value="qwen2.5:7b">🧠 Qwen 2.5 - 7.6B</option>
+					<option value="llama3.2:3b">🦙 Llama 3.2 - 3.2B</option>
+					<option value="gemma4:31b-cloud">☁️ Gemma4 31b (클라우드)</option>
+				</select>
+				<div class="text-[9px] text-slate-500 mt-1.5 flex items-center gap-1">
+					<span id="ollama-status" class="inline-flex items-center gap-1">
+						<i class="fa-solid fa-circle text-red-500 text-[6px]"></i>
+						Ollama 연결 확인 중...
+					</span>
+				</div>
+			</div>
+
+			<!-- Panel Content -->
+			<div class="flex-1 overflow-y-auto p-4 space-y-3">
+
+				<!-- Accordion Item 1: 자동 요약 및 제목 생성 -->
+				<details class="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition">
+					<summary class="flex items-center justify-between px-4 py-3 bg-slate-50 group-open:bg-purple-50 cursor-pointer font-semibold text-xs text-slate-700 group-open:text-purple-700 transition">
+						<span class="flex items-center gap-2">
+							<i class="fa-solid fa-wand-magic-sparkles text-purple-700 group-open:text-purple-800 text-sm"></i>
+							자동 요약 및 제목 생성
+						</span>
+						<i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+					</summary>
+					<div class="p-4 border-t border-slate-100 space-y-3">
+						<p class="text-[11px] text-slate-500">내용을 작성하면 AI가 핵심 내용을 파악하여 클릭을 유도하는 매력적인 제목과 요약 문구를 자동으로 제안합니다.</p>
+						<button type="button" class="w-full px-3 py-2 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition flex items-center justify-center gap-2" id="generate-title-btn">
+							<i class="fa-solid fa-wand-magic-sparkles"></i>
+							<span>제목 및 요약 생성</span>
+						</button>
+
+						<!-- Result Preview Area -->
+						<div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+							<div class="text-[10px] font-semibold text-slate-600 flex items-center gap-1">
+								<i class="fa-solid fa-circle-check text-green-500"></i>
+								생성 결과
+							</div>
+
+							<!-- Title Result -->
+							<div class="bg-slate-50 rounded-lg p-3 space-y-1.5">
+								<label class="text-[10px] font-semibold text-slate-600">제목</label>
+								<textarea id="title-result-area" placeholder="제목이 생성됩니다..." class="w-full text-[11px] bg-white border border-slate-200 rounded px-2 py-1.5 resize-none h-12 focus:outline-none focus:ring-1 focus:ring-purple-500"></textarea>
+								<button type="button" id="apply-title-btn" class="w-full px-2 py-1 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">제목 적용</button>
+							</div>
+
+							<!-- Summary Result -->
+							<div class="bg-slate-50 rounded-lg p-3 space-y-1.5">
+								<label class="text-[10px] font-semibold text-slate-600">요약</label>
+								<textarea id="summary-result-area" placeholder="요약이 생성됩니다..." class="w-full text-[11px] bg-white border border-slate-200 rounded px-2 py-1.5 resize-none h-16 focus:outline-none focus:ring-1 focus:ring-purple-500"></textarea>
+								<button type="button" id="apply-summary-btn" class="w-full px-2 py-1 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">요약 적용</button>
+							</div>
+						</div>
+					</div>
+				</details>
+
+				<!-- Accordion Item 2: 문체 변환 및 교정 -->
+				<details class="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition">
+					<summary class="flex items-center justify-between px-4 py-3 bg-slate-50 group-open:bg-purple-50 cursor-pointer font-semibold text-xs text-slate-700 group-open:text-purple-700 transition">
+						<span class="flex items-center gap-2">
+							<i class="fa-solid fa-pen-fancy text-purple-600 group-open:text-purple-700"></i>
+							문체 변환 및 교정
+						</span>
+						<i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+					</summary>
+					<div class="p-4 border-t border-slate-100 space-y-3">
+						<p class="text-[11px] text-slate-500">초안을 대충 작성하더라도 공지사항에 어울리는 격식 있는 어조로 다듬어주고, 맞춤법·띄어쓰기·문법 오류를 실시간으로 교정합니다.</p>
+						<button type="button" class="w-full px-3 py-2 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition flex items-center justify-center gap-2" id="correct-style-btn">
+							<i class="fa-solid fa-pen-fancy"></i>
+							<span>문체 교정하기</span>
+						</button>
+
+						<!-- Result Preview Area -->
+						<div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+							<div class="text-[10px] font-semibold text-slate-600 flex items-center gap-1">
+								<i class="fa-solid fa-circle-check text-green-500"></i>
+								교정 결과
+							</div>
+
+							<!-- Corrected Content -->
+							<div class="bg-slate-50 rounded-lg p-3 space-y-1.5">
+								<div class="flex items-center justify-between gap-2 mb-1">
+									<label class="text-[10px] font-semibold text-slate-600">교정된 내용</label>
+									<span id="error-count-badge" class="text-[9px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">5개 오류 수정됨</span>
+								</div>
+								<textarea id="corrected-result-area" placeholder="교정된 내용이 표시됩니다..." class="w-full text-[11px] bg-white border border-slate-200 rounded px-2 py-1.5 resize-none h-20 focus:outline-none focus:ring-1 focus:ring-purple-500"></textarea>
+								<button type="button" id="apply-corrected-btn" class="w-full px-2 py-1 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">교정 내용 적용</button>
+							</div>
+						</div>
+					</div>
+				</details>
+
+				<!-- Accordion Item 3: 다국어 번역 -->
+				<details class="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition">
+					<summary class="flex items-center justify-between px-4 py-3 bg-slate-50 group-open:bg-purple-50 cursor-pointer font-semibold text-xs text-slate-700 group-open:text-purple-700 transition">
+						<span class="flex items-center gap-2">
+							<i class="fa-solid fa-globe text-purple-600 group-open:text-purple-700"></i>
+							다국어 번역
+						</span>
+						<i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+					</summary>
+					<div class="p-4 border-t border-slate-100 space-y-3">
+						<p class="text-[11px] text-slate-500">외국인 사용자나 다국적 환경을 고려하여 작성된 공지사항을 주요 외국어로 즉시 번역할 수 있습니다.</p>
+						<div class="grid grid-cols-2 gap-2">
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded transition" data-lang="en">🇬🇧 영문 번역</button>
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded transition" data-lang="zh">🇨🇳 중문 번역</button>
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded transition" data-lang="ja">🇯🇵 일문 번역</button>
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded transition" data-lang="es">🇪🇸 스페인어</button>
+						</div>
+
+						<!-- Result Preview Area -->
+						<div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+							<div class="text-[10px] font-semibold text-slate-600 flex items-center gap-1">
+								<i class="fa-solid fa-circle-check text-green-500"></i>
+								번역 결과
+							</div>
+
+							<!-- Translation Result -->
+							<div class="bg-slate-50 rounded-lg p-3 space-y-1.5">
+								<div class="flex items-center justify-between gap-2 mb-1">
+									<label class="text-[10px] font-semibold text-slate-600">
+										<span id="translation-lang">선택된 언어</span> 번역
+									</label>
+									<span class="text-[9px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded" id="translation-status">번역 대기 중</span>
+								</div>
+								<textarea placeholder="번역된 내용이 표시됩니다..." class="w-full text-[11px] bg-white border border-slate-200 rounded px-2 py-1.5 resize-none h-20 focus:outline-none focus:ring-1 focus:ring-purple-500" id="translation-result"></textarea>
+								<button type="button" class="w-full px-2 py-1 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition" id="apply-translation">번역 내용 적용</button>
+							</div>
+
+							<!-- Translation Info -->
+							<div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-[9px] text-blue-700">
+								<i class="fa-solid fa-info-circle mr-1"></i>
+								번역된 내용은 새 탭에 적용됩니다.
+							</div>
+						</div>
+					</div>
+				</details>
+
+			</div>
+
+			<!-- Panel Footer -->
+			<div class="border-t border-slate-200 bg-slate-50 p-4">
+				<p class="text-[10px] text-slate-500 text-center">AI 에이전트 기능은 작성 중에도<br/>언제든지 사용할 수 있습니다.</p>
+			</div>
+		</div>� 내용을 파악하여 클릭을 유도하는 매력적인 제목과 요약 문구를 자동으로 제안합니다.</p>
+						<button type="button" class="w-full px-3 py-2 text-xs font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition">제목 및 요약 생성</button>
+					</div>
+				</details>
+
+				<!-- Accordion Item 2: 문체 변환 및 교정 -->
+				<details class="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition">
+					<summary class="flex items-center justify-between px-4 py-3 bg-slate-50 group-open:bg-purple-50 cursor-pointer font-semibold text-xs text-slate-700 group-open:text-purple-700 transition">
+						<span class="flex items-center gap-2">
+							<i class="fa-solid fa-pen-fancy text-slate-400 group-open:text-purple-500"></i>
+							문체 변환 및 교정
+						</span>
+						<i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+					</summary>
+					<div class="p-4 border-t border-slate-100 space-y-3">
+						<p class="text-[11px] text-slate-500">초안을 대충 작성하더라도 공지사항에 어울리는 격식 있는 어조로 다듬어주고, 맞춤법·띄어쓰기·문법 오류를 실시간으로 교정합니다.</p>
+						<button type="button" class="w-full px-3 py-2 text-xs font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition">문체 교정하기</button>
+					</div>
+				</details>
+
+				<!-- Accordion Item 3: 다국어 번역 -->
+				<details class="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition">
+					<summary class="flex items-center justify-between px-4 py-3 bg-slate-50 group-open:bg-purple-50 cursor-pointer font-semibold text-xs text-slate-700 group-open:text-purple-700 transition">
+						<span class="flex items-center gap-2">
+							<i class="fa-solid fa-globe text-slate-400 group-open:text-purple-500"></i>
+							다국어 번역
+						</span>
+						<i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+					</summary>
+					<div class="p-4 border-t border-slate-100 space-y-3">
+						<p class="text-[11px] text-slate-500">외국인 사용자나 다국적 환경을 고려하여 작성된 자료를 주요 외국어로 즉시 번역할 수 있습니다.</p>
+						<div class="grid grid-cols-2 gap-2">
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">영문 번역</button>
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">중문 번역</button>
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">일문 번역</button>
+							<button type="button" class="px-2 py-1.5 text-[10px] font-semibold text-purple-600 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition">스페인어</button>
+						</div>
+					</div>
+				</details>
+
+			</div>
+
+			<!-- Panel Footer -->
+			<div class="border-t border-slate-200 bg-slate-50 p-4">
+				<p class="text-[10px] text-slate-500 text-center">AI 에이전트 기능은 작성 중에도<br/>언제든지 사용할 수 있습니다.</p>
+			</div>
+		</div>
+
+		<!-- Overlay Background -->
+		<div id="ai-agent-overlay" class="fixed inset-0 bg-black/30 transform opacity-0 pointer-events-none transition-opacity duration-300 z-20"></div>
+	</body>
+</html>

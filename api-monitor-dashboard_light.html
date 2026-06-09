@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<meta name="format-detection" content="telephone=no" />
+<title id="neibisTopTitle">사이트별 운영관리 | 한국고용정보원-국문 | API Monitor</title>
+
+<!-- Google Fonts for modern look -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- FontAwesome (Icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<!-- Tailwind CSS (Strictly allowed per Rule) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+	tailwind.config = {
+		theme: {
+			extend: {
+				fontFamily: {
+					sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+					mono: ['IBM Plex Mono', 'monospace'],
+				},
+				colors: {
+					primary: {
+						50: '#f0f5ff',
+						100: '#e0ebff',
+						500: '#2563eb',
+						600: '#1d4ed8',
+						700: '#1e40af',
+					},
+					sidebar: {
+						bg: '#ffffff',
+						hover: '#f3f4f6',
+						active: '#eff6ff',
+						text: '#374151',
+						textMuted: '#9ca3af',
+						border: '#e5e7eb',
+					}
+				}
+			}
+		}
+	}
+</script>
+
+<style>
+:root {
+  --bg-base: #f8fafc;
+  --bg-panel: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #f8fafc;
+  --bg-input: #f1f5f9;
+  --border: #e2e8f0;
+  --border-mid: #cbd5e1;
+  --border-accent: #94a3b8;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-dim: #94a3b8;
+  --accent-blue: #2563eb;
+  --accent-blue-dim: rgba(37,99,235,0.08);
+  --accent-blue-glow: rgba(37,99,235,0.2);
+  --ok: #16a34a;
+  --ok-dim: rgba(22,163,74,0.08);
+  --ok-border: rgba(22,163,74,0.25);
+  --warn: #d97706;
+  --warn-dim: rgba(217,119,6,0.08);
+  --warn-border: rgba(217,119,6,0.25);
+  --err: #dc2626;
+  --err-dim: rgba(220,38,38,0.08);
+  --err-border: rgba(220,38,38,0.25);
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-sans: 'Inter', 'Noto Sans KR', sans-serif;
+}
+
+/* Custom Premium Styles and Micro-animations */
+body {
+	font-family: 'Inter', 'Noto Sans KR', sans-serif;
+	background-color: #f8fafc;
+}
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+::-webkit-scrollbar-track {
+	background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+	background: #cbd5e1;
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #94a3b8;
+}
+
+/* ── Content ── */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Alert Banner ── */
+.alert-row { display: flex; flex-direction: column; gap: 6px; }
+.alert-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 8px;
+  font-size: 12px; border: 1px solid;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+.alert-item.err { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+.alert-item.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+.alert-tag {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+}
+.alert-item.err .alert-tag { background: var(--err); color: #fff; }
+.alert-item.warn .alert-tag { background: var(--warn); color: #000; }
+.alert-text { flex: 1; }
+.alert-time { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+.alert-close {
+  width: 20px; height: 20px; border-radius: 4px; border: none;
+  background: rgba(0,0,0,0.04); color: var(--text-secondary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.alert-close:hover { background: rgba(0,0,0,0.06); }
+
+/* ── Metric Cards ── */
+.metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.metric-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px 24px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.metric-card:hover { border-color: var(--border-mid); transform: translateY(-2px); }
+.metric-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+}
+.metric-card.ok::before { background: var(--ok); }
+.metric-card.err::before { background: var(--err); }
+.metric-card.warn::before { background: var(--warn); }
+.metric-card.blue::before { background: var(--accent-blue); }
+.metric-label {
+  font-size: 11px; color: var(--text-secondary); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+}
+.metric-value {
+  font-family: var(--font-mono); font-size: 28px; font-weight: 700;
+  line-height: 1; margin-bottom: 6px;
+}
+.metric-card.ok .metric-value { color: var(--ok); }
+.metric-card.err .metric-value { color: var(--err); }
+.metric-card.warn .metric-value { color: var(--warn); }
+.metric-card.blue .metric-value { color: var(--accent-blue); }
+.metric-unit { font-size: 14px; font-weight: 400; }
+.metric-sub { font-size: 11px; color: var(--text-dim); }
+.metric-delta { font-size: 11px; }
+.metric-delta.up { color: var(--err); }
+.metric-delta.dn { color: var(--ok); }
+
+/* ── Grid Layouts ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+/* ── Panel ── */
+.panel {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+.panel-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+}
+.panel-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.panel-sub { font-size: 11px; color: var(--text-secondary); margin-left: auto; }
+.panel-body { padding: 0; }
+
+/* ── API Table ── */
+.api-table { width: 100%; border-collapse: collapse; }
+.api-table th {
+  font-family: var(--font-sans); font-size: 11px; font-weight: 700;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 12px 24px; text-align: left;
+  border-bottom: 1px solid var(--border); background: #f8fafc;
+}
+.api-table td {
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--text-primary); vertical-align: middle;
+}
+.api-table tr:last-child td { border-bottom: none; }
+.api-table tr { transition: background 0.1s; cursor: pointer; }
+.api-table tr:hover td { background: var(--bg-hover); }
+
+.api-name { font-weight: 600; color: #1e293b; }
+.api-org { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 9999px; border: 1px solid;
+}
+.status-badge.ok { background: var(--ok-dim); color: var(--ok); border-color: var(--ok-border); }
+.status-badge.warn { background: var(--warn-dim); color: var(--warn); border-color: var(--warn-border); }
+.status-badge.err { background: var(--err-dim); color: var(--err); border-color: var(--err-border); }
+.status-badge .sdot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.status-badge.ok .sdot { animation: pulse 2s infinite; }
+
+.resp-ok { font-family: var(--font-mono); font-size: 12px; color: var(--ok); font-weight: 600; }
+.resp-warn { font-family: var(--font-mono); font-size: 12px; color: var(--warn); font-weight: 600; }
+.resp-err { font-family: var(--font-mono); font-size: 12px; color: var(--err); font-weight: 600; }
+
+.sparkbar-wrap { display: flex; align-items: center; gap: 8px; }
+.sparkbar-bg {
+  flex: 1; height: 6px; background: #e2e8f0;
+  border-radius: 3px; overflow: hidden;
+}
+.sparkbar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+.sparkbar-fill.ok { background: var(--ok); }
+.sparkbar-fill.warn { background: var(--warn); }
+.sparkbar-fill.err { background: var(--err); }
+.sparkbar-pct { font-family: var(--font-mono); font-size: 11px; min-width: 36px; text-align: right; font-weight: 600; }
+
+.mini-sparkline { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+.spark-bar { width: 4px; border-radius: 2px; background: var(--accent-blue); opacity: 0.6; flex-shrink: 0; }
+.spark-bar:last-child { opacity: 1; }
+
+.since { font-family: var(--font-sans); font-size: 12px; color: var(--text-secondary); }
+
+/* ── Chart Panel ── */
+.chart-wrap { position: relative; padding: 16px 24px; }
+
+/* ── Log Panel ── */
+.log-list { display: flex; flex-direction: column; }
+.log-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 24px; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.log-item:last-child { border-bottom: none; }
+.log-lv {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+}
+.log-lv.err { background: var(--err-dim); color: var(--err); border: 1px solid var(--err-border); }
+.log-lv.warn { background: var(--warn-dim); color: var(--warn); border: 1px solid var(--warn-border); }
+.log-lv.info { background: var(--accent-blue-dim); color: var(--accent-blue); border: 1px solid var(--accent-blue-glow); }
+.log-lv.ok { background: var(--ok-dim); color: var(--ok); border: 1px solid var(--ok-border); }
+.log-body { flex: 1; }
+.log-msg { color: var(--text-primary); font-weight: 500; }
+.log-detail { color: var(--text-secondary); font-size: 11px; margin-top: 4px; font-family: var(--font-mono); }
+.log-ts { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); flex-shrink: 0; white-space: nowrap; }
+
+/* ── Server Panel ── */
+.server-list { display: flex; flex-direction: column; gap: 0; }
+.server-item {
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+}
+.server-item:last-child { border-bottom: none; }
+.server-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.server-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+.server-pct { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+.server-pct.ok { color: var(--ok); }
+.server-pct.warn { color: var(--warn); }
+.server-pct.err { color: var(--err); }
+.resource-bar { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+.resource-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+/* ── Alert Settings ── */
+.alert-settings { padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.alert-rule {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 12px;
+  background: #f8fafc; border: 1px solid var(--border);
+}
+.alert-rule-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.alert-rule-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.toggle {
+  width: 38px; height: 22px; border-radius: 99px;
+  background: var(--ok); flex-shrink: 0; cursor: pointer;
+  position: relative; border: none; transition: background 0.2s;
+}
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transition: transform 0.2s;
+}
+.toggle.off { background: #cbd5e1; }
+.toggle.off::after { transform: translateX(0); }
+.toggle.on::after { transform: translateX(16px); }
+
+/* ── Detail Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--bg-card); border: 1px solid var(--border-mid);
+  border-radius: 16px; width: 560px; max-height: 85vh;
+  overflow-y: auto; transform: translateY(8px);
+  transition: transform 0.2s;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.modal-close {
+  width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+.modal-body { padding: 24px; }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.modal-stat {
+  background: #f8fafc; border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+}
+.modal-stat-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; }
+.modal-stat-value { font-family: var(--font-mono); font-size: 18px; font-weight: 700; }
+.modal-section-label {
+  font-family: var(--font-sans); font-size: 11px; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; font-weight: 700;
+}
+.modal-chart-wrap { position: relative; height: 160px; }
+
+/* ── API Register Page ── */
+.apreg-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+.apreg-form-wrap { display: flex; flex-direction: column; gap: 24px; }
+
+.form-section { padding: 20px 24px; }
+.form-section-title {
+  font-size: 13px; font-weight: 700; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.form-section-title svg { width: 14px; height: 14px; stroke: var(--accent-blue); fill: none; stroke-width: 2.5; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.full { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 12px; font-weight: 700; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 4px;
+}
+.form-label .req { color: var(--err); font-size: 12px; }
+.form-label .tip {
+  font-size: 10px; font-weight: 400; color: var(--text-dim);
+  background: var(--bg-hover); padding: 1px 5px; border-radius: 4px;
+  margin-left: 4px;
+}
+.form-input {
+  padding: 10px 14px; border: 1px solid var(--border-mid);
+  border-radius: 8px; font-family: var(--font-sans);
+  font-size: 13px; color: var(--text-primary);
+  background: var(--bg-card); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.form-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.form-input::placeholder { color: var(--text-dim); }
+.form-input.mono { font-family: var(--font-mono); font-size: 12px; }
+.form-select {
+  padding: 10px 32px 10px 14px; border: 1px solid var(--border-mid);
+  border-radius: 8px; font-family: var(--font-sans);
+  font-size: 13px; color: var(--text-primary);
+  background: var(--bg-card); outline: none;
+  appearance: none; width: 100%; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+.form-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); outline: none; }
+
+.form-textarea {
+  padding: 10px 14px; border: 1px solid var(--border-mid);
+  border-radius: 8px; font-family: var(--font-mono);
+  font-size: 12px; color: var(--text-primary);
+  background: var(--bg-card); outline: none; resize: vertical;
+  width: 100%; min-height: 80px; line-height: 1.6;
+}
+.form-textarea:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+.form-input-group { display: flex; gap: 6px; }
+.form-input-group .form-input { flex: 1; }
+.form-input-group .form-select { flex: 0 0 90px; }
+
+.form-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; line-height: 1.4; }
+
+.form-check-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.form-check-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent-blue); cursor: pointer; }
+.form-check-label { font-size: 12px; color: var(--text-primary); cursor: pointer; font-weight: 500; }
+.form-check-sub { font-size: 11px; color: var(--text-dim); }
+
+.form-divider { border: none; border-top: 1px solid var(--border); margin: 6px 0; }
+
+.form-actions {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  background: #f8fafc;
+}
+.form-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 8px;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 700;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.form-btn svg { width: 14px; height: 14px; }
+.form-btn.primary { background: var(--accent-blue); color: #fff; }
+.form-btn.primary:hover { background: #1d4ed8; }
+.form-btn.primary svg { stroke: #fff; fill: none; stroke-width: 2.5; }
+.form-btn.secondary { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-mid); }
+.form-btn.secondary:hover { background: var(--bg-hover); color: var(--text-primary); }
+.form-btn.secondary svg { stroke: var(--text-secondary); fill: none; stroke-width: 2.5; }
+.form-btn.test { background: #f0fdf4; color: var(--ok); border: 1px solid var(--ok-border); }
+.form-btn.test:hover { background: #dcfce7; }
+.form-btn.test svg { stroke: var(--ok); fill: none; stroke-width: 2.5; }
+.form-btn.danger { background: #fef2f2; color: var(--err); border: 1px solid var(--err-border); }
+.form-btn.danger:hover { background: #fee2e2; }
+.form-btn.danger svg { stroke: var(--err); fill: none; stroke-width: 2.5; }
+
+/* Test result banner */
+.test-result {
+  margin: 0 24px 16px; padding: 12px 16px;
+  border-radius: 8px; font-size: 12px;
+  display: none; align-items: center; gap: 10px;
+  border: 1px solid;
+}
+.test-result.show { display: flex; animation: slideIn 0.25s ease; }
+.test-result.ok { background: #f0fdf4; border-color: var(--ok-border); color: var(--ok); }
+.test-result.err { background: #fef2f2; border-color: var(--err-border); color: var(--err); }
+.test-result svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; flex-shrink: 0; }
+.test-result-detail { flex: 1; line-height: 1.5; font-weight: 500; }
+.test-result-ms { font-family: var(--font-mono); font-weight: 700; margin-left: auto; flex-shrink: 0; }
+
+/* Registered list (right panel) */
+.apreg-list { display: flex; flex-direction: column; gap: 16px; }
+.apreg-list-header {
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.apreg-list-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.apreg-list-cnt {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  background: var(--accent-blue-dim); color: var(--accent-blue);
+  padding: 2px 10px; border-radius: 9999px;
+}
+.apreg-item {
+  display: flex; flex-direction: column; gap: 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s; cursor: pointer;
+}
+.apreg-item:last-child { border-bottom: none; }
+.apreg-item:hover { background: var(--bg-hover); }
+.apreg-item-main { display: flex; align-items: center; gap: 10px; padding: 14px 24px 8px; }
+.apreg-item-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.apreg-item-dot.ok { background: var(--ok); }
+.apreg-item-dot.warn { background: var(--warn); }
+.apreg-item-dot.err { background: var(--err); }
+.apreg-item-info { flex: 1; min-width: 0; }
+.apreg-item-name { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.apreg-item-org { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.apreg-item-meta { display: flex; align-items: center; gap: 14px; padding: 0 24px 14px 42px; }
+.apreg-item-type {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  padding: 1px 7px; border-radius: 4px;
+  background: var(--accent-blue-dim); color: var(--accent-blue);
+}
+.apreg-item-url { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.apreg-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.apreg-action-btn {
+  font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-secondary); cursor: pointer; transition: all 0.12s;
+}
+.apreg-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.apreg-action-btn.del:hover { background: #fef2f2; color: var(--err); border-color: var(--err-border); }
+
+/* Sidebar Collapsed State Styles */
+#sidebar.collapsed {
+	width: 4rem; /* w-16 */
+}
+#sidebar.collapsed .logo-text,
+#sidebar.collapsed .toolbar button:not(#sidebar-toggle),
+#sidebar.collapsed hr,
+#sidebar.collapsed .px-3.mb-2,
+#sidebar.collapsed span,
+#sidebar.collapsed p,
+#sidebar.collapsed select,
+#sidebar.collapsed input,
+#sidebar.collapsed button:not(#sidebar-toggle),
+#sidebar.collapsed details ul,
+#sidebar.collapsed ul ul,
+#sidebar.collapsed details summary i.fa-chevron-down,
+#sidebar.collapsed .flex-1.overflow-y-auto > div:first-child, /* 즐겨찾기 영역 */
+#sidebar.collapsed .flex-1.overflow-y-auto > div:nth-child(3) > div:first-child { /* 메뉴 탐색 타이틀 */
+	display: none !important;
+}
+#sidebar.collapsed .sidebar-header {
+	justify-content: center;
+	padding: 1.25rem 0.5rem;
+}
+#sidebar.collapsed .sidebar-header a {
+	justify-content: center;
+}
+#sidebar.collapsed nav a, 
+#sidebar.collapsed nav summary,
+#sidebar.collapsed .flex-1.overflow-y-auto a,
+#sidebar.collapsed .flex-1.overflow-y-auto summary {
+	justify-content: center;
+	padding-left: 0;
+	padding-right: 0;
+}
+#sidebar.collapsed .flex-1.overflow-y-auto li a i {
+	margin-right: 0 !important;
+}
+#sidebar.collapsed div.p-4.border-t {
+	padding: 1rem 0.5rem;
+	justify-content: center;
+}
+#sidebar.collapsed div.p-4.border-t .flex {
+	justify-content: center;
+}
+</style>
+</head>
+<body class="overflow-hidden">
+
+		<!-- Main Layout Shell -->
+		<div class="flex h-screen w-screen bg-slate-50 text-slate-800">
+			
+			<!-- SIDEBAR -->
+			<aside id="sidebar" class="w-64 bg-sidebar-bg border-r border-sidebar-border flex flex-col flex-shrink-0 z-20 transition-all duration-300">
+				<!-- Sidebar Header -->
+				<div class="sidebar-header p-5 border-b border-sidebar-border flex items-center justify-between">
+					<a href="#" class="flex items-center gap-2">
+						<img src="img-logo.png" alt="로고" class="h-6 object-contain" />
+						<span class="logo-text text-sm font-semibold text-slate-700 tracking-wide">관리시스템</span>
+					</a>
+					<button type="button" id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition" title="메뉴 접기">
+						<i class="fa-solid fa-angles-left text-xs"></i>
+					</button>
+				</div>
+
+				<!-- Sidebar Content -->
+				<div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+					<!-- Favorites -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-star text-amber-400"></i>
+							<span>즐겨찾기</span>
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="#" class="flex items-center px-3 py-2 text-xs font-medium text-slate-600 hover:bg-sidebar-hover rounded-lg transition">
+									팝업/배너 관리 &gt; 프로모션 영역 관리
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- GNB Menu -->
+					<div>
+						<div class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+							메뉴 탐색
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-line w-5 text-center text-slate-400"></i>
+									<span>대시보드</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-sliders w-5 text-center text-slate-400"></i>
+											<span>운영</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">웹콘텐츠 관리</a></li>
+										<li>
+											<details class="group">
+												<summary class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>팝업/배너 관리</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">프로모션 영역 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">레이어 팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업존 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">설문조사 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">조직 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">일정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-laptop-code w-5 text-center text-slate-400"></i>
+									<span>시스템</span>
+								</a>
+							</li>
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 bg-sidebar-active text-primary-600 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-desktop w-5 text-center text-primary-500"></i>
+											<span>API Monitor</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="javascript:void(0)" id="menu-overview" onclick="setTab(this, 'overview')" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">전체현황</a></li>
+										<li><a href="javascript:void(0)" id="menu-traffic" onclick="setTab(this, 'traffic')" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">트래픽 분석</a></li>
+										<li><a href="javascript:void(0)" id="menu-log" onclick="setTab(this, 'log')" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">장애이력</a></li>
+										<li><a href="javascript:void(0)" id="menu-alert" onclick="setTab(this, 'alert')" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">알림 설정</a></li>
+										<li><a href="javascript:void(0)" id="menu-apiregister" onclick="setTab(this, 'apiregister')" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">API 등록</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-robot w-5 text-center text-slate-400"></i>
+											<span>Chatbot 관리</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="chatbot-dashboard.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">실시간 통계</a></li>
+										<li><a href="chatbot-settings.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 설정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
+									<span>로그</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
+									<span>통계</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- Site Management Section -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-globe"></i>
+							<span>사이트 관리</span>
+						</div>
+						<div class="px-3 mb-2">
+							<div class="relative">
+								<input type="text" placeholder="사이트 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition">
+								<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[10px] text-slate-400"></i>
+							</div>
+						</div>
+						<ul class="space-y-1 ml-2 text-xs">
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between px-3 py-1.5 text-slate-700 hover:bg-sidebar-hover rounded-lg cursor-pointer list-none font-medium">
+										<span class="truncate">한국고용정보원-국문</span>
+										<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+										<li>
+											<details open class="group">
+												<summary class="flex items-center justify-between px-2 py-1 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>테스트 메뉴</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-400 border-l border-slate-100 pl-2">
+													<li><a href="api-monitor-dashboard.html" class="block px-2 py-1 hover:text-slate-900 rounded">게시판 - 일반형(기본)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(민원)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(답글)</a></li>
+													<li><a href="untydata-list.html" class="block px-2 py-1 hover:text-slate-900">자료 통합 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">지능형 공문서 검색</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">FX 이슈노트</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">환위험관리 가이드</a></li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<!-- Sidebar Footer User Profile -->
+				<div class="p-4 border-t border-sidebar-border bg-slate-50/50">
+					<div class="flex items-center gap-3">
+						<div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-semibold shadow-inner">
+							<i class="fa-solid fa-user-tie"></i>
+						</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-semibold text-slate-800 truncate">홍길동</p>
+							<p class="text-xs text-slate-400 truncate">시스템관리자</p>
+						</div>
+						<div class="text-right">
+							<span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">60:00</span>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-2 mt-4">
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="시간연장">
+							<i class="fa-solid fa-clock-rotate-left text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">연장</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="정보수정">
+							<i class="fa-solid fa-user-gear text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">정보수정</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600 transition" title="로그아웃">
+							<i class="fa-solid fa-power-off text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">로그아웃</span>
+						</button>
+					</div>
+				</div>
+			</aside>
+
+			<!-- MAIN CONTENT AREA -->
+			<div class="flex-1 flex flex-col overflow-hidden">
+				
+				<!-- Header (Topbar) -->
+				<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+					<div class="flex items-center gap-4">
+						<button class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" onclick="history.back(); return false;">
+							<i class="fa-solid fa-arrow-left"></i>
+						</button>
+						<div class="flex flex-col">
+							<!-- Breadcrumb -->
+							<ol class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+								<li>사이트별 운영관리</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>한국고용정보원-국문</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>테스트 메뉴</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>API Monitor</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li id="breadcrumb-last" class="text-slate-600 font-semibold">전체 현황</li>
+							</ol>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-4">
+						<!-- Timer / Status Info -->
+						<div class="text-xs text-slate-400 font-medium flex items-center gap-3">
+							<span class="flex items-center gap-1.5">
+								<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+								<span class="text-slate-600 font-semibold">시스템 정상</span>
+							</span>
+							<span class="text-slate-300">|</span>
+							<span>갱신: <span id="clock" class="text-slate-600 font-mono font-semibold">--:--:--</span></span>
+						</div>
+
+						<div class="h-5 w-px bg-slate-200"></div>
+
+						<div class="flex items-center gap-1.5">
+							<div class="tab-group flex rounded-lg border border-slate-200 p-0.5 bg-slate-100 text-xs" id="time-range">
+								<button class="tab-btn px-2.5 py-1 text-slate-600 rounded-md hover:text-slate-900 transition active bg-white shadow-sm font-semibold">1시간</button>
+								<button class="tab-btn px-2.5 py-1 text-slate-600 rounded-md hover:text-slate-900 transition">6시간</button>
+								<button class="tab-btn px-2.5 py-1 text-slate-600 rounded-md hover:text-slate-900 transition">24시간</button>
+							</div>
+						</div>
+					</div>
+				</header>
+
+				<!-- Scrollable Content Body -->
+				<main class="flex-1 overflow-y-auto p-6 space-y-6" id="main-content">
+					<!-- Injected by JS -->
+				</main>
+
+    <!-- Footer -->
+    <footer class="h-9 bg-white border-t border-slate-200 flex items-center justify-between px-6 text-[10px] text-slate-400 font-medium z-10 flex-shrink-0">
+      <div class="flex items-center gap-6">
+        <span>수집주기: <strong class="text-slate-600">30s</strong></span>
+        <span>타임아웃 임계: <strong class="text-slate-600">3,000ms</strong></span>
+        <span>지연 임계: <strong class="text-slate-600">800ms</strong></span>
+        <span>오늘 총 호출: <strong class="text-slate-600" id="total-calls">0</strong></span>
+      </div>
+      <span>v2.4.1 · 행정서비스망</span>
+    </footer>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">API 상세</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* ── Data ── */
+const APIS = [
+  { id:1, org:'행정안전부', name:'주민등록 진위확인', type:'REST', status:'err', resp:null, suc:34, calls:[120,98,110,95,30,12,8,0,0,0], sla:99.5 },
+  { id:2, org:'국세청', name:'사업자등록 조회', type:'REST', status:'err', resp:503, suc:0, calls:[200,210,195,188,50,0,0,0,0,0], sla:99.0 },
+  { id:3, org:'금융결제원', name:'계좌실명 인증', type:'REST', status:'warn', resp:1240, suc:91, calls:[150,155,160,162,158,155,148,152,159,161], sla:99.9 },
+  { id:4, org:'건강보험공단', name:'자격 조회', type:'SOAP', status:'warn', resp:980, suc:88, calls:[80,82,79,85,83,81,78,84,80,82], sla:99.5 },
+  { id:5, org:'법원행정처', name:'등기부등본 열람', type:'REST', status:'ok', resp:218, suc:99, calls:[60,58,62,61,59,63,60,61,62,60], sla:98.0 },
+  { id:6, org:'행정안전부', name:'도로명주소 API', type:'REST', status:'ok', resp:143, suc:100, calls:[300,310,298,305,312,308,295,302,309,307], sla:99.5 },
+  { id:7, org:'고용노동부', name:'고용보험 자격', type:'SOAP', status:'ok', resp:305, suc:98, calls:[45,48,44,47,46,45,48,44,47,46], sla:98.0 },
+  { id:8, org:'국민연금공단', name:'가입자 확인', type:'REST', status:'ok', resp:271, suc:99, calls:[90,92,88,91,93,90,88,91,92,90], sla:99.0 },
+  { id:9, org:'조달청', name:'입찰정보 조회', type:'REST', status:'ok', resp:388, suc:97, calls:[120,118,122,119,121,120,118,122,119,121], sla:97.0 },
+  { id:10, org:'기상청', name:'기상특보 정보', type:'REST', status:'ok', resp:92, suc:100, calls:[200,205,198,202,206,201,199,203,204,200], sla:95.0 },
+  { id:11, org:'교육부', name:'학력조회 서비스', type:'SOAP', status:'ok', resp:445, suc:96, calls:[30,32,29,31,30,28,32,31,29,30], sla:97.0 },
+  { id:12, org:'병무청', name:'병역사항 조회', type:'REST', status:'ok', resp:330, suc:99, calls:[25,24,26,25,23,26,24,25,26,25], sla:99.0 },
+  { id:13, org:'공정거래위원회', name:'사업자정보 조회', type:'REST', status:'ok', resp:512, suc:95, calls:[40,42,38,41,40,39,42,40,41,40], sla:97.0 },
+];
+
+const LOGS = [
+  { ts:'14:22:03', lv:'err', msg:'국세청 사업자등록 조회 HTTP 503', detail:'Service Unavailable — 유지보수 공지 미수신, 담당자 즉시 연락 요망' },
+  { ts:'14:18:41', lv:'err', msg:'주민등록 진위확인 연결 Timeout (30s)', detail:'3회 재시도 모두 실패 — IP: 210.94.13.22 → 담당자 SMS 발송 완료' },
+  { ts:'13:55:20', lv:'warn', msg:'금융결제원 계좌실명 인증 응답 지연 1,240ms', detail:'SLA 기준 800ms 초과 — 최근 15분 평균 1,190ms 지속 중' },
+  { ts:'13:45:08', lv:'warn', msg:'건강보험공단 자격조회 응답 980ms', detail:'피크타임 영향 추정 — 13:30 이후 지속 상승 중' },
+  { ts:'11:32:17', lv:'ok', msg:'건강보험공단 정상 복구', detail:'장애 지속 22분 → 정상화 확인. 원인: 내부 DB 쿼리 최적화 작업' },
+  { ts:'11:08:44', lv:'err', msg:'건강보험공단 Connection Refused', detail:'Port 443 응답 없음 — 기관 측 계획 외 재시작으로 추후 확인됨' },
+  { ts:'10:15:33', lv:'info', msg:'도로명주소 API 인증키 갱신', detail:'만료 30일 전 자동 갱신 완료 — 새 키 적용 완료' },
+  { ts:'09:01:00', lv:'info', msg:'일일 모니터링 초기화', detail:'수집 주기 30s, 대상 API 13개, 알림 채널 정상 확인' },
+];
+
+/* ── State ── */
+let currentTab = 'overview';
+let trafficChart = null;
+let respChart = null;
+let tickInterval = null;
+let simData = {
+  traffic: Array.from({length:24}, (_,i) => Math.floor(Math.random()*200+100)),
+  resp: Array.from({length:24}, () => Math.floor(Math.random()*300+150)),
+};
+
+/* ── Clock ── */
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('ko-KR');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── Tab ── */
+function setTab(el, tab) {
+  // 1. 모든 GNB API Monitor 서브메뉴 활성화 스타일 해제
+  const menuIds = ['overview', 'traffic', 'log', 'alert', 'apiregister'];
+  menuIds.forEach(id => {
+    const menuEl = document.getElementById('menu-' + id);
+    if (menuEl) {
+      menuEl.className = "block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition";
+    }
+  });
+
+  // 2. 현재 활성화된 탭 메뉴에 active 스타일 적용
+  let targetEl = el;
+  if (!targetEl && typeof tab === 'string') {
+    targetEl = document.getElementById('menu-' + tab);
+  }
+  if (targetEl) {
+    targetEl.className = "block px-3 py-1.5 text-xs text-primary-600 bg-primary-50 font-semibold rounded";
+  }
+
+  currentTab = tab;
+  const titles = { overview:'전체 현황', traffic:'트래픽 분석', log:'장애 이력', alert:'알림 설정', apiregister:'API 등록' };
+  
+  // Breadcrumb의 마지막 항목 갱신
+  const breadcrumbLast = document.getElementById('breadcrumb-last');
+  if (breadcrumbLast) {
+    breadcrumbLast.textContent = titles[tab] || tab;
+  }
+
+  render();
+}
+
+/* ── Helpers ── */
+function statusBadge(s) {
+  const map = { ok:['OK','ok'], warn:['WARN','warn'], err:['ERROR','err'] };
+  const [label, cls] = map[s]||['?',''];
+  return `<span class="status-badge ${cls}"><span class="sdot"></span>${label}</span>`;
+}
+
+function respDisplay(api) {
+  if (api.resp === null || api.resp === undefined) return `<span class="resp-err">Timeout</span>`;
+  if (typeof api.resp === 'number' && api.resp >= 400) return `<span class="resp-err">${api.resp}</span>`;
+  const ms = api.resp;
+  const cls = ms > 800 ? 'warn' : 'ok';
+  return `<span class="resp-${cls}">${ms.toLocaleString()} ms</span>`;
+}
+
+function sucBar(api) {
+  const cls = api.suc >= 95 ? 'ok' : api.suc >= 70 ? 'warn' : 'err';
+  const color = api.suc >= 95 ? 'var(--ok)' : api.suc >= 70 ? 'var(--warn)' : 'var(--err)';
+  return `<div class="sparkbar-wrap">
+    <div class="sparkbar-bg"><div class="sparkbar-fill ${cls}" style="width:${api.suc}%"></div></div>
+    <span class="sparkbar-pct" style="color:${color}">${api.suc}%</span>
+  </div>`;
+}
+
+function miniSpark(calls) {
+  const max = Math.max(...calls);
+  return `<div class="mini-sparkline">${calls.map(v=>`<div class="spark-bar" style="height:${Math.max(3,Math.round(v/max*22))}px"></div>`).join('')}</div>`;
+}
+
+/* ── Total calls ── */
+function updateFooter() {
+  const total = APIS.reduce((a,b)=>a+b.calls.reduce((x,y)=>x+y,0),0) * 10;
+  document.getElementById('total-calls').textContent = total.toLocaleString();
+}
+
+/* ── Renders ── */
+function renderOverview() {
+  const ok = APIS.filter(a=>a.status==='ok').length;
+  const err = APIS.filter(a=>a.status==='err').length;
+  const warn = APIS.filter(a=>a.status==='warn').length;
+  const avgResp = Math.round(APIS.filter(a=>a.resp&&a.resp<400).reduce((a,b)=>a+b.resp,0)/APIS.filter(a=>a.resp&&a.resp<400).length);
+
+  const alerts = err > 0 ? `
+    <div class="alert-row">
+      ${APIS.filter(a=>a.status==='err').map(a=>`
+        <div class="alert-item err">
+          <span class="alert-tag">CRITICAL</span>
+          <span class="alert-text"><strong>${a.org} — ${a.name}</strong> ${a.resp===null?'연결 Timeout':a.resp+' 오류'} 발생 — 담당자 알림 발송 완료</span>
+          <span class="alert-time">방금</span>
+          <button class="alert-close" onclick="this.closest('.alert-item').style.display='none'">×</button>
+        </div>`).join('')}
+      ${APIS.filter(a=>a.status==='warn').map(a=>`
+        <div class="alert-item warn">
+          <span class="alert-tag">WARN</span>
+          <span class="alert-text"><strong>${a.org} — ${a.name}</strong> 응답 지연 ${a.resp} ms (SLA 기준 초과)</span>
+          <span class="alert-time">진행 중</span>
+          <button class="alert-close" onclick="this.closest('.alert-item').style.display='none'">×</button>
+        </div>`).join('')}
+    </div>` : '';
+
+  const rows = APIS.map(a=>`
+    <tr onclick="openModal(${a.id})">
+      <td><div class="api-name">${a.name}</div><div class="api-org">${a.org} · ${a.type}</div></td>
+      <td>${statusBadge(a.status)}</td>
+      <td>${respDisplay(a)}</td>
+      <td>${sucBar(a)}</td>
+      <td>${miniSpark(a.calls)}</td>
+      <td class="since">${a.status==='err'?'장애':a.status==='warn'?'지연':'정상'}</td>
+    </tr>`).join('');
+
+  return `
+    ${alerts}
+    <div class="metric-row">
+      <div class="metric-card ok">
+        <div class="metric-label">정상 연계</div>
+        <div class="metric-value">${ok}<span class="metric-unit"> / ${APIS.length}</span></div>
+        <div class="metric-sub">전체 연계 수 기준</div>
+      </div>
+      <div class="metric-card err">
+        <div class="metric-label">장애</div>
+        <div class="metric-value">${err}</div>
+        <div class="metric-sub metric-delta up">즉시 확인 필요</div>
+      </div>
+      <div class="metric-card warn">
+        <div class="metric-label">응답 지연</div>
+        <div class="metric-value">${warn}</div>
+        <div class="metric-sub">SLA 임계 초과</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">평균 응답시간</div>
+        <div class="metric-value">${avgResp}<span class="metric-unit"> ms</span></div>
+        <div class="metric-sub metric-delta up">↑ 전일 대비 +18ms</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span class="panel-title">API 연계 목록</span>
+        <span class="panel-sub">클릭하면 상세 정보를 볼 수 있습니다</span>
+      </div>
+      <div class="panel-body">
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>기관 / API명</th>
+              <th>상태</th>
+              <th>응답시간</th>
+              <th>성공률 (1h)</th>
+              <th>트래픽</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="panel-title">시간대별 트래픽 (RPS)</span>
+          <span class="panel-sub">오늘 09:00 ~ 현재</span>
+        </div>
+        <div class="chart-wrap">
+          <div style="position:relative;height:180px;">
+            <canvas id="trafficChart" role="img" aria-label="시간대별 API 요청수 막대 차트"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="panel-title">평균 응답시간 추이</span>
+          <span class="panel-sub">전체 API 평균 (ms)</span>
+        </div>
+        <div class="chart-wrap">
+          <div style="position:relative;height:180px;">
+            <canvas id="respChart" role="img" aria-label="평균 응답시간 라인 차트"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTraffic() {
+  const totalRps = APIS.reduce((a,b)=>a+b.calls[b.calls.length-1],0);
+  const peakRps = Math.max(...APIS.reduce((acc,a)=>a.calls.map((v,i)=>(acc[i]||0)+v),[...Array(10)].map(()=>0)));
+  return `
+    <div class="metric-row">
+      <div class="metric-card blue">
+        <div class="metric-label">현재 RPS</div>
+        <div class="metric-value">${totalRps}</div>
+        <div class="metric-sub">초당 요청 수 (전체)</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">피크 RPS (오늘)</div>
+        <div class="metric-value">${peakRps}</div>
+        <div class="metric-sub">12:00~13:00 구간</div>
+      </div>
+      <div class="metric-card ok">
+        <div class="metric-label">오늘 총 호출</div>
+        <div class="metric-value">1.2<span class="metric-unit">M</span></div>
+        <div class="metric-sub metric-delta dn">↓ 전일 대비 -3%</div>
+      </div>
+      <div class="metric-card warn">
+        <div class="metric-label">큐 적체</div>
+        <div class="metric-value">247</div>
+        <div class="metric-sub">미처리 요청 건수</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">기관별 트래픽 현황</span>
+      </div>
+      <div class="panel-body">
+        <table class="api-table">
+          <thead><tr><th>기관 / API명</th><th>현재 RPS</th><th>피크 RPS</th><th>오늘 총 호출</th><th>평균 응답</th><th>에러율</th></tr></thead>
+          <tbody>
+            ${APIS.map(a=>{
+              const cur = a.calls[a.calls.length-1];
+              const peak = Math.max(...a.calls);
+              const tot = a.calls.reduce((x,y)=>x+y,0)*120;
+              const errRate = (100-a.suc).toFixed(1);
+              const errCls = errRate>10?'resp-err':errRate>3?'resp-warn':'resp-ok';
+              return `<tr onclick="openModal(${a.id})">
+                <td><div class="api-name">${a.name}</div><div class="api-org">${a.org}</div></td>
+                <td style="font-family:var(--font-mono);font-size:13px;">${cur}</td>
+                <td style="font-family:var(--font-mono);font-size:13px;">${peak}</td>
+                <td style="font-family:var(--font-mono);font-size:13px;">${tot.toLocaleString()}</td>
+                <td>${respDisplay(a)}</td>
+                <td><span class="${errCls}" style="font-family:var(--font-mono);font-size:12px;">${errRate}%</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">서버 리소스</span></div>
+        <div class="server-list">
+          ${[['CPU 사용률',42,'ok'],['메모리 사용률',78,'warn'],['네트워크 I/O',23,'ok'],['디스크 사용률',61,'ok'],['스레드 풀 사용률',55,'ok']].map(([name,val,cls])=>`
+          <div class="server-item">
+            <div class="server-header">
+              <span class="server-name">${name}</span>
+              <span class="server-pct ${cls}" style="font-family:var(--font-mono);">${val}%</span>
+            </div>
+            <div class="resource-bar"><div class="resource-fill" style="width:${val}%;background:var(--${cls})"></div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">연계 유형별 분포</span></div>
+        <div class="chart-wrap">
+          <div style="position:relative;height:200px;">
+            <canvas id="typeChart" role="img" aria-label="연계 유형별 API 분포 도넛 차트"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLog() {
+  return `
+    <div class="metric-row">
+      <div class="metric-card err"><div class="metric-label">오늘 오류 건수</div><div class="metric-value">3</div><div class="metric-sub">치명 장애</div></div>
+      <div class="metric-card warn"><div class="metric-label">경고 건수</div><div class="metric-value">4</div><div class="metric-sub">SLA 초과</div></div>
+      <div class="metric-card ok"><div class="metric-label">복구 건수</div><div class="metric-value">1</div><div class="metric-sub">평균 22분</div></div>
+      <div class="metric-card blue"><div class="metric-label">평균 복구 시간</div><div class="metric-value">22<span class="metric-unit"> 분</span></div><div class="metric-sub">MTTR</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">장애 · 이벤트 이력</span>
+        <span class="panel-sub">오늘 00:00 ~ 현재</span>
+      </div>
+      <div class="log-list">
+        ${LOGS.map(l=>`
+        <div class="log-item">
+          <span class="log-lv ${l.lv}">${l.lv.toUpperCase()}</span>
+          <div class="log-body">
+            <div class="log-msg">${l.msg}</div>
+            <div class="log-detail">${l.detail}</div>
+          </div>
+          <span class="log-ts">${l.ts}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderAlert() {
+  const rules = [
+    ['응답시간 임계치 초과', 'SLA 기준 800ms 초과 시 즉시 알림', true],
+    ['성공률 95% 미만', '1분 이동평균 기준 알림', true],
+    ['연속 실패 3회 이상', '헬스체크 연속 실패 시 알림', true],
+    ['연결 Timeout 발생', '30s 초과 시 즉시 알림', true],
+    ['인증키 만료 30일 전', '자동 갱신 시도 후 알림', true],
+    ['야간 장애 SMS 발송', '22:00~08:00 장애 시 On-call 발송', false],
+    ['주간 SLA 보고서 자동발송', '매주 월요일 09:00 담당자 이메일', false],
+  ];
+  return `
+    <div class="grid-2">
+      <div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">알림 규칙</span></div>
+          <div class="alert-settings">
+            ${rules.map(([label,sub,on])=>`
+            <div class="alert-rule">
+              <div>
+                <div class="alert-rule-label">${label}</div>
+                <div class="alert-rule-sub">${sub}</div>
+              </div>
+              <button class="toggle ${on?'on':'off'}" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">알림 채널</span></div>
+          <div class="alert-settings">
+            ${[['이메일 (SMTP)','admin@agency.go.kr',true],['SMS','담당자 3명 등록',true],['슬랙 Webhook','#api-alert 채널',true],['카카오 알림톡','기관 대표 채널',false]].map(([ch,det,on])=>`
+            <div class="alert-rule">
+              <div>
+                <div class="alert-rule-label">${ch}</div>
+                <div class="alert-rule-sub">${det}</div>
+              </div>
+              <button class="toggle ${on?'on':'off'}" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+            </div>`).join('')}
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">임계치 설정</span></div>
+          <div class="alert-settings">
+            ${[['응답시간 경고 (ms)','800'],['응답시간 위험 (ms)','3000'],['성공률 경고 (%)','95'],['연속 실패 횟수','3']].map(([label,val])=>`
+            <div class="alert-rule">
+              <div class="alert-rule-label">${label}</div>
+              <input type="number" value="${val}" style="
+                width:80px;text-align:right;padding:4px 8px;
+                background:var(--bg-input);border:1px solid var(--border-mid);
+                border-radius:5px;color:var(--text-primary);
+                font-family:var(--font-mono);font-size:13px;
+              ">
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── Chart init ── */
+function initCharts() {
+  // Traffic chart
+  const tctx = document.getElementById('trafficChart');
+  if (tctx) {
+    if (trafficChart) trafficChart.destroy();
+    const hours = Array.from({length:14},(_,i)=>`${(i+9).toString().padStart(2,'0')}:00`);
+    const data = [120,185,240,310,290,340,260,210,180,260,320,290,245,210];
+    trafficChart = new Chart(tctx, {
+      type:'bar',
+      data:{
+        labels:hours,
+        datasets:[{
+          label:'RPS',
+          data,
+          backgroundColor: data.map(v=>v>=300?'rgba(220,38,38,0.75)':v>=200?'rgba(217,119,6,0.75)':'rgba(37,99,235,0.75)'),
+          borderRadius:3, borderSkipped:false,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y} req/s`}}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,0.06)',drawBorder:false},ticks:{color:'#7a8499',font:{size:10,family:'IBM Plex Mono'}}},
+          y:{grid:{color:'rgba(0,0,0,0.06)',drawBorder:false},ticks:{color:'#7a8499',font:{size:10,family:'IBM Plex Mono'},maxTicksLimit:4}}
+        }
+      }
+    });
+  }
+
+  // Response time chart
+  const rctx = document.getElementById('respChart');
+  if (rctx) {
+    if (respChart) respChart.destroy();
+    const hours = Array.from({length:14},(_,i)=>`${(i+9).toString().padStart(2,'0')}:00`);
+    const respData = [180,210,240,290,320,450,380,310,295,340,290,260,310,342];
+    respChart = new Chart(rctx, {
+      type:'line',
+      data:{
+        labels:hours,
+        datasets:[{
+          label:'응답시간',
+          data: respData,
+          borderColor:'#2563eb',
+          backgroundColor:'rgba(37,99,235,0.07)',
+          borderWidth:2, pointRadius:3, pointBackgroundColor:'#2563eb',
+          tension:0.4, fill:true,
+        },{
+          label:'SLA 기준',
+          data: Array(14).fill(800),
+          borderColor:'rgba(245,158,11,0.5)',
+          borderDash:[5,4], borderWidth:1.5, pointRadius:0,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y} ms`}}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a8499',font:{size:10,family:'IBM Plex Mono'}}},
+          y:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a8499',font:{size:10,family:'IBM Plex Mono'},maxTicksLimit:4},suggestedMin:0,suggestedMax:1000}
+        }
+      }
+    });
+  }
+
+  // Type donut
+  const dctx = document.getElementById('typeChart');
+  if (dctx) {
+    new Chart(dctx, {
+      type:'doughnut',
+      data:{
+        labels:['REST API','SOAP/XML','파일 전송','DB 직결'],
+        datasets:[{
+          data:[9,3,1,0],
+          backgroundColor:['rgba(59,130,246,0.8)','rgba(245,158,11,0.8)','rgba(34,197,94,0.8)','rgba(100,100,120,0.5)'],
+          borderColor:'transparent', borderWidth:2,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false, cutout:'65%',
+        plugins:{
+          legend:{
+            display:true, position:'bottom',
+            labels:{color:'#64748b',font:{size:11},boxWidth:10,padding:10}
+          }
+        }
+      }
+    });
+  }
+
+  // Modal chart
+  const mctx = document.getElementById('modalChart');
+  if (mctx) {
+    const hrs = Array.from({length:12},(_,i)=>`${(i+9).toString().padStart(2,'0')}h`);
+    new Chart(mctx, {
+      type:'line',
+      data:{
+        labels:hrs,
+        datasets:[{
+          label:'응답시간',
+          data:hrs.map(()=>Math.floor(Math.random()*300+100)),
+          borderColor:'#2563eb', backgroundColor:'rgba(59,130,246,0.1)',
+          borderWidth:2, pointRadius:2, fill:true, tension:0.4,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a8499',font:{size:10}}},
+          y:{grid:{color:'rgba(0,0,0,0.06)'},ticks:{color:'#7a8499',font:{size:10},maxTicksLimit:3}}
+        }
+      }
+    });
+  }
+}
+
+/* ── API Register ── */
+let editingApiId = null;
+
+const REGISTERED_APIS = [
+  { id:1, org:'행정안전부', name:'주민등록 진위확인', type:'REST', method:'POST', url:'https://api.mois.go.kr/v1/resident/verify', authType:'API Key', sla:99.5, interval:30, timeout:5000, retry:3, status:'err' },
+  { id:2, org:'국세청', name:'사업자등록 조회', type:'REST', method:'GET', url:'https://api.nts.go.kr/v1/bizno', authType:'OAuth2', sla:99.0, interval:30, timeout:5000, retry:3, status:'err' },
+  { id:3, org:'금융결제원', name:'계좌실명 인증', type:'REST', method:'POST', url:'https://api.kftc.or.kr/v2/account/verify', authType:'Mutual TLS', sla:99.9, interval:30, timeout:3000, retry:2, status:'warn' },
+  { id:4, org:'건강보험공단', name:'자격 조회', type:'SOAP', method:'POST', url:'https://soap.nhis.or.kr/InsureService', authType:'Certificate', sla:99.5, interval:60, timeout:10000, retry:3, status:'warn' },
+  { id:5, org:'법원행정처', name:'등기부등본 열람', type:'REST', method:'GET', url:'https://api.iros.go.kr/v1/register', authType:'API Key', sla:98.0, interval:30, timeout:8000, retry:2, status:'ok' },
+  { id:6, org:'행정안전부', name:'도로명주소 API', type:'REST', method:'GET', url:'https://api.juso.go.kr/addrlink/v2', authType:'API Key', sla:99.5, interval:30, timeout:3000, retry:3, status:'ok' },
+  { id:7, org:'고용노동부', name:'고용보험 자격', type:'SOAP', method:'POST', url:'https://soap.ei.go.kr/EI_Service', authType:'Certificate', sla:98.0, interval:60, timeout:8000, retry:2, status:'ok' },
+  { id:8, org:'국민연금공단', name:'가입자 확인', type:'REST', method:'POST', url:'https://api.nps.or.kr/v1/member/check', authType:'OAuth2', sla:99.0, interval:30, timeout:5000, retry:3, status:'ok' },
+];
+
+function renderApiRegister() {
+  var listHtml = REGISTERED_APIS.map(function(a){ return apregItem(a); }).join('');
+  var cnt = REGISTERED_APIS.length;
+  return '<div class="apreg-layout">' +
+    '<div class="apreg-form-wrap">' +
+      '<div class="panel">' +
+        '<div class="panel-header" style="background:var(--accent-blue-dim);">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+          '<span class="panel-title" id="form-panel-title">신규 API 등록</span>' +
+          '<button class="form-btn secondary" style="margin-left:auto;padding:5px 12px;font-size:12px;" onclick="resetForm()">' +
+            '<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 초기화' +
+          '</button>' +
+        '</div>' +
+
+        '<div class="form-section">' +
+          '<div class="form-section-title">' +
+            '<svg viewBox="0 0 24 24"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>' +
+            '기본 정보' +
+          '</div>' +
+          '<div class="form-grid" style="margin-bottom:12px;">' +
+            '<div class="form-group"><label class="form-label">연계 기관명 <span class="req">*</span></label><input type="text" class="form-input" id="f-org" placeholder="예) 행정안전부"></div>' +
+            '<div class="form-group"><label class="form-label">API 명칭 <span class="req">*</span></label><input type="text" class="form-input" id="f-name" placeholder="예) 주민등록 진위확인"></div>' +
+          '</div>' +
+          '<div class="form-grid cols3" style="margin-bottom:12px;">' +
+            '<div class="form-group"><label class="form-label">연계 유형 <span class="req">*</span></label>' +
+              '<select class="form-select" id="f-type"><option value="REST">REST API</option><option value="SOAP">SOAP / XML</option><option value="GRAPHQL">GraphQL</option><option value="FILE">파일 전송</option><option value="DB">DB 직접</option></select></div>' +
+            '<div class="form-group"><label class="form-label">HTTP 메서드</label>' +
+              '<select class="form-select" id="f-method"><option>GET</option><option selected>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option></select></div>' +
+            '<div class="form-group"><label class="form-label">SLA 기준 (%)</label><input type="number" class="form-input mono" id="f-sla" value="99.0" min="0" max="100" step="0.1"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label">Endpoint URL <span class="req">*</span></label><input type="url" class="form-input mono" id="f-url" placeholder="https://api.example.go.kr/v1/endpoint"></div>' +
+          '<div class="form-hint">※ 정부 내부망은 사설 IP(10.x, 172.x, 192.168.x) 또는 .go.kr 도메인 입력</div>' +
+        '</div>' +
+
+        '<hr class="form-divider">' +
+
+        '<div class="form-section">' +
+          '<div class="form-section-title">' +
+            '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+            '인증 정보' +
+          '</div>' +
+          '<div class="form-grid" style="margin-bottom:12px;">' +
+            '<div class="form-group"><label class="form-label">인증 방식 <span class="req">*</span></label>' +
+              '<select class="form-select" id="f-auth" onchange="toggleAuthFields()">' +
+                '<option value="none">없음 (공개 API)</option>' +
+                '<option value="apikey" selected>API Key</option>' +
+                '<option value="oauth2">OAuth 2.0</option>' +
+                '<option value="basic">Basic Auth</option>' +
+                '<option value="cert">공인인증서 (Mutual TLS)</option>' +
+                '<option value="jwt">JWT Bearer</option>' +
+              '</select></div>' +
+            '<div class="form-group"><label class="form-label">키 전달 위치</label>' +
+              '<select class="form-select" id="f-key-loc"><option>Header</option><option>Query Param</option><option>Body</option></select></div>' +
+          '</div>' +
+          '<div id="auth-fields-apikey" class="form-grid">' +
+            '<div class="form-group"><label class="form-label">API Key 이름 <span class="tip">Header명</span></label><input type="text" class="form-input mono" id="f-key-name" placeholder="예) X-API-KEY"></div>' +
+            '<div class="form-group"><label class="form-label">API Key 값 <span class="tip">암호화 저장</span></label><input type="password" class="form-input mono" id="f-key-val" placeholder="••••••••••••••••"></div>' +
+          '</div>' +
+          '<div id="auth-fields-oauth2" style="display:none" class="form-grid">' +
+            '<div class="form-group"><label class="form-label">Token URL</label><input type="url" class="form-input mono" placeholder="https://auth.example.go.kr/token"></div>' +
+            '<div class="form-group"><label class="form-label">Client ID</label><input type="text" class="form-input mono" placeholder="client_id"></div>' +
+            '<div class="form-group"><label class="form-label">Client Secret</label><input type="password" class="form-input mono" placeholder="••••••••"></div>' +
+            '<div class="form-group"><label class="form-label">Scope</label><input type="text" class="form-input mono" placeholder="read write"></div>' +
+          '</div>' +
+          '<div id="auth-fields-cert" style="display:none" class="form-grid">' +
+            '<div class="form-group"><label class="form-label">인증서 파일 (.pfx)</label><input type="file" class="form-input" accept=".pfx,.p12,.pem"></div>' +
+            '<div class="form-group"><label class="form-label">인증서 비밀번호</label><input type="password" class="form-input mono" placeholder="••••••••"></div>' +
+          '</div>' +
+          '<div id="auth-fields-basic" style="display:none" class="form-grid">' +
+            '<div class="form-group"><label class="form-label">사용자명</label><input type="text" class="form-input mono" placeholder="username"></div>' +
+            '<div class="form-group"><label class="form-label">비밀번호</label><input type="password" class="form-input mono" placeholder="••••••••"></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<hr class="form-divider">' +
+
+        '<div class="form-section">' +
+          '<div class="form-section-title">' +
+            '<svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>' +
+            '모니터링 설정' +
+          '</div>' +
+          '<div class="form-grid cols3" style="margin-bottom:12px;">' +
+            '<div class="form-group"><label class="form-label">수집 주기 <span class="tip">초</span></label>' +
+              '<select class="form-select" id="f-interval"><option value="10">10초</option><option value="30" selected>30초</option><option value="60">1분</option><option value="300">5분</option></select></div>' +
+            '<div class="form-group"><label class="form-label">타임아웃 <span class="tip">ms</span></label><input type="number" class="form-input mono" id="f-timeout" value="5000" step="500"></div>' +
+            '<div class="form-group"><label class="form-label">재시도 횟수</label>' +
+              '<select class="form-select" id="f-retry"><option>1</option><option>2</option><option selected>3</option><option>5</option></select></div>' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:12px;">' +
+            '<label class="form-label">헬스체크 파라미터 <span class="tip">선택</span></label>' +
+            '<textarea class="form-textarea" id="f-health-param" placeholder=\'{"action":"health","version":"1.0"}\'></textarea>' +
+            '<div class="form-hint">헬스체크 요청 시 전송할 Body/Query 파라미터 (JSON)</div>' +
+          '</div>' +
+          '<div class="form-group" style="margin-bottom:4px;">' +
+            '<label class="form-label">정상 응답 조건</label>' +
+            '<div style="display:flex;gap:8px;align-items:center;">' +
+              '<span style="font-size:12px;color:var(--text-secondary);">HTTP 상태코드</span>' +
+              '<input type="text" class="form-input mono" id="f-ok-codes" value="200,201" style="flex:0 0 110px;">' +
+              '<span style="font-size:12px;color:var(--text-secondary);">응답 키워드</span>' +
+              '<input type="text" class="form-input mono" id="f-ok-keyword" placeholder="success" style="flex:1;">' +
+            '</div>' +
+          '</div>' +
+          '<hr class="form-divider" style="margin:12px 0;">' +
+          '<div style="display:flex;flex-direction:column;gap:2px;">' +
+            '<div class="form-check-row"><input type="checkbox" id="chk-alert" checked><div><div class="form-check-label">장애 발생 시 즉시 알림</div></div></div>' +
+            '<div class="form-check-row"><input type="checkbox" id="chk-sla" checked><div><div class="form-check-label">SLA 위반 시 알림</div></div></div>' +
+            '<div class="form-check-row"><input type="checkbox" id="chk-recover" checked><div><div class="form-check-label">복구 시 정상화 알림</div></div></div>' +
+            '<div class="form-check-row"><input type="checkbox" id="chk-active" checked>' +
+              '<div><div class="form-check-label">모니터링 활성화</div><div class="form-check-sub">해제 시 수집 중단 (등록 정보는 유지)</div></div></div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="test-result" id="test-result-banner">' +
+          '<svg id="test-result-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' +
+          '<div class="test-result-detail" id="test-result-msg"></div>' +
+          '<span class="test-result-ms" id="test-result-ms"></span>' +
+        '</div>' +
+
+        '<div class="form-actions">' +
+          '<button class="form-btn test" onclick="testConnection()">' +
+            '<svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> 연결 테스트' +
+          '</button>' +
+          '<div style="flex:1;"></div>' +
+          '<button class="form-btn secondary" onclick="resetForm()">' +
+            '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> 취소' +
+          '</button>' +
+          '<button class="form-btn primary" onclick="saveApi()">' +
+            '<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>' +
+            '<span id="save-btn-txt">등록 완료</span>' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div><div class="panel">' +
+      '<div class="apreg-list-header">' +
+        '<span class="apreg-list-title">등록된 API 목록</span>' +
+        '<span class="apreg-list-cnt" id="apreg-cnt">' + cnt + '개</span>' +
+      '</div>' +
+      '<div id="apreg-list-body">' + listHtml + '</div>' +
+    '</div></div>' +
+  '</div>';
+}
+
+function apregItem(a) {
+  var statusColor = a.status==='ok'?'ok':a.status==='warn'?'warn':'err';
+  var shortUrl = (a.url||'').replace('https://','').substring(0,32)+'…';
+  return '<div class="apreg-item" onclick="loadApiToForm(' + a.id + ')">' +
+    '<div class="apreg-item-main">' +
+      '<div class="apreg-item-dot ' + statusColor + '"></div>' +
+      '<div class="apreg-item-info">' +
+        '<div class="apreg-item-name">' + a.name + '</div>' +
+        '<div class="apreg-item-org">' + a.org + '</div>' +
+      '</div>' +
+      '<div class="apreg-item-actions" onclick="event.stopPropagation()">' +
+        '<button class="apreg-action-btn" onclick="loadApiToForm(' + a.id + ')">편집</button>' +
+        '<button class="apreg-action-btn del" onclick="deleteApi(' + a.id + ')">삭제</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="apreg-item-meta">' +
+      '<span class="apreg-item-type">' + a.type + '</span>' +
+      '<span class="apreg-item-url">' + shortUrl + '</span>' +
+    '</div>' +
+  '</div>';
+}
+
+function toggleAuthFields() {
+  const val = document.getElementById('f-auth')?.value || 'apikey';
+  ['apikey','oauth2','cert','basic'].forEach(k => {
+    const el = document.getElementById('auth-fields-'+k);
+    if (el) el.style.display = 'none';
+  });
+  const show = document.getElementById('auth-fields-'+val);
+  if (show) show.style.display = 'grid';
+}
+
+function testConnection() {
+  const url = document.getElementById('f-url')?.value;
+  if (!url) { showTestResult(false, 'Endpoint URL을 먼저 입력하세요', ''); return; }
+  const btn = document.querySelector('.form-btn.test');
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;animation:spin 1s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 테스트 중…';
+  btn.disabled = true;
+  // Simulate
+  setTimeout(() => {
+    btn.innerHTML = origHtml; btn.disabled = false;
+    const ok = Math.random() > 0.3;
+    const ms = Math.floor(Math.random()*400+80);
+    showTestResult(ok,
+      ok ? '연결 성공 — 정상 응답을 수신했습니다' : 'Connection Refused — 서버 응답 없음 (timeout)',
+      ok ? ms+'ms' : '');
+  }, 1800);
+}
+
+function showTestResult(ok, msg, ms) {
+  const el = document.getElementById('test-result-banner');
+  const icon = document.getElementById('test-result-icon');
+  el.className = 'test-result show ' + (ok?'ok':'err');
+  document.getElementById('test-result-msg').textContent = msg;
+  document.getElementById('test-result-ms').textContent = ms;
+  icon.innerHTML = ok
+    ? '<polyline points="20 6 9 17 4 12"/>'
+    : '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+}
+
+function saveApi() {
+  const org = document.getElementById('f-org')?.value.trim();
+  const name = document.getElementById('f-name')?.value.trim();
+  const url = document.getElementById('f-url')?.value.trim();
+  if (!org || !name || !url) {
+    alert('기관명, API 명칭, Endpoint URL은 필수 입력 항목입니다.');
+    return;
+  }
+  if (editingApiId) {
+    const idx = REGISTERED_APIS.findIndex(a=>a.id===editingApiId);
+    if (idx>=0) {
+      REGISTERED_APIS[idx] = { ...REGISTERED_APIS[idx], org, name, url,
+        type: document.getElementById('f-type')?.value||'REST',
+        method: document.getElementById('f-method')?.value||'POST',
+        sla: parseFloat(document.getElementById('f-sla')?.value)||99.0,
+      };
+    }
+    editingApiId = null;
+  } else {
+    REGISTERED_APIS.push({
+      id: Date.now(), org, name, url,
+      type: document.getElementById('f-type')?.value||'REST',
+      method: document.getElementById('f-method')?.value||'POST',
+      sla: parseFloat(document.getElementById('f-sla')?.value)||99.0,
+      interval:30, timeout:5000, retry:3, status:'ok',
+      authType: document.getElementById('f-auth')?.value||'apikey',
+    });
+  }
+  resetForm();
+  document.getElementById('apreg-list-body').innerHTML = REGISTERED_APIS.map(a=>apregItem(a)).join('');
+  document.getElementById('apreg-cnt').textContent = REGISTERED_APIS.length + '개';
+  // Sync with APIS array
+  APIS.length = 0;
+  REGISTERED_APIS.forEach((r,i) => APIS.push({
+    id:r.id, org:r.org, name:r.name, type:r.type, status:r.status,
+    resp: r.status==='err'?null:r.status==='warn'?850:200,
+    suc: r.status==='err'?0:r.status==='warn'?88:99,
+    calls: Array(10).fill(0).map(()=>Math.floor(Math.random()*200+50)),
+    sla:r.sla,
+  }));
+}
+
+function resetForm() {
+  editingApiId = null;
+  ['f-org','f-name','f-url','f-key-name','f-key-val','f-ok-keyword','f-health-param'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  const sel = document.getElementById('f-type'); if(sel) sel.value='REST';
+  const sel2 = document.getElementById('f-method'); if(sel2) sel2.value='POST';
+  const sel3 = document.getElementById('f-sla'); if(sel3) sel3.value='99.0';
+  const sel4 = document.getElementById('f-auth'); if(sel4) { sel4.value='apikey'; toggleAuthFields(); }
+  const sel5 = document.getElementById('f-timeout'); if(sel5) sel5.value='5000';
+  const sel6 = document.getElementById('f-ok-codes'); if(sel6) sel6.value='200,201';
+  document.getElementById('form-panel-title').textContent = '신규 API 등록';
+  document.getElementById('save-btn-txt').textContent = '등록 완료';
+  const tr = document.getElementById('test-result-banner'); if(tr) tr.className='test-result';
+}
+
+function loadApiToForm(id) {
+  const api = REGISTERED_APIS.find(a=>a.id===id);
+  if (!api) return;
+  editingApiId = id;
+  const s = v => { const el=document.getElementById(v[0]); if(el) el.value=v[1]; };
+  s(['f-org', api.org]); s(['f-name', api.name]); s(['f-url', api.url]);
+  s(['f-type', api.type]); s(['f-sla', api.sla]);
+  if (document.getElementById('f-auth') && api.authType) {
+    const map = {'API Key':'apikey','OAuth2':'oauth2','Mutual TLS':'cert','Certificate':'cert','Basic':'basic'};
+    document.getElementById('f-auth').value = map[api.authType]||'apikey';
+    toggleAuthFields();
+  }
+  document.getElementById('form-panel-title').textContent = `${api.name} 편집`;
+  document.getElementById('save-btn-txt').textContent = '수정 저장';
+  document.querySelector('.panel-header').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function deleteApi(id) {
+  if (!confirm('이 API를 삭제하시겠습니까?')) return;
+  const idx = REGISTERED_APIS.findIndex(a=>a.id===id);
+  if (idx>=0) REGISTERED_APIS.splice(idx,1);
+  document.getElementById('apreg-list-body').innerHTML = REGISTERED_APIS.map(a=>apregItem(a)).join('');
+  document.getElementById('apreg-cnt').textContent = REGISTERED_APIS.length + '개';
+}
+
+
+/* ── Render ── */
+function render() {
+  const el = document.getElementById('main-content');
+  let html = '';
+  if (currentTab === 'overview') html = renderOverview();
+  else if (currentTab === 'traffic') html = renderTraffic();
+  else if (currentTab === 'log') html = renderLog();
+  else if (currentTab === 'alert') html = renderAlert();
+  else if (currentTab === 'apiregister') html = renderApiRegister();
+  el.innerHTML = html;
+  setTimeout(initCharts, 50);
+  updateFooter();
+}
+
+/* ── Modal ── */
+function openModal(id) {
+  const api = APIS.find(a=>a.id===id);
+  if (!api) return;
+  document.getElementById('modal-title').textContent = `${api.org} — ${api.name}`;
+  const respStr = api.resp === null ? 'Timeout' : api.resp+'ms';
+  const slaPass = api.suc >= api.sla;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-grid">
+      <div class="modal-stat">
+        <div class="modal-stat-label">현재 상태</div>
+        <div class="modal-stat-value" style="font-size:14px;margin-top:4px;">${statusBadge(api.status)}</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">응답시간</div>
+        <div class="modal-stat-value" style="color:${api.status==='err'?'var(--err)':api.status==='warn'?'var(--warn)':'var(--ok)'}">${respStr}</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">성공률 (1h)</div>
+        <div class="modal-stat-value" style="color:${api.suc>=95?'var(--ok)':api.suc>=70?'var(--warn)':'var(--err)'}">${api.suc}%</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">SLA 기준 / 달성 여부</div>
+        <div class="modal-stat-value" style="font-size:13px;color:${slaPass?'var(--ok)':'var(--err)'};">${api.sla}% / ${slaPass?'✓ 달성':'✗ 미달'}</div>
+      </div>
+    </div>
+    <div class="modal-section-label">응답시간 추이 (최근 12시간)</div>
+    <div class="modal-chart-wrap"><canvas id="modalChart" role="img" aria-label="API 응답시간 추이 라인 차트"></canvas></div>
+    <div style="margin-top:16px;">
+      <div class="modal-section-label">연계 정보</div>
+      <table class="api-table" style="font-size:12px;">
+        <tbody>
+          <tr><td style="color:var(--text-secondary);width:120px;padding:8px 0;">연계 방식</td><td style="padding:8px 0;font-family:var(--font-mono);">${api.type}</td></tr>
+          <tr><td style="color:var(--text-secondary);padding:8px 0;">헬스체크</td><td style="padding:8px 0;font-family:var(--font-mono);">30초 주기</td></tr>
+          <tr><td style="color:var(--text-secondary);padding:8px 0;">타임아웃 설정</td><td style="padding:8px 0;font-family:var(--font-mono);">30,000 ms</td></tr>
+          <tr><td style="color:var(--text-secondary);padding:8px 0;">재시도 횟수</td><td style="padding:8px 0;font-family:var(--font-mono);">3회</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('open');
+  setTimeout(initCharts, 50);
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+/* ── Tab range ── */
+document.getElementById('time-range').addEventListener('click', e => {
+  if (e.target.classList.contains('tab-btn')) {
+    document.querySelectorAll('#time-range .tab-btn').forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
+
+/* ── Live sim ── */
+function liveTick() {
+  APIS.forEach(api => {
+    if (api.status === 'ok' && Math.random() > 0.7) {
+      api.calls = [...api.calls.slice(1), Math.max(0, api.calls[api.calls.length-1] + Math.floor((Math.random()-0.5)*20))];
+    }
+  });
+  if (trafficChart && currentTab === 'overview') {
+    const newRps = Math.floor(Math.random()*150+100);
+    trafficChart.data.datasets[0].data = [...trafficChart.data.datasets[0].data.slice(1), newRps];
+    trafficChart.data.datasets[0].backgroundColor = trafficChart.data.datasets[0].data.map(v=>v>=300?'rgba(220,38,38,0.75)':v>=200?'rgba(217,119,6,0.75)':'rgba(37,99,235,0.75)');
+    trafficChart.update('none');
+  }
+}
+setInterval(liveTick, 5000);
+
+/* ── Init ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab') || 'overview';
+  setTab(null, tab);
+
+  // 사이드바 접기/펼치기 토글 스크립트
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const toggleSidebarIcon = sidebarToggle.querySelector('i');
+
+  sidebarToggle.addEventListener('click', function() {
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+      toggleSidebarIcon.classList.remove('fa-angles-left');
+      toggleSidebarIcon.classList.add('fa-angles-right');
+      sidebarToggle.setAttribute('title', '메뉴 펼치기');
+    } else {
+      toggleSidebarIcon.classList.remove('fa-angles-right');
+      toggleSidebarIcon.classList.add('fa-angles-left');
+      sidebarToggle.setAttribute('title', '메뉴 접기');
+    }
+  });
+});
+</script>
+</body>
+</html>

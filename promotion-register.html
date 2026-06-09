@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<meta name="format-detection" content="telephone=no" />
+		<title id="neibisTopTitle">사이트별 운영관리 | 한국고용정보원-국문 | 팝업/배너 관리 | 프로모션 영역 관리</title>
+
+		<!-- Google Fonts for modern look -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+		<!-- FontAwesome (Icons) -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+						},
+						colors: {
+							primary: {
+								50: '#f0f5ff',
+								100: '#e0ebff',
+								500: '#2563eb',
+								600: '#1d4ed8',
+								700: '#1e40af',
+							},
+							sidebar: {
+								bg: '#ffffff',
+								hover: '#f3f4f6',
+								active: '#eff6ff',
+								text: '#374151',
+								textMuted: '#9ca3af',
+								border: '#e5e7eb',
+							}
+						}
+					}
+				}
+			}
+		</script>
+
+		<style>
+			body {
+				font-family: 'Inter', 'Noto Sans KR', sans-serif;
+				background-color: #f8fafc;
+			}
+			/* Custom scrollbar */
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e1;
+				border-radius: 3px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #94a3b8;
+			}
+
+			/* Sidebar Collapsed State Styles */
+			#sidebar.collapsed {
+				width: 4rem; /* w-16 */
+			}
+			#sidebar.collapsed .logo-text,
+			#sidebar.collapsed .toolbar button:not(#sidebar-toggle),
+			#sidebar.collapsed hr,
+			#sidebar.collapsed .px-3.mb-2,
+			#sidebar.collapsed span,
+			#sidebar.collapsed p,
+			#sidebar.collapsed select,
+			#sidebar.collapsed input,
+			#sidebar.collapsed button:not(#sidebar-toggle),
+			#sidebar.collapsed details ul,
+			#sidebar.collapsed ul ul,
+			#sidebar.collapsed details summary i.fa-chevron-down,
+			#sidebar.collapsed .flex-1.overflow-y-auto > div:first-child, /* 즐겨찾기 영역 */
+			#sidebar.collapsed .flex-1.overflow-y-auto > div:nth-child(3) > div:first-child { /* 메뉴 탐색 타이틀 */
+				display: none !important;
+			}
+			#sidebar.collapsed .sidebar-header {
+				justify-content: center;
+				padding: 1.25rem 0.5rem;
+			}
+			#sidebar.collapsed .sidebar-header a {
+				justify-content: center;
+			}
+			#sidebar.collapsed nav a, 
+			#sidebar.collapsed nav summary,
+			#sidebar.collapsed .flex-1.overflow-y-auto a,
+			#sidebar.collapsed .flex-1.overflow-y-auto summary {
+				justify-content: center;
+				padding-left: 0;
+				padding-right: 0;
+			}
+			#sidebar.collapsed .flex-1.overflow-y-auto li a i {
+				margin-right: 0 !important;
+			}
+			#sidebar.collapsed div.p-4.border-t {
+				padding: 1rem 0.5rem;
+				justify-content: center;
+			}
+			#sidebar.collapsed div.p-4.border-t .flex {
+				justify-content: center;
+			}
+		</style>
+	</head>
+	<body class="overflow-hidden">
+		<!-- Main Layout Shell -->
+		<div class="flex h-screen w-screen bg-slate-50 text-slate-800">
+
+			<!-- SIDEBAR -->
+			<aside id="sidebar" class="w-64 bg-sidebar-bg border-r border-sidebar-border flex flex-col flex-shrink-0 z-20 transition-all duration-300">
+				<!-- Sidebar Header -->
+				<div class="p-5 border-b border-sidebar-border flex items-center justify-between">
+					<a href="dashboard.html" class="flex items-center gap-2">
+						<img src="img-logo.png" alt="로고" class="h-6 object-contain" />
+						<span class="logo-text text-sm font-semibold text-slate-700 tracking-wide">관리시스템</span>
+					</a>
+					<button type="button" id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition" title="메뉴 접기">
+						<i class="fa-solid fa-angles-left text-xs"></i>
+					</button>
+				</div>
+
+				<!-- Sidebar Content -->
+				<div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+					<!-- Favorites -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-star text-amber-400"></i>
+							<span>즐겨찾기</span>
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="promotion-register.html" class="flex items-center px-3 py-2 text-xs font-medium text-slate-600 hover:bg-sidebar-hover rounded-lg transition">
+									팝업/배너 관리 &gt; 프로모션 영역 관리
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- GNB Menu -->
+					<div>
+						<div class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+							메뉴 탐색
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-line w-5 text-center text-slate-400"></i>
+									<span>대시보드</span>
+								</a>
+							</li>
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 bg-sidebar-active text-primary-600 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-sliders w-5 text-center text-primary-500"></i>
+											<span>운영</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">웹콘텐츠 관리</a></li>
+										<li>
+											<details open class="group">
+												<summary class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>팝업/배너 관리</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+													<li><a href="promotion-register.html" class="block px-3 py-1 text-[11px] text-primary-600 bg-primary-50 font-semibold rounded">프로모션 영역 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">레이어 팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업존 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">설문조사 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">조직 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">일정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-laptop-code w-5 text-center text-slate-400"></i>
+									<span>시스템</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-desktop w-5 text-center text-slate-400"></i>
+											<span>API Monitor</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="api-monitor-dashboard_light.html?tab=overview" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">전체현황</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=traffic" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">트래픽 분석</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=log" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">장애이력</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=alert" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">알림 설정</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=apiregister" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">API 등록</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-robot w-5 text-center text-slate-400"></i>
+											<span>Chatbot 관리</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="chatbot-dashboard.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">실시간 통계</a></li>
+										<li><a href="chatbot-settings.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 설정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
+									<span>로그</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
+									<span>통계</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- Site Management Section -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-globe"></i>
+							<span>사이트 관리</span>
+						</div>
+						<div class="px-3 mb-2">
+							<div class="relative">
+								<input type="text" placeholder="사이트 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition">
+								<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[10px] text-slate-400"></i>
+							</div>
+						</div>
+						<ul class="space-y-1 ml-2 text-xs">
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between px-3 py-1.5 text-slate-700 hover:bg-sidebar-hover rounded-lg cursor-pointer list-none font-medium">
+										<span class="truncate">한국고용정보원-국문</span>
+										<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+										<li>
+											<details open class="group">
+												<summary class="flex items-center justify-between px-2 py-1 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>테스트 메뉴</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-400 border-l border-slate-100 pl-2">
+													<li><a href="api-monitor-dashboard.html" class="block px-2 py-1 hover:text-slate-900 rounded">게시판 - 일반형(기본)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(민원)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(답글)</a></li>
+													<li><a href="untydata-list.html" class="block px-2 py-1 text-primary-600 bg-primary-50 font-semibold rounded">자료 통합 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="doc-search.html" class="block px-2 py-1 hover:text-slate-900">지능형 공문서 검색</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">FX 이슈노트</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">환위험관리 가이드</a></li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<!-- Sidebar Footer User Profile -->
+				<div class="p-4 border-t border-sidebar-border bg-slate-50/50">
+					<div class="flex items-center gap-3">
+						<div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-semibold shadow-inner">
+							<i class="fa-solid fa-user-tie"></i>
+						</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-semibold text-slate-800 truncate">홍길동</p>
+							<p class="text-xs text-slate-400 truncate">시스템관리자</p>
+						</div>
+						<div class="text-right">
+							<span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">60:00</span>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-2 mt-4">
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="시간연장">
+							<i class="fa-solid fa-clock-rotate-left text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">연장</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="정보수정">
+							<i class="fa-solid fa-user-gear text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">정보수정</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600 transition" title="로그아웃">
+							<i class="fa-solid fa-power-off text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">로그아웃</span>
+						</button>
+					</div>
+				</div>
+			</aside>
+
+			<!-- MAIN CONTENT AREA -->
+			<div class="flex-1 flex flex-col overflow-hidden">
+
+				<!-- Header (Topbar) -->
+				<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+					<div class="flex items-center gap-4">
+						<button class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" onclick="history.back(); return false;">
+							<i class="fa-solid fa-arrow-left"></i>
+						</button>
+						<div class="flex flex-col">
+							<!-- Breadcrumb -->
+							<ol class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+								<li>운영</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>팝업/배너 관리</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li class="text-slate-600 font-semibold">프로모션 영역 관리</li>
+							</ol>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<button type="button" id="ai-contrast-btn-top" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+							<i class="fa-solid fa-wand-magic-sparkles"></i>
+							<span>AI 이미지 명도대비 최적화</span>
+						</button>
+						<button type="button" id="ai-alt-btn-top" class="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-800 text-white hover:bg-slate-700 rounded-lg transition flex items-center gap-1.5">
+							<i class="fa-solid fa-robot"></i>
+							<span>AI 이미지 설명</span>
+						</button>
+						<button type="button" onclick="alert('저장되었습니다.');" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+							<i class="fa-solid fa-floppy-disk"></i>
+							<span>저장</span>
+						</button>
+					</div>
+				</header>
+
+				<!-- Scrollable Content Body -->
+				<main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+					<!-- Content Header Title Card -->
+					<div class="bg-white rounded-2xl p-6 border border-slate-200 flex items-center justify-between shadow-sm">
+						<div>
+							<h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+								<span>프로모션 영역 관리</span>
+								<button class="text-slate-300 hover:text-amber-400 transition" title="즐겨찾기">
+									<i class="fa-regular fa-star text-sm"></i>
+								</button>
+							</h2>
+						</div>
+					</div>
+
+					<!-- REGISTER FORM -->
+					<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden text-xs text-slate-600">
+						<form id="saveForm">
+							<!-- Hidden Inputs -->
+							<input type="hidden" name="dataSclsfMltiplIdVl" id="dataSclsfMltiplIdVl" value="0" />
+							<input type="hidden" name="dataSrcCd" id="dataSrcCd" value="1" />
+							<input type="hidden" name="dataPstgSttsCd" value="1" />
+							<input type="hidden" name="pstgPrdCd" value="1" />
+
+							<!-- Row 1: 게시여부 / 게시순위 -->
+							<div class="grid grid-cols-1 md:grid-cols-2 border-b border-slate-100">
+								<!-- 게시여부 -->
+								<div class="flex flex-col md:flex-row border-r border-slate-100">
+									<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+										<span>게시여부</span>
+										<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+									</div>
+									<div class="flex-1 p-4 flex items-center gap-4">
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input type="radio" name="dataSttsCd" value="A" checked class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+											<span>게시</span>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input type="radio" name="dataSttsCd" value="H" class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+											<span>미게시</span>
+										</label>
+									</div>
+								</div>
+								<!-- 게시순위 -->
+								<div class="flex flex-col md:flex-row">
+									<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+										<span>게시순위</span>
+									</div>
+									<div class="flex-1 p-3 flex items-center">
+										<input type="text" placeholder="홈페이지구분을 선택해주세요." class="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-600 bg-slate-50 cursor-not-allowed outline-none" readonly id="post-order-input">
+									</div>
+								</div>
+							</div>
+
+							<!-- Row 2: 홈페이지구분 -->
+							<div class="flex flex-col md:flex-row border-b border-slate-100">
+								<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+									<span>홈페이지구분</span>
+									<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+								</div>
+								<div class="flex-1 p-3">
+									<select id="homepage-select" class="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-600 outline-none bg-white">
+										<option value="">선택</option>
+										<option value="ko">한국고용정보원-국문</option>
+										<option value="en">한국고용정보원-영문</option>
+									</select>
+									<p class="text-[10px] text-blue-500 mt-1.5">홈페이지구분은 저장 후 수정이 불가능합니다.</p>
+								</div>
+							</div>
+
+							<!-- Row 3: 제목 -->
+							<div class="flex flex-col md:flex-row border-b border-slate-100">
+								<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+									<span>제목</span>
+									<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+								</div>
+								<div class="flex-1 p-3">
+									<input type="text" placeholder="제목을 입력해주세요." class="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-600 focus:outline-none focus:border-blue-500">
+								</div>
+							</div>
+
+							<!-- Row 4: 게시 시작일시 / 게시 종료일시 -->
+							<div class="grid grid-cols-1 md:grid-cols-2 border-b border-slate-100">
+								<!-- 게시 시작일시 -->
+								<div class="flex flex-col md:flex-row border-r border-slate-100">
+									<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+										<span>게시 시작일시</span>
+										<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+									</div>
+									<div class="flex-1 p-3 flex items-center gap-2">
+										<div class="relative w-36">
+											<input type="text" placeholder="YYYY.MM.DD" readonly class="w-full border border-slate-200 rounded-lg pl-3 pr-8 py-1.5 text-xs text-slate-500 outline-none">
+											<i class="fa-regular fa-calendar absolute right-2.5 top-2.5 text-slate-400 text-xs"></i>
+										</div>
+										<select class="border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-500 outline-none bg-white min-w-[70px]">
+											<option>00 시</option>
+											<option>09 시</option>
+											<option>12 시</option>
+										</select>
+										<select class="border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-500 outline-none bg-white min-w-[70px]">
+											<option>00 분</option>
+											<option>30 분</option>
+										</select>
+									</div>
+								</div>
+								<!-- 게시 종료일시 -->
+								<div class="flex flex-col md:flex-row">
+									<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+										<span>게시 종료일시</span>
+										<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+									</div>
+									<div class="flex-1 p-3 flex items-center gap-2">
+										<div class="relative w-36">
+											<input type="text" placeholder="YYYY.MM.DD" readonly class="w-full border border-slate-200 rounded-lg pl-3 pr-8 py-1.5 text-xs text-slate-500 outline-none">
+											<i class="fa-regular fa-calendar absolute right-2.5 top-2.5 text-slate-400 text-xs"></i>
+										</div>
+										<select class="border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-500 outline-none bg-white min-w-[70px]">
+											<option>00 시</option>
+											<option>09 시</option>
+											<option>12 시</option>
+										</select>
+										<select class="border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-500 outline-none bg-white min-w-[70px]">
+											<option>00 분</option>
+											<option>30 분</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<!-- Row 5: 이미지(PC) / 이미지(mobile) -->
+							<div class="grid grid-cols-1 md:grid-cols-2 border-b border-slate-100">
+								<!-- 이미지(PC) -->
+								<div class="flex flex-col md:flex-row border-r border-slate-100">
+									<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+										<span>이미지(PC)</span>
+										<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+									</div>
+									<div class="flex-1 p-3">
+										<div class="border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center hover:bg-slate-50/50 transition cursor-pointer relative" id="upload-pc-area">
+											<i class="fa-solid fa-arrow-up-from-bracket text-slate-400 text-lg mb-2"></i>
+											<span class="text-slate-500 font-medium">파일을 마우스로 끌어오거나, <span class="text-blue-500 underline font-semibold">파일을 선택</span>해 주세요.</span>
+											<span class="text-[10px] text-slate-400 mt-1">최대 50MB 이하의 파일을 등록할 수 있습니다.</span>
+											<input type="file" id="pc-file-input" class="absolute inset-0 opacity-0 cursor-pointer">
+										</div>
+									</div>
+								</div>
+								<!-- 이미지(mobile) -->
+								<div class="flex flex-col md:flex-row">
+									<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+										<span>이미지(mobile)</span>
+										<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+									</div>
+									<div class="flex-1 p-3">
+										<div class="border-2 border-dashed border-slate-200 rounded-xl p-6 flex flex-col items-center justify-center hover:bg-slate-50/50 transition cursor-pointer relative" id="upload-mobile-area">
+											<i class="fa-solid fa-arrow-up-from-bracket text-slate-400 text-lg mb-2"></i>
+											<span class="text-slate-500 font-medium">파일을 마우스로 끌어오거나, <span class="text-blue-500 underline font-semibold">파일을 선택</span>해 주세요.</span>
+											<span class="text-[10px] text-slate-400 mt-1">최대 50MB 이하의 파일을 등록할 수 있습니다.</span>
+											<input type="file" id="mobile-file-input" class="absolute inset-0 opacity-0 cursor-pointer">
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Row 6: 새창 여부 -->
+							<div class="flex flex-col md:flex-row border-b border-slate-100">
+								<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+									<span>새창 여부</span>
+									<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+								</div>
+								<div class="flex-1 p-4 flex items-center gap-4">
+									<label class="flex items-center gap-2 cursor-pointer">
+										<input type="radio" name="newWindowYn" value="Y" checked class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+										<span>새창</span>
+									</label>
+									<label class="flex items-center gap-2 cursor-pointer">
+										<input type="radio" name="newWindowYn" value="N" class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500">
+										<span>현재창</span>
+									</label>
+								</div>
+							</div>
+
+							<!-- Row 7: 링크URL -->
+							<div class="flex flex-col md:flex-row border-b border-slate-100">
+								<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+									<span>링크URL</span>
+									<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+								</div>
+								<div class="flex-1 p-3">
+									<input type="text" placeholder="링크를 입력해주세요." class="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-600 focus:outline-none focus:border-blue-500">
+								</div>
+							</div>
+
+							<!-- Row 8: 이미지 설명 -->
+							<div class="flex flex-col md:flex-row">
+								<div class="w-full md:w-36 bg-slate-50/70 p-4 font-semibold text-slate-600 flex items-center border-r border-slate-100">
+									<span>이미지 설명</span>
+									<i class="fa-solid fa-asterisk text-[6px] text-red-500 ml-1"></i>
+								</div>
+								<div class="flex-1 p-3 space-y-2">
+									<div class="relative">
+										<textarea id="image-alt-textarea" placeholder="* 웹접근성 지침에 맞춰 팝업이미지 설명을 입력해 주세요." class="w-full border border-slate-200 rounded-lg p-3 h-24 text-xs text-slate-600 focus:outline-none focus:border-blue-500 resize-none"></textarea>
+										<button type="button" id="ai-alt-btn-inner" class="absolute right-3 bottom-3 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-[10px] font-semibold flex items-center gap-1 transition">
+											<i class="fa-solid fa-robot text-[9px]"></i>
+											<span>AI 이미지 설명</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+
+					<!-- BOTTOM ACTIONS -->
+					<div class="flex items-center justify-between pt-4 pb-8">
+						<button type="button" onclick="history.back();" class="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition flex items-center gap-1.5">
+							<i class="fa-solid fa-chevron-left text-[10px]"></i>
+							<span>목록</span>
+						</button>
+						<div class="flex items-center gap-2">
+							<button type="button" id="ai-contrast-btn-bottom" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+								<i class="fa-solid fa-wand-magic-sparkles"></i>
+								<span>AI 이미지 명도대비 최적화</span>
+							</button>
+							<button type="button" id="ai-alt-btn-bottom" class="px-4 py-2 text-xs font-bold text-slate-700 bg-slate-800 text-white hover:bg-slate-700 rounded-lg transition flex items-center gap-1.5">
+								<i class="fa-solid fa-robot"></i>
+								<span>AI 이미지 설명</span>
+							</button>
+							<button type="button" onclick="alert('저장되었습니다.');" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+								<i class="fa-solid fa-floppy-disk"></i>
+								<span>저장</span>
+							</button>
+						</div>
+					</div>
+
+				</main>
+
+				<!-- Footer Bar -->
+				<footer class="h-9 bg-white border-t border-slate-200 flex items-center justify-between px-6 text-[10px] text-slate-400 font-medium z-10 flex-shrink-0">
+					<span>NEIBIS 시스템 &copy; 2026. All rights reserved.</span>
+					<span>v2.4.1 · 행정서비스망</span>
+				</footer>
+			</div>
+
+			<!-- AI ASSISTANT SLIDE PANEL -->
+			<div id="ai-panel" class="fixed top-0 right-0 h-screen w-96 bg-white border-l border-slate-200 shadow-xl transform translate-x-full transition-transform duration-300 z-30 flex flex-col overflow-hidden">
+				<!-- Panel Header -->
+				<div class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between text-white">
+					<div class="flex items-center gap-2">
+						<i class="fa-solid fa-robot text-blue-400 text-lg"></i>
+						<h3 class="text-sm font-bold tracking-wide" id="panel-title-text">AI Smart Assistant</h3>
+					</div>
+					<button id="ai-panel-close" type="button" class="text-slate-400 hover:text-white transition" title="닫기">
+						<i class="fa-solid fa-xmark text-lg"></i>
+					</button>
+				</div>
+
+				<!-- Panel Content -->
+				<div class="flex-1 overflow-y-auto p-4 space-y-4" id="panel-content-body">
+					<!-- Default State / Placeholder -->
+					<div class="flex flex-col items-center justify-center h-full text-center text-slate-400 space-y-2 p-6">
+						<i class="fa-solid fa-wand-magic-sparkles text-3xl text-slate-300"></i>
+						<p class="text-xs font-semibold">AI 스마트 어시스턴트 기능이 대기 중입니다.</p>
+						<p class="text-[10px] text-slate-400">상단의 AI 어시스턴트 기능 버튼을 클릭해보세요.</p>
+					</div>
+				</div>
+
+				<!-- Panel Footer -->
+				<div class="border-t border-slate-200 bg-slate-50 p-4">
+					<p class="text-[9px] text-slate-400 text-center font-mono">Gemma Vision Pipeline v2.1</p>
+				</div>
+			</div>
+
+			<!-- Overlay Background -->
+			<div id="ai-overlay" class="fixed inset-0 bg-black/30 transform opacity-0 pointer-events-none transition-opacity duration-300 z-20"></div>
+		</div>
+
+		<script>
+			// 사이드바 접기/펼치기 토글 스크립트
+			const sidebar = document.getElementById('sidebar');
+			const sidebarToggle = document.getElementById('sidebar-toggle');
+			const toggleSidebarIcon = sidebarToggle.querySelector('i');
+
+			sidebarToggle.addEventListener('click', function() {
+				sidebar.classList.toggle('collapsed');
+				if (sidebar.classList.contains('collapsed')) {
+					toggleSidebarIcon.classList.remove('fa-angles-left');
+					toggleSidebarIcon.classList.add('fa-angles-right');
+					sidebarToggle.setAttribute('title', '메뉴 펼치기');
+				} else {
+					toggleSidebarIcon.classList.remove('fa-angles-right');
+					toggleSidebarIcon.classList.add('fa-angles-left');
+					sidebarToggle.setAttribute('title', '메뉴 접기');
+				}
+			});
+
+			// 홈페이지구분 선택에 따른 동적 게시순위 플레이스홀더 제어
+			const homepageSelect = document.getElementById('homepage-select');
+			const postOrderInput = document.getElementById('post-order-input');
+			homepageSelect.addEventListener('change', function() {
+				if (this.value === 'ko') {
+					postOrderInput.value = '1순위 (한국고용정보원-국문)';
+					postOrderInput.classList.remove('bg-slate-50', 'cursor-not-allowed');
+					postOrderInput.removeAttribute('readonly');
+				} else if (this.value === 'en') {
+					postOrderInput.value = '1순위 (한국고용정보원-영문)';
+					postOrderInput.classList.remove('bg-slate-50', 'cursor-not-allowed');
+					postOrderInput.removeAttribute('readonly');
+				} else {
+					postOrderInput.value = '';
+					postOrderInput.classList.add('bg-slate-50', 'cursor-not-allowed');
+					postOrderInput.setAttribute('readonly', 'true');
+				}
+			});
+
+			// AI 스마트 어시스턴트 슬라이드 패널 제어
+			const aiPanel = document.getElementById('ai-panel');
+			const aiOverlay = document.getElementById('ai-overlay');
+			const aiPanelClose = document.getElementById('ai-panel-close');
+			const panelTitleText = document.getElementById('panel-title-text');
+			const panelContentBody = document.getElementById('panel-content-body');
+
+			function openAIPanel() {
+				aiPanel.classList.remove('translate-x-full');
+				aiOverlay.classList.remove('opacity-0', 'pointer-events-none');
+			}
+
+			function closeAIPanel() {
+				aiPanel.classList.add('translate-x-full');
+				aiOverlay.classList.add('opacity-0', 'pointer-events-none');
+			}
+
+			aiPanelClose.addEventListener('click', closeAIPanel);
+			aiOverlay.addEventListener('click', closeAIPanel);
+
+			// AI 기능 구현
+			// 1. AI 이미지 명도대비 최적화
+			const contrastButtons = [
+				document.getElementById('ai-contrast-btn-top'),
+				document.getElementById('ai-contrast-btn-bottom')
+			];
+
+			contrastButtons.forEach(btn => {
+				btn.addEventListener('click', function() {
+					panelTitleText.textContent = '이미지 명도대비 최적화';
+					panelContentBody.innerHTML = `
+						<div class="space-y-4">
+							<div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider bg-slate-100 p-2.5 rounded">ACCESSIBILITY DIAGNOSTIC</div>
+							<h4 class="text-sm font-bold text-slate-800">이미지 명도대비 최적화</h4>
+							<div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center justify-center min-h-[140px] text-slate-400">
+								<i class="fa-regular fa-image text-3xl"></i>
+							</div>
+							
+							<div class="p-3 bg-green-50 border border-green-200 rounded-xl text-green-800 space-y-1">
+								<div class="flex items-center gap-1.5 font-bold text-xs">
+									<i class="fa-solid fa-circle-check"></i>
+									<span>7.5 : 1 (기준 통과)</span>
+								</div>
+								<p class="text-[10px] text-green-700">WCAG 2.1 가이드라인(4.5:1 이상) 준수 필요</p>
+							</div>
+
+							<div class="space-y-2">
+								<span class="text-xs font-bold text-slate-700 block">추천 색상 가이드</span>
+								<div class="border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden">
+									<div class="p-3 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+										<div class="flex items-center gap-2">
+											<span class="w-6 h-6 rounded bg-[#151515] border border-slate-200"></span>
+											<div class="text-[10px]">
+												<p class="font-bold text-slate-700">명도 강화 블랙</p>
+												<p class="font-mono text-slate-400">#151515 | 7.2:1</p>
+											</div>
+										</div>
+										<i class="fa-solid fa-circle-check text-slate-300"></i>
+									</div>
+									<div class="p-3 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+										<div class="flex items-center gap-2">
+											<span class="w-6 h-6 rounded bg-[#003399] border border-slate-200"></span>
+											<div class="text-[10px]">
+												<p class="font-bold text-slate-700">딥 네이비 고대비</p>
+												<p class="font-mono text-slate-400">#003399 | 5.1:1</p>
+											</div>
+										</div>
+										<i class="fa-solid fa-circle-check text-slate-300"></i>
+									</div>
+								</div>
+							</div>
+							<div class="text-[10px] text-slate-400 flex items-center gap-1.5 mt-2">
+								<i class="fa-solid fa-circle-info"></i>
+								<span>상세 분석 이력 로그 확인이 가능합니다.</span>
+							</div>
+						</div>
+					`;
+					openAIPanel();
+				});
+			});
+
+			// 2. AI 이미지 설명 생성
+			const altButtons = [
+				document.getElementById('ai-alt-btn-top'),
+				document.getElementById('ai-alt-btn-bottom'),
+				document.getElementById('ai-alt-btn-inner')
+			];
+
+			altButtons.forEach(btn => {
+				btn.addEventListener('click', function() {
+					panelTitleText.textContent = 'AI 이미지 설명 생성기';
+					panelContentBody.innerHTML = `
+						<div class="space-y-4">
+							<div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider bg-slate-100 p-2.5 rounded">CONTENT INTELLIGENCE</div>
+							<h4 class="text-sm font-bold text-slate-800">AI 이미지 설명 생성기</h4>
+							<div class="border border-slate-200 rounded-xl p-4 bg-slate-50 flex items-center justify-center min-h-[140px] text-slate-400">
+								<i class="fa-regular fa-image text-3xl"></i>
+							</div>
+
+							<div class="p-4 bg-blue-600 text-white rounded-xl space-y-3 shadow-md">
+								<p class="text-[10px] font-semibold uppercase tracking-wider flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI GENERATED DESCRIPTION</p>
+								<p class="text-xs leading-relaxed" id="generated-alt-text">한국고용노동교육원의 타운홀미팅 행사 포스터로, "공동의 신뢰 구축과 소통 활성화를 위한 리더십 토론회" 문구와 일시(2026.06.18), 장소(대강당)가 기재되어 있습니다.</p>
+								<button type="button" class="w-full bg-white hover:bg-slate-50 text-blue-600 font-bold py-2 rounded text-xs transition shadow" id="apply-alt-btn">본문에 적용하기</button>
+							</div>
+
+							<div class="space-y-2">
+								<span class="text-xs font-bold text-slate-700 block">추천 태그</span>
+								<div class="flex flex-wrap gap-1.5">
+									<span class="px-2.5 py-1 bg-slate-100 rounded text-[10px] font-medium text-slate-600">#기획재정부</span>
+									<span class="px-2.5 py-1 bg-slate-100 rounded text-[10px] font-medium text-slate-600">#타운홀미팅</span>
+									<span class="px-2.5 py-1 bg-slate-100 rounded text-[10px] font-medium text-slate-600">#포스터</span>
+									<span class="px-2.5 py-1 bg-slate-100 rounded text-[10px] font-medium text-slate-600">#배너</span>
+								</div>
+							</div>
+						</div>
+					`;
+					openAIPanel();
+
+					// 본문에 적용하기 버튼 클릭 시 textarea에 입력
+					document.getElementById('apply-alt-btn').addEventListener('click', function() {
+						const altText = document.getElementById('generated-alt-text').textContent;
+						const textarea = document.getElementById('image-alt-textarea');
+						if (textarea) {
+							textarea.value = altText;
+							textarea.classList.add('ring-2', 'ring-blue-500');
+							setTimeout(() => {
+								textarea.classList.remove('ring-2', 'ring-blue-500');
+							}, 2000);
+							alert('✅ 이미지 설명이 본문에 성공적으로 적용되었습니다.');
+							closeAIPanel();
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<meta name="format-detection" content="telephone=no" />
+		<title id="neibisTopTitle">대시보드 | 한국고용정보원-국문 | 관리시스템</title>
+		
+		<!-- Google Fonts for modern look -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+		
+		<!-- FontAwesome (Icons) -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+		
+		<!-- Chart.js -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+		
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+						},
+						colors: {
+							primary: {
+								50: '#f0f5ff',
+								100: '#e0ebff',
+								500: '#2563eb',
+								600: '#1d4ed8',
+								700: '#1e40af',
+							},
+							sidebar: {
+								bg: '#ffffff',
+								hover: '#f3f4f6',
+								active: '#eff6ff',
+								text: '#374151',
+								textMuted: '#9ca3af',
+								border: '#e5e7eb',
+							}
+						}
+					}
+				}
+			}
+		</script>
+		
+		<style>
+			body {
+				font-family: 'Inter', 'Noto Sans KR', sans-serif;
+				background-color: #f8fafc;
+			}
+			/* Custom scrollbar */
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e1;
+				border-radius: 3px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #94a3b8;
+			}
+
+			/* Sidebar Collapsed State Styles */
+			#sidebar.collapsed {
+				width: 4rem; /* w-16 */
+			}
+			#sidebar.collapsed .logo-text,
+			#sidebar.collapsed .toolbar button:not(#sidebar-toggle),
+			#sidebar.collapsed hr,
+			#sidebar.collapsed .px-3.mb-2,
+			#sidebar.collapsed span,
+			#sidebar.collapsed p,
+			#sidebar.collapsed select,
+			#sidebar.collapsed input,
+			#sidebar.collapsed button:not(#sidebar-toggle),
+			#sidebar.collapsed details ul,
+			#sidebar.collapsed ul ul,
+			#sidebar.collapsed details summary i.fa-chevron-down,
+			#sidebar.collapsed .flex-1.overflow-y-auto > div:first-child, /* 즐겨찾기 영역 */
+			#sidebar.collapsed .flex-1.overflow-y-auto > div:nth-child(3) > div:first-child { /* 메뉴 탐색 타이틀 */
+				display: none !important;
+			}
+			#sidebar.collapsed .sidebar-header {
+				justify-content: center;
+				padding: 1.25rem 0.5rem;
+			}
+			#sidebar.collapsed .sidebar-header a {
+				justify-content: center;
+			}
+			#sidebar.collapsed nav a, 
+			#sidebar.collapsed nav summary,
+			#sidebar.collapsed .flex-1.overflow-y-auto a,
+			#sidebar.collapsed .flex-1.overflow-y-auto summary {
+				justify-content: center;
+				padding-left: 0;
+				padding-right: 0;
+			}
+			#sidebar.collapsed .flex-1.overflow-y-auto li a i {
+				margin-right: 0 !important;
+			}
+			#sidebar.collapsed div.p-4.border-t {
+				padding: 1rem 0.5rem;
+				justify-content: center;
+			}
+			#sidebar.collapsed div.p-4.border-t .flex {
+				justify-content: center;
+			}
+		</style>
+	</head>
+	<body class="overflow-hidden">
+		<!-- Main Layout Shell -->
+		<div class="flex h-screen w-screen bg-slate-50 text-slate-800">
+			
+			<!-- SIDEBAR -->
+			<aside id="sidebar" class="w-64 bg-sidebar-bg border-r border-sidebar-border flex flex-col flex-shrink-0 z-20 transition-all duration-300">
+				<!-- Sidebar Header -->
+				<div class="p-5 border-b border-sidebar-border flex items-center justify-between">
+					<a href="dashboard.html" class="flex items-center gap-2">
+						<img src="img-logo.png" alt="로고" class="h-6 object-contain" />
+						<span class="logo-text text-sm font-semibold text-slate-700 tracking-wide">관리시스템</span>
+					</a>
+					<button type="button" id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition" title="메뉴 접기">
+						<i class="fa-solid fa-angles-left text-xs"></i>
+					</button>
+				</div>
+
+				<!-- Sidebar Content -->
+				<div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+					<!-- Favorites -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-star text-amber-400"></i>
+							<span>즐겨찾기</span>
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="#" class="flex items-center px-3 py-2 text-xs font-medium text-slate-600 hover:bg-sidebar-hover rounded-lg transition">
+									팝업/배너 관리 &gt; 프로모션 영역 관리
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- GNB Menu -->
+					<div>
+						<div class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+							메뉴 탐색
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-primary-600 bg-sidebar-active rounded-lg transition font-semibold">
+									<i class="fa-solid fa-chart-line w-5 text-center text-primary-500"></i>
+									<span>대시보드</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-sliders w-5 text-center text-slate-400"></i>
+											<span>운영</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">웹콘텐츠 관리</a></li>
+										<li>
+											<details class="group">
+												<summary class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>팝업/배너 관리</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+													<li><a href="promotion-register.html" class="block px-3 py-1 text-[11px] hover:text-slate-900">프로모션 영역 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">레이어 팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업존 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">설문조사 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">조직 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">일정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-laptop-code w-5 text-center text-slate-400"></i>
+									<span>시스템</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-desktop w-5 text-center text-slate-400"></i>
+											<span>API Monitor</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="api-monitor-dashboard_light.html?tab=overview" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">전체현황</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=traffic" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">트래픽 분석</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=log" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">장애이력</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=alert" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">알림 설정</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=apiregister" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">API 등록</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-robot w-5 text-center text-slate-400"></i>
+											<span>Chatbot 관리</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="chatbot-dashboard.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">실시간 통계</a></li>
+										<li><a href="chatbot-settings.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 설정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
+									<span>로그</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
+									<span>통계</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- Site Management Section -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-globe"></i>
+							<span>사이트 관리</span>
+						</div>
+						<div class="px-3 mb-2">
+							<div class="relative">
+								<input type="text" placeholder="사이트 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition">
+								<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[10px] text-slate-400"></i>
+							</div>
+						</div>
+						<ul class="space-y-1 ml-2 text-xs">
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between px-3 py-1.5 text-slate-700 hover:bg-sidebar-hover rounded-lg cursor-pointer list-none font-medium">
+										<span class="truncate">한국고용정보원-국문</span>
+										<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+										<li>
+											<details open class="group">
+												<summary class="flex items-center justify-between px-2 py-1 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>테스트 메뉴</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-400 border-l border-slate-100 pl-2">
+													<li><a href="api-monitor-dashboard.html" class="block px-2 py-1 hover:text-slate-900 rounded">게시판 - 일반형(기본)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(민원)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(답글)</a></li>
+													<li><a href="untydata-list.html" class="block px-2 py-1 hover:text-slate-900">자료 통합 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="doc-search.html" class="block px-2 py-1 hover:text-slate-900">지능형 공문서 검색</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">FX 이슈노트</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">환위험관리 가이드</a></li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<!-- Sidebar Footer User Profile -->
+				<div class="p-4 border-t border-sidebar-border bg-slate-50/50">
+					<div class="flex items-center gap-3">
+						<div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-semibold shadow-inner">
+							<i class="fa-solid fa-user-tie"></i>
+						</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-semibold text-slate-800 truncate">홍길동</p>
+							<p class="text-xs text-slate-400 truncate">시스템관리자</p>
+						</div>
+						<div class="text-right">
+							<span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">60:00</span>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-2 mt-4">
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="시간연장">
+							<i class="fa-solid fa-clock-rotate-left text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">연장</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="정보수정">
+							<i class="fa-solid fa-user-gear text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">정보수정</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600 transition" title="로그아웃">
+							<i class="fa-solid fa-power-off text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">로그아웃</span>
+						</button>
+					</div>
+				</div>
+			</aside>
+
+			<!-- MAIN CONTENT AREA -->
+			<div class="flex-1 flex flex-col overflow-hidden">
+				
+				<!-- Header (Topbar) -->
+				<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+					<div class="flex items-center gap-4">
+						<button class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" onclick="history.back(); return false;">
+							<i class="fa-solid fa-arrow-left"></i>
+						</button>
+						<div class="flex flex-col">
+							<!-- Breadcrumb -->
+							<ol class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+								<li>사이트별 운영관리</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li class="text-slate-600 font-semibold">대시보드</li>
+							</ol>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-3">
+						<button class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-amber-500 transition" title="즐겨찾기 추가">
+							<i class="fa-solid fa-star"></i>
+						</button>
+						<button class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" title="새로고침" onclick="window.location.reload();">
+							<i class="fa-solid fa-rotate-right"></i>
+						</button>
+					</div>
+				</header>
+
+				<!-- Scrollable Content Body -->
+				<main class="flex-1 overflow-y-auto p-6 space-y-6">
+					
+					<!-- Content Header Title Card -->
+					<div class="bg-white rounded-2xl p-6 border border-slate-200 flex items-center justify-between shadow-sm">
+						<div>
+							<h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+								<span>대시보드</span>
+								<span class="text-xs bg-primary-50 text-primary-600 px-2.5 py-1 rounded-full font-medium border border-primary-100">현황 분석</span>
+							</h2>
+							<p class="text-sm text-slate-400 mt-1">네이비스 관리시스템 방문자 및 주요 운영 지표를 한눈에 모니터링합니다.</p>
+						</div>
+					</div>
+
+					<!-- QUICK LINK ROW -->
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<!-- Card 1 -->
+						<a href="#" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-primary-500 hover:-translate-y-1 transition duration-200 flex items-start gap-4">
+							<div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-primary-600 text-xl flex-shrink-0">
+								<i class="fa-solid fa-pen-to-square"></i>
+							</div>
+							<div>
+								<h4 class="font-bold text-slate-800 text-sm">웹 콘텐츠 관리</h4>
+								<p class="text-xs text-slate-400 mt-1.5 leading-relaxed">웹 에디터를 사용하여 누구나 쉽게 실시간으로 사이트 콘텐츠를 수정할 수 있습니다.</p>
+							</div>
+						</a>
+						<!-- Card 2 -->
+						<a href="#" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-primary-500 hover:-translate-y-1 transition duration-200 flex items-start gap-4">
+							<div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-xl flex-shrink-0">
+								<i class="fa-solid fa-circle-question"></i>
+							</div>
+							<div>
+								<h4 class="font-bold text-slate-800 text-sm">네이비스 이용안내</h4>
+								<p class="text-xs text-slate-400 mt-1.5 leading-relaxed">시스템 가이드북 및 이용 매뉴얼, 온라인 고객 지원 센터를 활용해보세요.</p>
+							</div>
+						</a>
+						<!-- Card 3 -->
+						<a href="#" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-primary-500 hover:-translate-y-1 transition duration-200 flex items-start gap-4">
+							<div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl flex-shrink-0">
+								<i class="fa-solid fa-file-invoice-with-usd"></i>
+							</div>
+							<div>
+								<h4 class="font-bold text-slate-800 text-sm">방문자 통계 요약 보고서</h4>
+								<p class="text-xs text-slate-400 mt-1.5 leading-relaxed">접속 데이터를 기반으로 주요 유입 분석 및 종합 통계 보고서를 제공합니다.</p>
+							</div>
+						</a>
+					</div>
+
+					<!-- MAIN DATA GRID -->
+					<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						
+						<!-- LEFT 2 COLS: VISITOR GRAPH & DEVICE STATS -->
+						<div class="lg:col-span-2 space-y-6">
+							<!-- Visitor Statistics -->
+							<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+								<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+									<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+										<i class="fa-solid fa-chart-area text-slate-400"></i>
+										<span>방문자 / 페이지 뷰 추이</span>
+									</h3>
+									<span class="text-[11px] text-slate-400 font-medium">최근 7일 접속 트렌드</span>
+								</div>
+								
+								<div class="p-6">
+									<div class="grid grid-cols-2 gap-4 mb-6">
+										<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+											<p class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+												<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+												오늘 방문자 수
+											</p>
+											<p class="text-2xl font-bold text-slate-800 mt-2 font-mono">1,248 <span class="text-xs font-normal text-slate-400">명</span></p>
+										</div>
+										<div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+											<p class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+												<span class="w-2 h-2 rounded-full bg-amber-500"></span>
+												오늘 페이지 뷰
+											</p>
+											<p class="text-2xl font-bold text-slate-800 mt-2 font-mono">4,892 <span class="text-xs font-normal text-slate-400">회</span></p>
+										</div>
+									</div>
+
+									<div class="relative h-64">
+										<canvas id="visitorChart"></canvas>
+									</div>
+								</div>
+							</div>
+
+							<!-- Device Statistics -->
+							<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+								<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
+									<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+										<i class="fa-solid fa-mobile-screen-button text-slate-400"></i>
+										<span>디바이스별 접속 통계</span>
+									</h3>
+									<span class="text-[11px] text-slate-400 font-medium">월간 통계 기준</span>
+								</div>
+								<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div class="relative h-48">
+										<canvas id="deviceChart"></canvas>
+									</div>
+									<div class="flex flex-col justify-center space-y-4">
+										<div class="flex items-center justify-between text-xs">
+											<span class="flex items-center gap-2 font-medium text-slate-600">
+												<span class="w-3 h-3 rounded-full bg-blue-500"></span> 데스크톱 (PC)
+											</span>
+											<span class="font-bold text-slate-700 font-mono">68.5%</span>
+										</div>
+										<div class="flex items-center justify-between text-xs">
+											<span class="flex items-center gap-2 font-medium text-slate-600">
+												<span class="w-3 h-3 rounded-full bg-emerald-500"></span> 모바일 (Mobile)
+											</span>
+											<span class="font-bold text-slate-700 font-mono">27.3%</span>
+										</div>
+										<div class="flex items-center justify-between text-xs">
+											<span class="flex items-center gap-2 font-medium text-slate-600">
+												<span class="w-3 h-3 rounded-full bg-amber-500"></span> 태블릿 (Tablet)
+											</span>
+											<span class="font-bold text-slate-700 font-mono">4.2%</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+
+						<!-- RIGHT 1 COL: MY INFO, POPULAR MENUS, RECENTLY VISITED -->
+						<div class="space-y-6">
+							<!-- Profile Card -->
+							<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center text-center">
+								<div class="w-20 h-20 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 text-3xl shadow-inner mb-4">
+									<i class="fa-solid fa-user-tie"></i>
+								</div>
+								<h3 class="font-bold text-slate-800 text-base">홍길동</h3>
+								<p class="text-xs text-primary-600 font-semibold bg-primary-50 px-2.5 py-0.5 rounded-full mt-1.5 border border-primary-100">시스템관리자</p>
+								
+								<div class="w-full border-t border-slate-100 my-4"></div>
+								
+								<div class="w-full text-left space-y-2 text-xs">
+									<div class="flex justify-between">
+										<span class="text-slate-400">마지막 접속시간</span>
+										<span class="text-slate-600 font-medium font-mono">2026-06-01 12:25</span>
+									</div>
+									<div class="flex justify-between">
+										<span class="text-slate-400">계정 등급</span>
+										<span class="text-amber-500 font-bold flex items-center gap-1">
+											<i class="fa-solid fa-medal"></i> Gold Level
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Popular Menu Ranking -->
+							<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+								<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+									<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+										<i class="fa-solid fa-fire text-amber-500"></i>
+										<span>주간 인기 메뉴</span>
+									</h3>
+								</div>
+								<ul class="divide-y divide-slate-100 text-xs">
+									<li class="px-6 py-3.5 flex items-center justify-between">
+										<span class="flex items-center gap-3">
+											<span class="w-5 h-5 rounded bg-blue-500 text-white font-bold flex items-center justify-center text-[10px]">1</span>
+											<span class="font-medium text-slate-700">게시판 - 일반형(기본)</span>
+										</span>
+										<span class="text-slate-400 font-medium">842 hit</span>
+									</li>
+									<li class="px-6 py-3.5 flex items-center justify-between">
+										<span class="flex items-center gap-3">
+											<span class="w-5 h-5 rounded bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-[10px]">2</span>
+											<span class="font-medium text-slate-700">프로모션 영역 관리</span>
+										</span>
+										<span class="text-slate-400 font-medium">624 hit</span>
+									</li>
+									<li class="px-6 py-3.5 flex items-center justify-between">
+										<span class="flex items-center gap-3">
+											<span class="w-5 h-5 rounded bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-[10px]">3</span>
+											<span class="font-medium text-slate-700">웹콘텐츠 관리</span>
+										</span>
+										<span class="text-slate-400 font-medium">511 hit</span>
+									</li>
+								</ul>
+							</div>
+
+							<!-- Recently Visited -->
+							<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+								<div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+									<h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+										<i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
+										<span>최근 방문한 메뉴</span>
+									</h3>
+								</div>
+								<ul class="divide-y divide-slate-100 text-xs">
+									<li class="px-6 py-3.5">
+										<a href="api-monitor-dashboard.html" class="group block">
+											<span class="font-semibold text-slate-700 group-hover:text-primary-600">게시판 - 일반형(기본)</span>
+											<p class="text-[10px] text-slate-400 mt-1">한국고용정보원-국문 &gt; 테스트 메뉴 &gt; 게시판 - 일반형</p>
+										</a>
+									</li>
+									<li class="px-6 py-3.5">
+										<a href="api-monitor-dashboard_light.html?tab=overview" class="group block">
+											<span class="font-semibold text-slate-700 group-hover:text-primary-600">API Monitor (전체현황)</span>
+											<p class="text-[10px] text-slate-400 mt-1">시스템 &gt; API Monitor &gt; 전체현황</p>
+										</a>
+									</li>
+								</ul>
+							</div>
+
+						</div>
+
+					</div>
+
+				</main>
+
+				<!-- Footer Bar -->
+				<footer class="h-9 bg-white border-t border-slate-200 flex items-center justify-between px-6 text-[10px] text-slate-400 font-medium z-10 flex-shrink-0">
+					<span>NEIBIS 시스템 &copy; 2026. All rights reserved.</span>
+					<span>v2.4.1 · 행정서비스망</span>
+				</footer>
+			</div>
+		</div>
+
+		<script>
+			// Chart Initializations
+			window.addEventListener('DOMContentLoaded', () => {
+				// Line Chart for Visitors
+				const ctxVis = document.getElementById('visitorChart').getContext('2d');
+				new Chart(ctxVis, {
+					type: 'line',
+					data: {
+						labels: ['05/26', '05/27', '05/28', '05/29', '05/30', '05/31', '06/01'],
+						datasets: [
+							{
+								label: '방문자 수',
+								data: [820, 930, 880, 1050, 620, 540, 1248],
+								borderColor: '#2563eb',
+								backgroundColor: 'rgba(37,99,235,0.05)',
+								fill: true,
+								tension: 0.4,
+								borderWidth: 2
+							},
+							{
+								label: '페이지 뷰',
+								data: [2800, 3100, 2900, 3900, 1800, 1500, 4892],
+								borderColor: '#f59e0b',
+								backgroundColor: 'rgba(245,158,11,0.05)',
+								fill: true,
+								tension: 0.4,
+								borderWidth: 2
+							}
+						]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								display: true,
+								position: 'top',
+								labels: {
+									boxWidth: 10,
+									font: { size: 10 }
+								}
+							}
+						},
+						scales: {
+							x: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } },
+							y: { grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } }
+						}
+					}
+				});
+
+				// Doughnut Chart for Device Usage
+				const ctxDev = document.getElementById('deviceChart').getContext('2d');
+				new Chart(ctxDev, {
+					type: 'doughnut',
+					data: {
+						labels: ['데스크톱', '모바일', '태블릿'],
+						datasets: [{
+							data: [68.5, 27.3, 4.2],
+							backgroundColor: ['#2563eb', '#10b981', '#f59e0b'],
+							borderWidth: 0
+						}]
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						cutout: '70%',
+						plugins: {
+							legend: {
+								display: false
+							}
+						}
+					}
+				});
+				// 사이드바 접기/펼치기 토글 스크립트
+				const sidebar = document.getElementById('sidebar');
+				const sidebarToggle = document.getElementById('sidebar-toggle');
+				const toggleSidebarIcon = sidebarToggle.querySelector('i');
+
+				sidebarToggle.addEventListener('click', function() {
+					sidebar.classList.toggle('collapsed');
+					if (sidebar.classList.contains('collapsed')) {
+						toggleSidebarIcon.classList.remove('fa-angles-left');
+						toggleSidebarIcon.classList.add('fa-angles-right');
+						sidebarToggle.setAttribute('title', '메뉴 펼치기');
+					} else {
+						toggleSidebarIcon.classList.remove('fa-angles-right');
+						toggleSidebarIcon.classList.add('fa-angles-left');
+						sidebarToggle.setAttribute('title', '메뉴 접기');
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
