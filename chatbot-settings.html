@@ -495,10 +495,10 @@
 										<label class="form-label">사용 모델 <span class="req">*</span></label>
 										<select id="botModel" class="form-select">
 											<option value="">모델 선택...</option>
-											<option value="gemma2">Gemma 2 (7B)</option>
-											<option value="llama2">Llama 2 (7B)</option>
-											<option value="mistral">Mistral (7B)</option>
-											<option value="neural-chat">Neural Chat</option>
+											<option value="gemma4:e4b">🤖 Gemma4 e4b (추천) - 8.0B</option>
+											<option value="qwen2.5:7b">🧠 Qwen 2.5 - 7.6B</option>
+											<option value="llama3.2:3b">🦙 Llama 3.2 - 3.2B</option>
+											<option value="gemma4:31b-cloud">☁️ Gemma4 31b (클라우드)</option>
 										</select>
 										<div class="form-hint" style="font-size:11px; color:var(--text-dim); margin-top:4px;">※ Ollama에 설치된 로컬 대형 언어 모델을 선택합니다.</div>
 									</div>
@@ -675,7 +675,7 @@
 					name: '일반 챗봇',
 					description: '일반적인 질문에 답변하는 챗봇',
 					active: true,
-					model: 'gemma2',
+					model: 'gemma4:e4b',
 					temperature: 0.7,
 					maxTokens: 512,
 					timeout: 30,
@@ -690,7 +690,7 @@
 					name: 'HR 챗봇',
 					description: '채용, 복지, 인사 관련 질문 담당',
 					active: true,
-					model: 'llama2',
+					model: 'qwen2.5:7b',
 					temperature: 0.5,
 					maxTokens: 768,
 					timeout: 45,
@@ -705,7 +705,7 @@
 					name: '기술지원 챗봇',
 					description: '기술 문제 해결 및 지원',
 					active: true,
-					model: 'mistral',
+					model: 'llama3.2:3b',
 					temperature: 0.3,
 					maxTokens: 1024,
 					timeout: 60,
@@ -1094,11 +1094,10 @@
 							<div>
 								<label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">AI 모델 <span style="color: #dc2626;">*</span></label>
 								<select id="newBotModel" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit;">
-									<option value="gemma4:e4b">Gemma4 e4b (추천)</option>
-									<option value="gemma2">Gemma 2 (7B)</option>
-									<option value="llama2">Llama 2 (7B)</option>
-									<option value="mistral">Mistral (7B)</option>
-									<option value="qwen2.5:7b">Qwen 2.5 (7B)</option>
+									<option value="gemma4:e4b">🤖 Gemma4 e4b (추천) - 8.0B</option>
+									<option value="qwen2.5:7b">🧠 Qwen 2.5 - 7.6B</option>
+									<option value="llama3.2:3b">🦙 Llama 3.2 - 3.2B</option>
+									<option value="gemma4:31b-cloud">☁️ Gemma4 31b (클라우드)</option>
 								</select>
 							</div>
 						</div>
