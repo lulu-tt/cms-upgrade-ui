@@ -554,6 +554,130 @@
 									</div>
 								</div>
 
+								<!-- 학습 자료 관리 -->
+								<div class="setting-section">
+									<div class="form-section-title">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1"/><path d="M9 8v4M9 15v1"/></svg>
+										학습 자료 관리
+									</div>
+									<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+
+										<!-- Option A: 텍스트 입력 -->
+										<div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--bg-hover);">
+											<label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 8px;">
+												<input type="checkbox" id="useTextLearning" class="w-4 h-4" style="cursor: pointer;">
+												<span style="font-weight: 600; color: var(--text-primary); font-size: 13px;">텍스트 입력</span>
+												<span style="font-size: 11px; color: var(--text-dim); margin-left: auto;">회사 정책, FAQ 등 텍스트</span>
+											</label>
+											<div id="textLearningPanel" style="display: none; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 8px;">
+												<div style="margin-bottom: 10px;">
+													<label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">학습 텍스트</label>
+													<textarea id="learningText" placeholder="챗봇이 학습할 텍스트를 입력하세요. (정책, 규정, FAQ 등)" rows="5" class="form-textarea" style="font-size: 12px;"></textarea>
+													<div style="margin-top: 6px; font-size: 11px; color: var(--text-dim);">또는</div>
+												</div>
+												<div>
+													<label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">파일 업로드</label>
+													<div style="border: 2px dashed var(--border); border-radius: 6px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s;" id="textFileUpload">
+														<i class="fa-solid fa-file-upload" style="color: var(--text-dim); margin-right: 6px;"></i>
+														<span style="font-size: 12px; color: var(--text-secondary);">TXT, PDF 파일 선택</span>
+													</div>
+													<input type="file" id="textFileInput" accept=".txt,.pdf" style="display: none;">
+												</div>
+											</div>
+										</div>
+
+										<!-- Option B: 데이터베이스 -->
+										<div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--bg-hover);">
+											<label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 8px;">
+												<input type="checkbox" id="useDbLearning" class="w-4 h-4" style="cursor: pointer;">
+												<span style="font-weight: 600; color: var(--text-primary); font-size: 13px;">데이터베이스 연동</span>
+												<span style="font-size: 11px; color: var(--text-dim); margin-left: auto;">SQL 쿼리로 데이터 연동</span>
+											</label>
+											<div id="dbLearningPanel" style="display: none; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 8px;">
+												<div class="form-grid" style="gap: 10px; margin-bottom: 10px;">
+													<div class="form-group">
+														<label class="form-label" style="font-size: 11px;">데이터베이스 타입</label>
+														<select id="dbType" class="form-select" style="font-size: 12px;">
+															<option value="">선택...</option>
+															<option value="mysql">MySQL</option>
+															<option value="postgresql">PostgreSQL</option>
+															<option value="mssql">MSSQL</option>
+															<option value="mongodb">MongoDB</option>
+														</select>
+													</div>
+													<div class="form-group">
+														<label class="form-label" style="font-size: 11px;">연결 상태</label>
+														<div style="padding: 8px 10px; background: white; border: 1px solid var(--border); border-radius: 6px; font-size: 11px; color: var(--text-dim);">
+															<i class="fa-solid fa-circle text-red-500 text-[4px]" style="margin-right: 4px;"></i>
+															미연결
+														</div>
+													</div>
+												</div>
+												<div class="form-group" style="margin-bottom: 10px;">
+													<label class="form-label" style="font-size: 11px;">데이터베이스명</label>
+													<input type="text" id="dbName" placeholder="예: company_db" class="form-input" style="font-size: 12px;">
+												</div>
+												<div class="form-group" style="margin-bottom: 10px;">
+													<label class="form-label" style="font-size: 11px;">SQL 쿼리</label>
+													<textarea id="dbQuery" placeholder="SELECT * FROM documents WHERE active = 1" rows="4" class="form-textarea" style="font-size: 12px; font-family: var(--font-mono);"></textarea>
+													<div style="margin-top: 4px; font-size: 10px; color: var(--text-dim);">선택된 열의 데이터가 학습 자료로 사용됩니다</div>
+												</div>
+												<button style="width: 100%; padding: 6px; background: var(--accent-blue); color: white; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;">연결 테스트</button>
+											</div>
+										</div>
+
+										<!-- Option C: 웹사이트 -->
+										<div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--bg-hover);">
+											<label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 8px;">
+												<input type="checkbox" id="useWebLearning" class="w-4 h-4" style="cursor: pointer;">
+												<span style="font-weight: 600; color: var(--text-primary); font-size: 13px;">웹사이트 크롤링</span>
+												<span style="font-size: 11px; color: var(--text-dim); margin-left: auto;">특정 사이트의 내용 수집</span>
+											</label>
+											<div id="webLearningPanel" style="display: none; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 8px;">
+												<div class="form-group" style="margin-bottom: 10px;">
+													<label class="form-label" style="font-size: 11px;">웹사이트 URL</label>
+													<input type="url" id="webUrl" placeholder="https://example.com" class="form-input" style="font-size: 12px;">
+												</div>
+												<div class="form-group" style="margin-bottom: 10px;">
+													<label class="form-label" style="font-size: 11px;">크롤링 범위</label>
+													<select id="webScope" class="form-select" style="font-size: 12px;">
+														<option value="root">홈페이지만</option>
+														<option value="subdomain">서브도메인 포함</option>
+														<option value="all">전체 사이트</option>
+													</select>
+												</div>
+												<div class="form-group" style="margin-bottom: 10px;">
+													<label class="form-label" style="font-size: 11px;">제외할 페이지 패턴</label>
+													<input type="text" id="webExclude" placeholder="예: /admin, /api, /search" class="form-input" style="font-size: 12px;">
+													<div style="margin-top: 4px; font-size: 10px; color: var(--text-dim);">쉼표로 구분</div>
+												</div>
+												<div class="form-group" style="margin-bottom: 10px;">
+													<label class="form-label" style="font-size: 11px;">업데이트 주기</label>
+													<select id="webUpdateFreq" class="form-select" style="font-size: 12px;">
+														<option value="once">일회만</option>
+														<option value="daily">매일</option>
+														<option value="weekly">매주</option>
+														<option value="monthly">매월</option>
+													</select>
+												</div>
+												<button style="width: 100%; padding: 6px; background: var(--accent-blue); color: white; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;">미리보기</button>
+											</div>
+										</div>
+									</div>
+
+									<!-- 학습 시작 버튼 -->
+									<div style="margin-top: 12px; display: flex; gap: 8px;">
+										<button style="flex: 1; padding: 8px; background: var(--accent-blue); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+											<i class="fa-solid fa-brain"></i> 학습 시작
+										</button>
+										<button style="flex: 1; padding: 8px; background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+											<i class="fa-solid fa-trash"></i> 학습 초기화
+										</button>
+									</div>
+								</div>
+
+								<hr class="form-divider" style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
+
 								<!-- 고급 설정 -->
 								<div class="setting-section">
 									<div class="form-section-title">
@@ -1034,6 +1158,35 @@
 
 			document.getElementById('botMaxTokens').addEventListener('input', (e) => {
 				document.getElementById('maxTokenValue').textContent = e.target.value;
+			});
+
+			// ===== 학습 자료 관리 =====
+			document.getElementById('useTextLearning').addEventListener('change', (e) => {
+				document.getElementById('textLearningPanel').style.display = e.target.checked ? 'block' : 'none';
+			});
+
+			document.getElementById('useDbLearning').addEventListener('change', (e) => {
+				document.getElementById('dbLearningPanel').style.display = e.target.checked ? 'block' : 'none';
+			});
+
+			document.getElementById('useWebLearning').addEventListener('change', (e) => {
+				document.getElementById('webLearningPanel').style.display = e.target.checked ? 'block' : 'none';
+			});
+
+			// 파일 업로드 이벤트
+			document.getElementById('textFileUpload').addEventListener('click', () => {
+				document.getElementById('textFileInput').click();
+			});
+
+			document.getElementById('textFileInput').addEventListener('change', (e) => {
+				const file = e.target.files[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.onload = (event) => {
+						document.getElementById('learningText').value = event.target.result;
+					};
+					reader.readAsText(file);
+				}
 			});
 
 			document.getElementById('saveBotBtn').addEventListener('click', () => {
