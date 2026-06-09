@@ -54,11 +54,23 @@
 				--bg-input: #f1f5f9;
 				--border: #e2e8f0;
 				--border-mid: #cbd5e1;
+				--border-accent: #94a3b8;
 				--text-primary: #1e293b;
 				--text-secondary: #64748b;
+				--text-dim: #94a3b8;
 				--accent-blue: #2563eb;
-				--accent-blue-dim: rgba(37,99,235,0.06);
-				--accent-blue-glow: rgba(37,99,235,0.15);
+				--accent-blue-dim: rgba(37,99,235,0.08);
+				--accent-blue-glow: rgba(37,99,235,0.2);
+				--ok: #16a34a;
+				--ok-dim: rgba(22,163,74,0.08);
+				--ok-border: rgba(22,163,74,0.25);
+				--warn: #d97706;
+				--warn-dim: rgba(217,119,6,0.08);
+				--warn-border: rgba(217,119,6,0.25);
+				--err: #dc2626;
+				--err-dim: rgba(220,38,38,0.08);
+				--err-border: rgba(220,38,38,0.25);
+				--font-mono: 'IBM Plex Mono', monospace;
 				--font-sans: 'Inter', 'Noto Sans KR', sans-serif;
 			}
 
@@ -67,6 +79,65 @@
 			/* Custom Scrollbar */
 			::-webkit-scrollbar { width: 6px; height: 6px; }
 			::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+
+			/* ── Panel & Form Layouts from chatbot-settings.html ── */
+			.panel {
+				background: var(--bg-card); border: 1px solid var(--border);
+				border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+			}
+			.panel-header {
+				display: flex; align-items: center; gap: 10px;
+				padding: 16px 24px; border-bottom: 1px solid var(--border);
+			}
+			.panel-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+			
+			.form-section-title {
+				font-size: 13px; font-weight: 700; color: var(--text-secondary);
+				text-transform: uppercase; letter-spacing: 0.05em;
+				margin-bottom: 16px; padding-bottom: 8px;
+				border-bottom: 1px solid var(--border);
+				display: flex; align-items: center; gap: 8px;
+			}
+			.form-section-title svg { width: 14px; height: 14px; stroke: var(--accent-blue); fill: none; stroke-width: 2.5; }
+			
+			.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+			.form-group { display: flex; flex-direction: column; gap: 6px; }
+			.form-label {
+				font-size: 12px; font-weight: 700; color: var(--text-secondary);
+				display: flex; align-items: center; gap: 4px;
+			}
+			.form-label .req { color: var(--err); font-size: 12px; }
+			
+			.form-input {
+				padding: 10px 14px; border: 1px solid var(--border-mid);
+				border-radius: 8px; font-family: var(--font-sans);
+				font-size: 13px; color: var(--text-primary);
+				background: var(--bg-card); outline: none;
+				transition: border-color 0.15s, box-shadow 0.15s;
+				width: 100%;
+			}
+			.form-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--accent-blue-glow); }
+			.form-input::placeholder { color: var(--text-dim); }
+
+			.form-select {
+				padding: 10px 32px 10px 14px; border: 1px solid var(--border-mid);
+				border-radius: 8px; font-family: var(--font-sans);
+				font-size: 13px; color: var(--text-primary);
+				background: var(--bg-card); outline: none;
+				appearance: none; width: 100%; cursor: pointer;
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+				background-repeat: no-repeat; background-position: right 12px center;
+			}
+			.form-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--accent-blue-glow); outline: none; }
+			
+			.form-textarea {
+				padding: 10px 14px; border: 1px solid var(--border-mid);
+				border-radius: 8px; font-family: var(--font-sans);
+				font-size: 13px; color: var(--text-primary);
+				background: var(--bg-card); outline: none; resize: vertical;
+				width: 100%; min-height: 80px; line-height: 1.6;
+			}
+			.form-textarea:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px var(--accent-blue-glow); }
 
 			#sidebar.collapsed {
 				width: 4.5rem;
@@ -319,7 +390,7 @@
 				</div>
 			</aside>
 
-			<!-- MAIN CONTENT AREA (기존 CMS 구조와 동일하게) -->
+			<!-- MAIN CONTENT AREA -->
 			<div class="flex-1 flex flex-col overflow-hidden">
 				
 				<!-- Header (기존 CMS Top 헤더 구조 이식) -->
@@ -342,11 +413,11 @@
 						</div>
 					</div>
 
-					<!-- Top Bar Actions (AI봇 선택 필터와 함께 통합) -->
+					<!-- Top Bar Actions -->
 					<div class="flex items-center gap-4">
 						<div class="flex items-center gap-2">
 							<span class="text-xs font-semibold text-slate-500">대상 AI 봇 :</span>
-							<select id="botSelector" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-800 outline-none transition cursor-pointer">
+							<select id="botSelector" class="form-select" style="padding: 5px 28px 5px 10px; font-size:12px; border-radius:6px; width:auto;">
 								<option value="bot1">🤖 인사총무팀 AI 비서</option>
 								<option value="bot2" selected>🤖 테스트봇</option>
 								<option value="bot3">🤖 직원용 자료실 챗봇</option>
@@ -363,11 +434,11 @@
 					</div>
 				</header>
 
-				<!-- Scrollable Content Body (콘텐츠 영역) -->
+				<!-- Scrollable Content Body -->
 				<main class="flex-1 overflow-y-auto p-6 space-y-6">
 					
-					<!-- Content Header Title Card -->
-					<div class="bg-white rounded-2xl p-6 border border-slate-200 flex items-center justify-between shadow-sm">
+					<!-- Content Header Title Card (기존 테마 스타일화) -->
+					<div class="panel p-6 flex items-center justify-between">
 						<div>
 							<h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
 								<span>챗봇 지식 학습 관리</span>
@@ -377,10 +448,10 @@
 						</div>
 					</div>
 
-					<!-- Top Status Info Bar (학습 현황 리포트) -->
+					<!-- Top Status Info Cards (기존 panel 클래스 적용) -->
 					<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 						<!-- Status Card 1 -->
-						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+						<div class="panel p-5 flex items-center gap-4">
 							<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
 								<i class="fa-solid fa-server text-lg"></i>
 							</div>
@@ -390,7 +461,7 @@
 							</div>
 						</div>
 						<!-- Status Card 2 -->
-						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+						<div class="panel p-5 flex items-center gap-4">
 							<div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
 								<i class="fa-solid fa-circle-check text-lg"></i>
 							</div>
@@ -400,7 +471,7 @@
 							</div>
 						</div>
 						<!-- Status Card 3 -->
-						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+						<div class="panel p-5 flex items-center gap-4">
 							<div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 animate-pulse">
 								<i class="fa-solid fa-arrows-spin text-lg"></i>
 							</div>
@@ -410,7 +481,7 @@
 							</div>
 						</div>
 						<!-- Status Card 4 (용량 사용량 게이지) -->
-						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+						<div class="panel p-5 flex flex-col justify-between">
 							<div class="flex items-center justify-between text-[11px] text-slate-400 font-medium mb-1">
 								<span>학습 스토리지 용량</span>
 								<span class="font-bold text-slate-700">62.07 MB / 1 GB</span>
@@ -424,30 +495,30 @@
 					<!-- Two-Column Workspace Layout -->
 					<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 						
-						<!-- Left Side: Interactive Batch Data Registry Panel (12 cols 중 7) -->
-						<div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+						<!-- Left Side: Interactive Batch Data Registry Panel (기존 panel 스타일 이식) -->
+						<div class="lg:col-span-7 panel flex flex-col">
 							
-							<!-- Panel Header with Integrated Tabs -->
-							<div class="px-5 pt-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+							<!-- Panel Header with Integrated Tabs (chatbot-settings.html style) -->
+							<div class="panel-header" style="background:var(--accent-blue-dim); justify-content: space-between; flex-wrap: wrap; gap: 12px;">
 								<div class="flex items-center gap-2">
-									<i class="fa-solid fa-plus-to-slot text-blue-600"></i>
-									<h2 class="text-sm font-bold text-slate-800">일괄 데이터 등록창</h2>
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+									<span class="panel-title">일괄 데이터 등록창</span>
 								</div>
 								
 								<!-- Tab Switchers -->
-								<div class="flex gap-1 text-xs border-b border-slate-200 w-full sm:w-auto">
-									<button onclick="switchTab('file')" id="tab-btn-file" class="active-tab px-4 py-2 border-b-2 font-bold transition">📁 파일 업로드</button>
-									<button onclick="switchTab('text')" id="tab-btn-text" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition">📝 텍스트 일괄입력</button>
-									<button onclick="switchTab('url')" id="tab-btn-url" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition">🌐 웹 주소(URL)</button>
+								<div class="flex gap-1 text-xs">
+									<button onclick="switchTab('file')" id="tab-btn-file" class="active-tab px-3 py-1 border-b-2 font-bold transition">📁 파일 업로드</button>
+									<button onclick="switchTab('text')" id="tab-btn-text" class="px-3 py-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition">📝 텍스트 일괄입력</button>
+									<button onclick="switchTab('url')" id="tab-btn-url" class="px-3 py-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition">🌐 웹 주소(URL)</button>
 								</div>
 							</div>
 
 							<!-- Panel Content Panels -->
-							<div class="p-5 min-h-[300px]">
+							<div class="p-6 min-h-[300px]">
 								
 								<!-- TAB 1: File Batch Upload Panel -->
 								<div id="panel-file" class="space-y-4">
-									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+									<div class="form-hint bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
 										📌 다중 파일을 선택하여 한 번에 학습 대기열에 올릴 수 있습니다. (지원 파일: pdf, txt, csv, xlsx, docx)
 									</div>
 									
@@ -475,7 +546,7 @@
 													<span class="font-medium truncate" title="[발전] 사업허가증.pdf">[발전] 사업허가증.pdf</span>
 												</div>
 												<div class="flex items-center gap-2 shrink-0">
-													<span class="text-[10px] text-slate-400">39 KB</span>
+													<span class="text-[10px] text-slate-400 font-mono">39 KB</span>
 													<button class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
 												</div>
 											</div>
@@ -486,7 +557,7 @@
 													<span class="font-medium truncate" title="2026_법정신고_양식.xlsx">2026_법정신고_양식.xlsx</span>
 												</div>
 												<div class="flex items-center gap-2 shrink-0">
-													<span class="text-[10px] text-slate-400">2.1 MB</span>
+													<span class="text-[10px] text-slate-400 font-mono">2.1 MB</span>
 													<button class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
 												</div>
 											</div>
@@ -497,7 +568,7 @@
 													<span class="font-medium truncate" title="서비스_운영정책.txt">서비스_운영정책.txt</span>
 												</div>
 												<div class="flex items-center gap-2 shrink-0">
-													<span class="text-[10px] text-slate-400">12 KB</span>
+													<span class="text-[10px] text-slate-400 font-mono">12 KB</span>
 													<button class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
 												</div>
 											</div>
@@ -505,44 +576,60 @@
 									</div>
 								</div>
 
-								<!-- TAB 2: Text Multi-Insert Panel -->
+								<!-- TAB 2: Text Multi-Insert Panel (CMS Grid input 스타일 적용) -->
 								<div id="panel-text" class="hidden space-y-4">
-									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
+									<div class="form-hint bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs flex items-center justify-between">
 										<span>📌 여러 개의 텍스트 정보를 개별 행으로 생성하여 한 번에 학습시킬 수 있습니다.</span>
-										<button onclick="addTextRow()" class="px-2 py-1 bg-primary-600 text-white rounded text-[10px] font-bold hover:bg-primary-700 transition">
+										<button onclick="addTextRow()" class="px-2.5 py-1 bg-primary-600 text-white rounded text-[10px] font-bold hover:bg-primary-700 transition">
 											<i class="fa-solid fa-plus mr-1"></i>행 추가
 										</button>
 									</div>
 
 									<!-- Dynamic Rows Container -->
 									<div id="textRowsContainer" class="space-y-3 max-h-[250px] overflow-y-auto pr-1">
-										<!-- Row 1 -->
-										<div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative">
-											<div class="flex gap-2">
-												<input type="text" placeholder="데이터 제목 (예: 휴가 규정)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500 font-semibold">
-												<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
+										<!-- Row 1 (CMS Grid style) -->
+										<div class="bg-white rounded-lg border border-slate-200 overflow-hidden text-xs">
+											<div class="flex border-b border-slate-100">
+												<div class="w-24 bg-slate-50/80 p-2 font-semibold text-slate-600 flex items-center border-r border-slate-100">제목</div>
+												<div class="flex-1 p-2 flex items-center gap-2">
+													<input type="text" placeholder="예: 휴가 규정" class="form-input" style="padding:6px 10px; font-size:12px;">
+													<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.bg-white').remove()"><i class="fa-solid fa-xmark"></i></button>
+												</div>
 											</div>
-											<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
+											<div class="flex">
+												<div class="w-24 bg-slate-50/80 p-2 font-semibold text-slate-600 flex items-center border-r border-slate-100">내용</div>
+												<div class="flex-1 p-2">
+													<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." class="form-textarea" style="padding:6px 10px; font-size:12px; min-height:60px;"></textarea>
+												</div>
+											</div>
 										</div>
 										<!-- Row 2 -->
-										<div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative">
-											<div class="flex gap-2">
-												<input type="text" placeholder="데이터 제목 (예: 경조사 지원금)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500 font-semibold">
-												<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
+										<div class="bg-white rounded-lg border border-slate-200 overflow-hidden text-xs">
+											<div class="flex border-b border-slate-100">
+												<div class="w-24 bg-slate-50/80 p-2 font-semibold text-slate-600 flex items-center border-r border-slate-100">제목</div>
+												<div class="flex-1 p-2 flex items-center gap-2">
+													<input type="text" placeholder="예: 경조사 지원금" class="form-input" style="padding:6px 10px; font-size:12px;">
+													<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.bg-white').remove()"><i class="fa-solid fa-xmark"></i></button>
+												</div>
 											</div>
-											<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
+											<div class="flex">
+												<div class="w-24 bg-slate-50/80 p-2 font-semibold text-slate-600 flex items-center border-r border-slate-100">내용</div>
+												<div class="flex-1 p-2">
+													<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." class="form-textarea" style="padding:6px 10px; font-size:12px; min-height:60px;"></textarea>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
 
 								<!-- TAB 3: URL Crawler Panel -->
 								<div id="panel-url" class="hidden space-y-4">
-									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+									<div class="form-hint bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
 										📌 웹사이트 URL 주소를 여러 개 입력하면 본문 데이터를 크롤러가 긁어와 학습합니다. (한 줄에 하나의 URL 입력)
 									</div>
-									<div class="space-y-1">
-										<label class="text-[11px] font-bold text-slate-500">학습시킬 URL 주소 (줄바꿈으로 구분)</label>
-										<textarea placeholder="https://company.com/intro&#10;https://company.com/faq" rows="6" class="w-full bg-white border border-slate-200 rounded-lg p-3 text-xs outline-none focus:border-blue-500 font-mono"></textarea>
+									<div class="form-group">
+										<label class="form-label">학습시킬 URL 주소 (줄바꿈으로 구분)</label>
+										<textarea placeholder="https://company.com/intro&#10;https://company.com/faq" class="form-textarea font-mono" style="min-height: 120px;"></textarea>
 									</div>
 								</div>
 
@@ -551,12 +638,12 @@
 							<!-- Action Footer Buttons -->
 							<div class="px-5 py-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center">
 								<div class="flex items-center gap-2">
-									<select class="bg-white border border-slate-200 rounded py-1.5 px-2 text-[11px] text-slate-600 outline-none cursor-pointer">
+									<select class="form-select" style="padding: 6px 24px 6px 10px; font-size:11px; width:auto; border-radius:6px;">
 										<option>대분류: 전체</option>
 										<option>인사 규정</option>
 										<option>업무 지침</option>
 									</select>
-									<select class="bg-white border border-slate-200 rounded py-1.5 px-2 text-[11px] text-slate-600 outline-none cursor-pointer">
+									<select class="form-select" style="padding: 6px 24px 6px 10px; font-size:11px; width:auto; border-radius:6px;">
 										<option>소분류: 전체</option>
 										<option>휴가/경조사</option>
 										<option>공문서/기타</option>
@@ -564,22 +651,22 @@
 								</div>
 								
 								<div class="flex gap-2">
-									<button class="px-4 py-2 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 transition">
-										<i class="fa-solid fa-hourglass-start mr-1.5"></i>대기열 임시추가
+									<button class="px-3 py-2 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 transition bg-white">
+										<i class="fa-solid fa-hourglass-start mr-1"></i>대기열 임시추가
 									</button>
-									<button class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
-										<i class="fa-solid fa-graduation-cap mr-1.5"></i>즉시 학습시키기
+									<button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+										<i class="fa-solid fa-graduation-cap mr-1"></i>즉시 학습시키기
 									</button>
 								</div>
 							</div>
 						</div>
 
 						<!-- Right Side: Unified Status Panel & Control Tower (12 cols 중 5) -->
-						<div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-							<div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+						<div class="lg:col-span-5 panel flex flex-col">
+							<div class="panel-header" style="background:var(--accent-blue-dim); justify-content: space-between;">
 								<div class="flex items-center gap-2">
-									<i class="fa-solid fa-desktop text-blue-600"></i>
-									<h2 class="text-sm font-bold text-slate-800">학습 제어 타워</h2>
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+									<span class="panel-title">학습 제어 타워</span>
 								</div>
 								<!-- Current State badge -->
 								<span class="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold rounded animate-pulse">학습 진행 중</span>
@@ -608,10 +695,10 @@
 								
 								<!-- Action buttons -->
 								<div class="grid grid-cols-2 gap-2">
-									<button class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-200">
+									<button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-200 bg-white">
 										<i class="fa-solid fa-pause"></i>학습 일시정지
 									</button>
-									<button class="py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+									<button class="py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
 										<i class="fa-solid fa-stop"></i>학습 완전중단
 									</button>
 								</div>
@@ -620,7 +707,7 @@
 
 								<!-- Quick Stats Summary -->
 								<div class="space-y-2.5">
-									<h3 class="text-xs font-bold text-slate-700">최근 학습 실패 로그</h3>
+									<div class="form-label font-bold"><i class="fa-solid fa-circle-exclamation text-red-500 mr-1.5"></i>최근 학습 실패 로그</div>
 									<div class="p-3 bg-red-50 border border-red-100 rounded-lg text-[11px] text-red-700 space-y-1">
 										<div class="flex justify-between font-semibold">
 											<span>⚠️ 2026_인사규정_정리.pdf</span>
@@ -634,21 +721,21 @@
 
 					</div>
 
-					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs -->
-					<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs (기존 테이블 디자인 적용) -->
+					<div class="panel">
 						<!-- Table Header & Filters -->
-						<div class="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+						<div class="panel-header" style="background:var(--accent-blue-dim); justify-content: space-between; flex-wrap: wrap; gap: 12px;">
 							<div class="flex items-center gap-2">
-								<i class="fa-solid fa-list-check text-blue-600"></i>
-								<h2 class="text-sm font-bold text-slate-800">지식 데이터 학습 목록</h2>
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+								<span class="panel-title">지식 데이터 학습 목록</span>
 							</div>
 							
 							<!-- Integrated Filter Tabs -->
-							<div class="flex items-center gap-1 text-xs border border-slate-200 p-1 bg-white rounded-lg">
-								<button class="px-3 py-1 bg-blue-600 text-white rounded font-bold transition">전체 (342)</button>
-								<button class="px-3 py-1 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">학습 완료 (336)</button>
-								<button class="px-3 py-1 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">대기 중 (4)</button>
-								<button class="px-3 py-1 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">실패 (2)</button>
+							<div class="flex items-center gap-1 text-[11px] border border-slate-200 p-1 bg-white rounded-lg">
+								<button class="px-2.5 py-0.5 bg-blue-600 text-white rounded font-bold transition">전체 (342)</button>
+								<button class="px-2.5 py-0.5 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">학습 완료 (336)</button>
+								<button class="px-2.5 py-0.5 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">대기 중 (4)</button>
+								<button class="px-2.5 py-0.5 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">실패 (2)</button>
 							</div>
 						</div>
 
@@ -664,7 +751,7 @@
 
 							<!-- Search Bar -->
 							<div class="flex gap-2 w-full sm:w-auto">
-								<input type="text" placeholder="데이터 제목, 경로 검색..." class="w-full sm:w-60 bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+								<input type="text" placeholder="데이터 제목, 경로 검색..." class="form-input" style="padding:5px 10px; font-size:12px; width:180px; margin:0;">
 								<button class="px-3 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded text-xs font-bold transition">검색</button>
 							</div>
 						</div>
@@ -795,25 +882,33 @@
 				document.getElementById('panel-text').classList.add('hidden');
 				document.getElementById('panel-url').classList.add('hidden');
 				
-				document.getElementById('tab-btn-file').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
-				document.getElementById('tab-btn-text').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
-				document.getElementById('tab-btn-url').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
+				document.getElementById('tab-btn-file').className = 'px-3 py-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
+				document.getElementById('tab-btn-text').className = 'px-3 py-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
+				document.getElementById('tab-btn-url').className = 'px-3 py-1 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
 
 				document.getElementById('panel-' + type).classList.remove('hidden');
-				document.getElementById('tab-btn-' + type).className = 'active-tab px-4 py-2 border-b-2 font-bold transition';
+				document.getElementById('tab-btn-' + type).className = 'active-tab px-3 py-1 border-b-2 font-bold transition';
 			}
 
-			// 텍스트 행 동적 추가 함수
+			// 텍스트 행 동적 추가 함수 (기존 CMS Grid style로 통일)
 			function addTextRow() {
 				const container = document.getElementById('textRowsContainer');
 				const newRow = document.createElement('div');
-				newRow.className = 'p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative';
+				newRow.className = 'bg-white rounded-lg border border-slate-200 overflow-hidden text-xs';
 				newRow.innerHTML = `
-					<div class="flex gap-2">
-						<input type="text" placeholder="데이터 제목" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500 font-semibold">
-						<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
+					<div class="flex border-b border-slate-100">
+						<div class="w-24 bg-slate-50/80 p-2 font-semibold text-slate-600 flex items-center border-r border-slate-100">제목</div>
+						<div class="flex-1 p-2 flex items-center gap-2">
+							<input type="text" placeholder="데이터 제목" class="form-input" style="padding:6px 10px; font-size:12px;">
+							<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.bg-white').remove()"><i class="fa-solid fa-xmark"></i></button>
+						</div>
 					</div>
-					<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
+					<div class="flex">
+						<div class="w-24 bg-slate-50/80 p-2 font-semibold text-slate-600 flex items-center border-r border-slate-100">내용</div>
+						<div class="flex-1 p-2">
+							<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." class="form-textarea" style="padding:6px 10px; font-size:12px; min-height:60px;"></textarea>
+						</div>
+					</div>
 				`;
 				container.appendChild(newRow);
 				container.scrollTop = container.scrollHeight;
