@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>챗봇 테스트</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 p-8">
+	<div class="max-w-2xl mx-auto">
+		<div class="bg-white rounded-lg shadow-lg p-6">
+			<h1 class="text-2xl font-bold mb-4">🤖 챗봇 직접 테스트</h1>
+
+			<div class="space-y-4">
+				<div>
+					<label class="block text-sm font-medium mb-2">테스트 메시지</label>
+					<input type="text" id="testMessage" value="안녕하세요. 반갑습니다." class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+				</div>
+
+				<div>
+					<label class="block text-sm font-medium mb-2">모델</label>
+					<select id="testModel" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+						<option value="gemma4:e4b">gemma4:e4b</option>
+						<option value="gemma4:12b">gemma4:12b</option>
+						<option value="qwen2.5:7b">qwen2.5:7b</option>
+						<option value="llama3.2:3b">llama3.2:3b</option>
+					</select>
+				</div>
+
+				<div>
+					<label class="block text-sm font-medium mb-2">타임아웃 (초)</label>
+					<input type="number" id="testTimeout" value="60" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+				</div>
+
+				<div>
+					<label class="block text-sm font-medium mb-2">응답 토큰 수</label>
+					<input type="number" id="testTokens" value="1024" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+				</div>
+
+				<button onclick="testChatbot()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
+					<i class="fas fa-paper-plane mr-2"></i> 테스트 전송
+				</button>
+			</div>
+
+			<div class="mt-6 border-t pt-4">
+				<h2 class="text-lg font-bold mb-3">콘솔 로그</h2>
+				<div id="logs" class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm overflow-y-auto h-96 whitespace-pre-wrap">
+					로그가 여기에 표시됩니다...
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const logDiv = document.getElementById('logs');
+		let logs = [];
+
+		// 콘솔 로그 캡처
+		const originalLog = console.log;
+		const originalError = console.error;
+
+		console.log = function(...args) {
+			originalLog(...args);
+			addLog('LOG', args.join(' '));
+		};
+
+		console.error = function(...args) {
+			originalError(...args);
+			addLog('ERROR', args.join(' '));
+		};
+
+		function addLog(type, message) {
+			const timestamp = new Date().toLocaleTimeString();
+			const logEntry = `[${timestamp}] [${type}] ${message}`;
+			logs.push(logEntry);
+			logDiv.textContent = logs.join('\n');
+			logDiv.scrollTop = logDiv.scrollHeight;
+		}
+
+		async function testChatbot() {
+			const message = document.getElementById('testMessage').value;
+			const model = document.getElementById('testModel').value;
+			const timeout = parseInt(document.getElementById('testTimeout').value) * 1000;
+			const numTokens = parseInt(document.getElementById('testTokens').value);
+
+			if (!message.trim()) {
+				alert('메시지를 입력하세요');
+				return;
+			}
+
+			logs = [];
+			addLog('START', '챗봇 테스트 시작...');
+			addLog('INFO', `메시지: ${message}`);
+			addLog('INFO', `모델: ${model}`);
+			addLog('INFO', `타임아웃: ${timeout}ms`);
+			addLog('INFO', `응답 토큰: ${numTokens}`);
+
+			try {
+				const ollamaUrl = 'http://localhost:11434';
+				const prompt = `당신은 친절한 AI 어시스턴트입니다. 사용자의 질문에 정확하고 도움이 되는 답변을 제공하세요.
+
+사용자 질문: ${message}
+
+답변:`;
+
+				addLog('API', `${ollamaUrl}/api/generate 호출 중...`);
+
+				const controller = new AbortController();
+				const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+				const response = await fetch(`${ollamaUrl}/api/generate`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					mode: 'cors',
+					credentials: 'omit',
+					signal: controller.signal,
+					body: JSON.stringify({
+						model: model,
+						prompt: prompt,
+						stream: false,
+						temperature: 0.7,
+						top_p: 0.9,
+						num_predict: numTokens
+					})
+				});
+
+				clearTimeout(timeoutId);
+
+				addLog('RESPONSE', `HTTP ${response.status}`);
+
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+				}
+
+				const data = await response.json();
+				let botResponse = data.response || '응답을 생성하지 못했습니다.';
+
+				// 응답 정제
+				botResponse = botResponse
+					.replace(/^.*?답변:\s*/s, '')
+					.replace(/^.*?응답:\s*/s, '')
+					.trim()
+					.split('\n\n')[0];
+
+				addLog('SUCCESS', '응답 수신 완료');
+				addLog('RESULT', botResponse);
+
+				alert(`✅ 테스트 성공!\n\n${botResponse}`);
+			} catch (error) {
+				addLog('ERROR', error.message);
+				let errorMsg = '오류 발생';
+
+				if (error.name === 'AbortError') {
+					errorMsg = '응답 시간 초과';
+				} else if (error.message.includes('Failed to fetch')) {
+					errorMsg = 'Ollama 서버에 연결할 수 없습니다';
+				} else {
+					errorMsg = error.message;
+				}
+
+				alert(`❌ 테스트 실패\n\n${errorMsg}`);
+			}
+		}
+
+		console.log('🚀 테스트 페이지 로드 완료');
+	</script>
+</body>
+</html>

@@ -228,7 +228,6 @@
 									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
 										<li><a href="chatbot-dashboard.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">실시간 통계</a></li>
 										<li><a href="chatbot-settings.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 설정관리</a></li>
-										<li><a href="chatbot-learning.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 학습관리</a></li>
 									</ul>
 								</details>
 							</li>
@@ -1384,7 +1383,7 @@
 
 					Array.from(this.files).forEach((file) => {
 						const fileItem = document.createElement('div');
-						fileItem.className = 'flex items-center justify-between p-3.5 bg-red-50 rounded-xl border border-red-200 text-xs hover:bg-red-100 transition';
+						fileItem.className = 'flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200 text-xs';
 
 						const ext = file.name.split('.').pop().toLowerCase();
 						let iconClass = 'fa-file';

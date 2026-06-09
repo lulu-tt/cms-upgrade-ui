@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>챗봇 학습관리 | 관리시스템</title>
+
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+		<!-- FontAwesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
+							mono: ['IBM Plex Mono', 'monospace'],
+						},
+						colors: {
+							primary: {
+								50: '#f0f5ff',
+								100: '#e0ebff',
+								500: '#2563eb',
+								600: '#1d4ed8',
+								700: '#1e40af',
+							},
+							sidebar: {
+								bg: '#ffffff',
+								hover: '#f3f4f6',
+								active: '#eff6ff',
+								text: '#374151',
+								border: '#e5e7eb',
+							}
+						}
+					}
+				}
+			}
+		</script>
+
+		<style>
+			:root {
+				--bg-base: #f8fafc;
+				--bg-panel: #ffffff;
+				--bg-card: #ffffff;
+				--bg-hover: #f8fafc;
+				--bg-input: #f1f5f9;
+				--border: #e2e8f0;
+				--border-mid: #cbd5e1;
+				--text-primary: #1e293b;
+				--text-secondary: #64748b;
+				--accent-blue: #2563eb;
+				--accent-blue-dim: rgba(37,99,235,0.06);
+				--accent-blue-glow: rgba(37,99,235,0.15);
+				--font-sans: 'Inter', 'Noto Sans KR', sans-serif;
+			}
+
+			body { font-family: var(--font-sans); background-color: var(--bg-base); color: var(--text-primary); }
+			
+			/* Custom Scrollbar */
+			::-webkit-scrollbar { width: 6px; height: 6px; }
+			::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+
+			.sidebar-menu-item {
+				transition: all 0.2s ease;
+			}
+			.active-tab {
+				border-color: var(--accent-blue);
+				color: var(--accent-blue);
+				font-weight: 600;
+			}
+		</style>
+	</head>
+	<body class="overflow-x-hidden">
+		<!-- App Layout Container -->
+		<div class="flex min-h-screen">
+			
+			<!-- Sidebar (Left Navigation) -->
+			<aside id="sidebar" class="w-64 border-r border-sidebar-border bg-sidebar-bg flex flex-col shrink-0 transition-all duration-300">
+				<!-- Sidebar Header -->
+				<div class="h-16 border-b border-sidebar-border flex items-center justify-between px-4">
+					<div class="flex items-center gap-2.5">
+						<div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-lg">
+							<i class="fa-solid fa-cube text-sm"></i>
+						</div>
+						<span class="font-bold text-[15px] tracking-wide text-slate-800">CMS Upgrade</span>
+					</div>
+					<button id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition p-1" title="메뉴 접기">
+						<i class="fa-solid fa-angles-left"></i>
+					</button>
+				</div>
+
+				<!-- Navigation Menu List -->
+				<div class="flex-1 overflow-y-auto p-4 space-y-6">
+					<!-- Site & Template Selection -->
+					<div class="space-y-1">
+						<label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 block">사이트 및 국문</label>
+						<select class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-xs font-semibold text-slate-700 outline-none focus:border-primary-500 cursor-pointer">
+							<option>한국고용정보원 - 국문</option>
+							<option>한국고용정보원 - 영문</option>
+							<option>기관소개 사이트</option>
+						</select>
+					</div>
+
+					<div class="space-y-2">
+						<label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 block">메인 관리</label>
+						<ul class="space-y-1">
+							<li>
+								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-line w-5 text-center text-slate-400"></i>
+									<span>운영 대시보드</span>
+								</a>
+							</li>
+							<li>
+								<a href="untydata-list.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-database w-5 text-center text-slate-400"></i>
+									<span>자료 통합 관리</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<!-- AI & Chatbot Section -->
+					<div class="space-y-2">
+						<label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 block">지능형 서비스</label>
+						<ul class="space-y-1">
+							<li>
+								<a href="doc-search.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-magnifying-glass-chart w-5 text-center text-slate-400"></i>
+									<span>지능형 공문서 검색</span>
+								</a>
+							</li>
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-robot w-5 text-center text-primary-500"></i>
+											<span>Chatbot 관리</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="chatbot-dashboard.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">실시간 통계</a></li>
+										<li><a href="chatbot-settings.html" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">챗봇 설정관리</a></li>
+										<li><a href="chatbot-learning.html" class="block px-3 py-1.5 text-xs text-primary-600 bg-primary-50 font-semibold rounded">챗봇 학습관리</a></li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</aside>
+
+			<!-- Main Content Area -->
+			<main class="flex-1 flex flex-col min-w-0 bg-slate-50">
+				
+				<!-- Top Header Bar -->
+				<header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0">
+					<div class="flex items-center gap-4">
+						<h1 class="text-lg font-bold text-slate-800">챗봇 학습관리</h1>
+						<span class="text-xs text-slate-400">|</span>
+						<p class="text-xs text-slate-500">지능형 챗봇의 지식 데이터를 학습시키고 모니터링합니다.</p>
+					</div>
+					
+					<!-- Top Right Quick Actions -->
+					<div class="flex items-center gap-4">
+						<!-- Target AI Selector -->
+						<div class="flex items-center gap-2">
+							<span class="text-xs font-semibold text-slate-500">대상 AI 봇 :</span>
+							<select id="botSelector" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-800 outline-none transition cursor-pointer">
+								<option value="bot1">🤖 인사총무팀 AI 비서</option>
+								<option value="bot2" selected>🤖 테스트봇</option>
+								<option value="bot3">🤖 직원용 자료실 챗봇</option>
+								<option value="bot4">🤖 홈페이지 안내봇</option>
+							</select>
+						</div>
+						
+						<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-600" title="관리자 계정">
+							Admin
+						</div>
+					</div>
+				</header>
+
+				<!-- Dashboard Content Body -->
+				<div class="flex-1 p-6 space-y-6 overflow-y-auto">
+					
+					<!-- Top Status Info Bar (대시보드식 학습 현황 리포트) -->
+					<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+						<!-- Status Card 1 -->
+						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+							<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+								<i class="fa-solid fa-server text-lg"></i>
+							</div>
+							<div>
+								<p class="text-[11px] text-slate-500 font-medium">전체 학습 데이터</p>
+								<p class="text-lg font-bold text-slate-800">342건</p>
+							</div>
+						</div>
+						<!-- Status Card 2 -->
+						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+							<div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+								<i class="fa-solid fa-circle-check text-lg"></i>
+							</div>
+							<div>
+								<p class="text-[11px] text-slate-500 font-medium">학습 완료</p>
+								<p class="text-lg font-bold text-slate-800">336건</p>
+							</div>
+						</div>
+						<!-- Status Card 3 -->
+						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+							<div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500 animate-pulse">
+								<i class="fa-solid fa-arrows-spin text-lg"></i>
+							</div>
+							<div>
+								<p class="text-[11px] text-slate-500 font-medium">학습 대기/진행 중</p>
+								<p class="text-lg font-bold text-slate-800">6건</p>
+							</div>
+						</div>
+						<!-- Status Card 4 (용량 사용량 게이지) -->
+						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+							<div class="flex items-center justify-between text-[11px] text-slate-500 font-medium mb-1">
+								<span>학습 스토리지 용량</span>
+								<span class="font-bold text-slate-700">62.07 MB / 1 GB</span>
+							</div>
+							<div class="w-full bg-slate-100 rounded-full h-2">
+								<div class="bg-blue-600 h-2 rounded-full" style="width: 6.2%"></div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Two-Column Workspace Layout -->
+					<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+						
+						<!-- Left Side: Interactive Batch Data Registry Panel (12 cols 중 7) -->
+						<div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+							
+							<!-- Panel Header with Integrated Tabs -->
+							<div class="px-5 pt-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+								<div class="flex items-center gap-2">
+									<i class="fa-solid fa-plus-to-slot text-blue-600"></i>
+									<h2 class="text-sm font-bold text-slate-800">일괄 데이터 등록창</h2>
+								</div>
+								
+								<!-- Tab Switchers -->
+								<div class="flex gap-1 text-xs border-b border-slate-200 w-full sm:w-auto">
+									<button onclick="switchTab('file')" id="tab-btn-file" class="active-tab px-4 py-2 border-b-2 font-bold transition">📁 파일 업로드</button>
+									<button onclick="switchTab('text')" id="tab-btn-text" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition">📝 텍스트 일괄입력</button>
+									<button onclick="switchTab('url')" id="tab-btn-url" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition">🌐 웹 주소(URL)</button>
+								</div>
+							</div>
+
+							<!-- Panel Content Panels -->
+							<div class="p-5 min-h-[300px]">
+								
+								<!-- TAB 1: File Batch Upload Panel -->
+								<div id="panel-file" class="space-y-4">
+									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+										📌 다중 파일을 선택하여 한 번에 학습 대기열에 올릴 수 있습니다. (지원 파일: pdf, txt, csv, xlsx, docx)
+									</div>
+									
+									<!-- Drag and Drop Area -->
+									<div class="border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/20 rounded-xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2">
+										<i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400"></i>
+										<div>
+											<p class="text-xs font-bold text-slate-700">마우스로 파일을 끌어서 놓거나 클릭하여 선택</p>
+											<p class="text-[10px] text-slate-400 mt-1">최대 20MB 이하 파일 다중 업로드 가능</p>
+										</div>
+										<input type="file" multiple class="hidden" id="fileInput">
+									</div>
+									
+									<!-- Selected Files Preview List -->
+									<div class="space-y-2">
+										<label class="text-[11px] font-bold text-slate-500 flex justify-between">
+											<span>선택한 파일 (3개)</span>
+											<button class="text-red-500 hover:underline text-[10px]"><i class="fa-solid fa-trash-can mr-1"></i>전체삭제</button>
+										</label>
+										<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+											<!-- Preview Item 1 -->
+											<div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+												<div class="flex items-center gap-2 truncate">
+													<i class="fa-solid fa-file-pdf text-red-500"></i>
+													<span class="font-medium truncate" title="[발전] 사업허가증.pdf">[발전] 사업허가증.pdf</span>
+												</div>
+												<div class="flex items-center gap-2 shrink-0">
+													<span class="text-[10px] text-slate-400">39 KB</span>
+													<button class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
+												</div>
+											</div>
+											<!-- Preview Item 2 -->
+											<div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+												<div class="flex items-center gap-2 truncate">
+													<i class="fa-solid fa-file-excel text-green-600"></i>
+													<span class="font-medium truncate" title="2026_법정신고_양식.xlsx">2026_법정신고_양식.xlsx</span>
+												</div>
+												<div class="flex items-center gap-2 shrink-0">
+													<span class="text-[10px] text-slate-400">2.1 MB</span>
+													<button class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
+												</div>
+											</div>
+											<!-- Preview Item 3 -->
+											<div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+												<div class="flex items-center gap-2 truncate">
+													<i class="fa-solid fa-file-lines text-slate-500"></i>
+													<span class="font-medium truncate" title="서비스_운영정책.txt">서비스_운영정책.txt</span>
+												</div>
+												<div class="flex items-center gap-2 shrink-0">
+													<span class="text-[10px] text-slate-400">12 KB</span>
+													<button class="text-slate-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- TAB 2: Text Multi-Insert Panel (여러 개의 텍스트 행 동적 입력 방식) -->
+								<div id="panel-text" class="hidden space-y-4">
+									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
+										<span>📌 여러 개의 텍스트 정보를 개별 행으로 생성하여 한 번에 학습시킬 수 있습니다.</span>
+										<button onclick="addTextRow()" class="px-2 py-1 bg-primary-600 text-white rounded text-[10px] font-bold hover:bg-primary-700 transition">
+											<i class="fa-solid fa-plus mr-1"></i>행 추가
+										</button>
+									</div>
+
+									<!-- Dynamic Rows Container -->
+									<div id="textRowsContainer" class="space-y-3 max-h-[250px] overflow-y-auto pr-1">
+										<!-- Row 1 -->
+										<div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative">
+											<div class="flex gap-2">
+												<input type="text" placeholder="데이터 제목 (예: 휴가 규정)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+												<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
+											</div>
+											<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
+										</div>
+										<!-- Row 2 -->
+										<div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative">
+											<div class="flex gap-2">
+												<input type="text" placeholder="데이터 제목 (예: 경조사 지원금)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+												<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
+											</div>
+											<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
+										</div>
+									</div>
+								</div>
+
+								<!-- TAB 3: URL Crawler Panel -->
+								<div id="panel-url" class="hidden space-y-4">
+									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100">
+										📌 웹사이트 URL 주소를 여러 개 입력하면 본문 데이터를 크롤러가 긁어와 학습합니다. (한 줄에 하나의 URL 입력)
+									</div>
+									<div class="space-y-1">
+										<label class="text-[11px] font-bold text-slate-500">학습시킬 URL 주소 (줄바꿈으로 구분)</label>
+										<textarea placeholder="https://company.com/intro&#10;https://company.com/faq" rows="6" class="w-full bg-white border border-slate-200 rounded-lg p-3 text-xs outline-none focus:border-blue-500 font-mono"></textarea>
+									</div>
+								</div>
+
+							</div>
+
+							<!-- Action Footer Buttons -->
+							<div class="px-5 py-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center">
+								<div class="flex items-center gap-2">
+									<select class="bg-white border border-slate-200 rounded py-1.5 px-2 text-[11px] text-slate-600 outline-none cursor-pointer">
+										<option>대분류: 전체</option>
+										<option>인사 규정</option>
+										<option>업무 지침</option>
+									</select>
+									<select class="bg-white border border-slate-200 rounded py-1.5 px-2 text-[11px] text-slate-600 outline-none cursor-pointer">
+										<option>소분류: 전체</option>
+										<option>휴가/경조사</option>
+										<option>공문서/기타</option>
+									</select>
+								</div>
+								
+								<div class="flex gap-2">
+									<button class="px-4 py-2 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 transition">
+										<i class="fa-solid fa-hourglass-start mr-1.5"></i>대기열에 임시 추가
+									</button>
+									<button class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+										<i class="fa-solid fa-graduation-cap mr-1.5"></i>즉시 학습시키기
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Right Side: Unified Status Panel & Control Tower (12 cols 중 5) -->
+						<div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+							<div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+								<div class="flex items-center gap-2">
+									<i class="fa-solid fa-desktop text-blue-600"></i>
+									<h2 class="text-sm font-bold text-slate-800">학습 제어 타워</h2>
+								</div>
+								<!-- Current State badge -->
+								<span class="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold rounded animate-pulse">학습 진행 중</span>
+							</div>
+							
+							<div class="p-5 space-y-5">
+								<!-- Real-time Progress Bar Widget -->
+								<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+									<div class="flex justify-between items-center">
+										<div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+											<i class="fa-solid fa-spinner animate-spin text-blue-500"></i>
+											<span>현재 파일 학습 중...</span>
+										</div>
+										<span class="text-xs font-bold text-blue-600">65%</span>
+									</div>
+									
+									<div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+										<div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 65%"></div>
+									</div>
+									
+									<div class="text-[10px] text-slate-400 flex justify-between">
+										<span>학습 파일: 2026_법정신고_양식.xlsx (2.1 MB)</span>
+										<span>남은시간 약 4초</span>
+									</div>
+								</div>
+								
+								<!-- Action buttons -->
+								<div class="grid grid-cols-2 gap-2">
+									<button class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 border border-slate-200">
+										<i class="fa-solid fa-pause"></i>학습 일시정지
+									</button>
+									<button class="py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5">
+										<i class="fa-solid fa-stop"></i>학습 완전중단
+									</button>
+								</div>
+
+								<hr class="border-slate-200">
+
+								<!-- Quick Stats Summary -->
+								<div class="space-y-2.5">
+									<h3 class="text-xs font-bold text-slate-700">최근 학습 실패 로그</h3>
+									<div class="p-3 bg-red-50 border border-red-100 rounded-lg text-[11px] text-red-700 space-y-1">
+										<div class="flex justify-between font-semibold">
+											<span>⚠️ 2026_인사규정_정리.pdf</span>
+											<span>15:42</span>
+										</div>
+										<p class="text-slate-500">에러내용: PDF 폰트 디코딩 실패로 텍스트 파싱을 진행할 수 없습니다.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs (대폭 직관성 개선) -->
+					<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+						<!-- Table Header & Filters -->
+						<div class="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+							<div class="flex items-center gap-2">
+								<i class="fa-solid fa-list-check text-blue-600"></i>
+								<h2 class="text-sm font-bold text-slate-800">지식 데이터 학습 목록</h2>
+							</div>
+							
+							<!-- Integrated Filter Tabs -->
+							<div class="flex items-center gap-1 text-xs border border-slate-200 p-1 bg-white rounded-lg">
+								<button class="px-3 py-1 bg-blue-600 text-white rounded font-bold transition">전체 (342)</button>
+								<button class="px-3 py-1 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">학습 완료 (336)</button>
+								<button class="px-3 py-1 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">대기 중 (4)</button>
+								<button class="px-3 py-1 text-slate-600 hover:bg-slate-50 rounded font-semibold transition">실패 (2)</button>
+							</div>
+						</div>
+
+						<!-- Search & Batch Actions Control -->
+						<div class="p-4 border-b border-slate-100 bg-slate-50/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs">
+							<div class="flex items-center gap-2">
+								<input type="checkbox" id="selectAll" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+								<label for="selectAll" class="font-medium text-slate-600 cursor-pointer">전체선택</label>
+								<span class="text-slate-300">|</span>
+								<button class="text-slate-600 hover:text-red-500 font-medium transition"><i class="fa-solid fa-trash-can mr-1"></i>선택 삭제</button>
+								<button class="text-slate-600 hover:text-blue-600 font-medium transition"><i class="fa-solid fa-arrows-rotate mr-1"></i>선택 재학습</button>
+							</div>
+
+							<!-- Search Bar -->
+							<div class="flex gap-2 w-full sm:w-auto">
+								<input type="text" placeholder="데이터 제목, 경로 검색..." class="w-full sm:w-60 bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+								<button class="px-3 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded text-xs font-bold transition">검색</button>
+							</div>
+						</div>
+
+						<!-- Table Content (Scrollable for responsive views) -->
+						<div class="overflow-x-auto">
+							<table class="w-full border-collapse text-left text-xs">
+								<thead>
+									<tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase">
+										<th class="py-3 px-4 w-10">선택</th>
+										<th class="py-3 px-4 w-16 text-center">번호</th>
+										<th class="py-3 px-4 w-20">유형</th>
+										<th class="py-3 px-4 w-28">대/소분류</th>
+										<th class="py-3 px-4">학습 소스 및 제목</th>
+										<th class="py-3 px-4 w-24">용량</th>
+										<th class="py-3 px-4 w-28 text-center">상태</th>
+										<th class="py-3 px-4 w-36 text-center">학습 일시</th>
+										<th class="py-3 px-4 w-40 text-center">작업</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-slate-100 text-slate-700">
+									<!-- Row 1 (대기상태) -->
+									<tr class="hover:bg-slate-50/50 bg-amber-50/10">
+										<td class="py-3 px-4"><input type="checkbox" class="rounded border-slate-300"></td>
+										<td class="py-3 px-4 text-center font-mono text-slate-400">4</td>
+										<td class="py-3 px-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded text-[10px]"><i class="fa-solid fa-file-excel mr-1"></i>FILE</span></td>
+										<td class="py-3 px-4 text-slate-500">인사 / 양식</td>
+										<td class="py-3 px-4">
+											<div class="font-bold text-slate-800">[발전] 사업허가증.pdf</div>
+											<div class="text-[10px] text-slate-400 mt-0.5 font-mono">/docs/permit/power_plant.pdf</div>
+										</td>
+										<td class="py-3 px-4 font-mono text-slate-500">39 KB</td>
+										<td class="py-3 px-4 text-center">
+											<span class="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded font-semibold text-[10px]"><i class="fa-solid fa-clock-rotate-left mr-1"></i>학습 대기</span>
+										</td>
+										<td class="py-3 px-4 text-center text-slate-400 font-mono">-</td>
+										<td class="py-3 px-4 text-center space-x-1.5">
+											<button class="text-blue-600 hover:underline font-bold">즉시학습</button>
+											<button class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+										</td>
+									</tr>
+									<!-- Row 2 (완료상태) -->
+									<tr class="hover:bg-slate-50/50">
+										<td class="py-3 px-4"><input type="checkbox" class="rounded border-slate-300"></td>
+										<td class="py-3 px-4 text-center font-mono text-slate-400">3</td>
+										<td class="py-3 px-4"><span class="px-2 py-0.5 bg-purple-50 text-purple-600 font-bold rounded text-[10px]"><i class="fa-solid fa-globe mr-1"></i>URL</span></td>
+										<td class="py-3 px-4 text-slate-500">홈페이지 / 소개</td>
+										<td class="py-3 px-4">
+											<div class="font-bold text-slate-800">회사소개 및 오시는 길</div>
+											<div class="text-[10px] text-slate-400 mt-0.5 font-mono">https://lulu-tt.github.io/company-intro</div>
+										</td>
+										<td class="py-3 px-4 font-mono text-slate-500">794 Bytes</td>
+										<td class="py-3 px-4 text-center">
+											<span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded font-semibold text-[10px]"><i class="fa-solid fa-check mr-1"></i>학습 완료</span>
+										</td>
+										<td class="py-3 px-4 text-center font-mono text-slate-500">2026-06-09 15:30:12</td>
+										<td class="py-3 px-4 text-center space-x-1.5">
+											<button class="text-slate-600 hover:text-blue-600 font-semibold">수정</button>
+											<button class="text-slate-600 hover:text-amber-600 font-semibold">재학습</button>
+											<button class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+										</td>
+									</tr>
+									<!-- Row 3 (실패상태) -->
+									<tr class="hover:bg-slate-50/50 bg-red-50/10">
+										<td class="py-3 px-4"><input type="checkbox" class="rounded border-slate-300"></td>
+										<td class="py-3 px-4 text-center font-mono text-slate-400">2</td>
+										<td class="py-3 px-4"><span class="px-2 py-0.5 bg-orange-50 text-orange-600 font-bold rounded text-[10px]"><i class="fa-solid fa-align-left mr-1"></i>TEXT</span></td>
+										<td class="py-3 px-4 text-slate-500">기타 / 규정</td>
+										<td class="py-3 px-4">
+											<div class="font-bold text-slate-800">소다립가사 텍스트 정보</div>
+											<div class="text-[10px] text-red-500 mt-0.5">⚠️ 인코딩 해독 불가로 인한 에러 (UTF-8 호환성)</div>
+										</td>
+										<td class="py-3 px-4 font-mono text-slate-500">1 KB</td>
+										<td class="py-3 px-4 text-center">
+											<span class="px-2 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded font-semibold text-[10px]"><i class="fa-solid fa-circle-exclamation mr-1"></i>학습 실패</span>
+										</td>
+										<td class="py-3 px-4 text-center text-slate-400 font-mono">-</td>
+										<td class="py-3 px-4 text-center space-x-1.5">
+											<button class="text-slate-600 hover:text-blue-600 font-semibold">수정</button>
+											<button class="text-slate-600 hover:text-amber-600 font-semibold">재학습</button>
+											<button class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+				</div>
+			</main>
+		</div>
+
+		<!-- UI Interaction Mock Scripts (대표님의 직관성 체크를 위한 가벼운 모크 스크립트) -->
+		<script>
+			// 탭 전환 핸들러
+			function switchTab(type) {
+				// 탭 패널 전체 숨김
+				document.getElementById('panel-file').classList.add('hidden');
+				document.getElementById('panel-text').classList.add('hidden');
+				document.getElementById('panel-url').classList.add('hidden');
+				
+				// 탭 버튼 스타일 초기화
+				document.getElementById('tab-btn-file').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
+				document.getElementById('tab-btn-text').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
+				document.getElementById('tab-btn-url').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
+
+				// 선택한 탭 활성화
+				document.getElementById('panel-' + type).classList.remove('hidden');
+				document.getElementById('tab-btn-' + type).className = 'active-tab px-4 py-2 border-b-2 font-bold transition';
+			}
+
+			// 텍스트 행 동적 추가 함수
+			function addTextRow() {
+				const container = document.getElementById('textRowsContainer');
+				const newRow = document.createElement('div');
+				newRow.className = 'p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative';
+				newRow.innerHTML = `
+					<div class="flex gap-2">
+						<input type="text" placeholder="데이터 제목" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+						<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
+					</div>
+					<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
+				`;
+				container.appendChild(newRow);
+				container.scrollTop = container.scrollHeight;
+			}
+		</script>
+	</body>
+</html>
