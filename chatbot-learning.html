@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<title>챗봇 학습관리 | 관리시스템</title>
+		<title>챗봇 학습관리 | 사이트별 운영관리</title>
 
 		<!-- Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +36,7 @@
 								hover: '#f3f4f6',
 								active: '#eff6ff',
 								text: '#374151',
+								textMuted: '#9ca3af',
 								border: '#e5e7eb',
 							}
 						}
@@ -67,9 +68,39 @@
 			::-webkit-scrollbar { width: 6px; height: 6px; }
 			::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
 
-			.sidebar-menu-item {
-				transition: all 0.2s ease;
+			#sidebar.collapsed {
+				width: 4.5rem;
 			}
+			#sidebar.collapsed .logo-text,
+			#sidebar.collapsed span,
+			#sidebar.collapsed summary i:last-child,
+			#sidebar.collapsed hr,
+			#sidebar.collapsed .px-3,
+			#sidebar.collapsed .p-4.border-t .flex-1,
+			#sidebar.collapsed .p-4.border-t button span {
+				display: none !important;
+			}
+			#sidebar.collapsed details summary {
+				justify-content: center;
+				padding: 0.75rem;
+			}
+			#sidebar.collapsed details ul {
+				display: none !important;
+			}
+			#sidebar.collapsed .space-y-6 > div > ul > li > a {
+				justify-content: center;
+				padding: 0.75rem;
+			}
+			#sidebar.collapsed .space-y-6 > div > ul > li > a span {
+				display: none;
+			}
+			#sidebar.collapsed select {
+				display: none;
+			}
+			#sidebar.collapsed div.relative {
+				display: none;
+			}
+			
 			.active-tab {
 				border-color: var(--accent-blue);
 				color: var(--accent-blue);
@@ -77,68 +108,112 @@
 			}
 		</style>
 	</head>
-	<body class="overflow-x-hidden">
-		<!-- App Layout Container -->
-		<div class="flex min-h-screen">
+	<body class="overflow-hidden">
+		<!-- Main Layout Shell (기존 CMS 구조) -->
+		<div class="flex h-screen w-screen bg-slate-50 text-slate-800">
 			
-			<!-- Sidebar (Left Navigation) -->
-			<aside id="sidebar" class="w-64 border-r border-sidebar-border bg-sidebar-bg flex flex-col shrink-0 transition-all duration-300">
+			<!-- SIDEBAR (기존 CMS LNB 그대로 사용) -->
+			<aside id="sidebar" class="w-64 bg-sidebar-bg border-r border-sidebar-border flex flex-col flex-shrink-0 z-20 transition-all duration-300">
 				<!-- Sidebar Header -->
-				<div class="h-16 border-b border-sidebar-border flex items-center justify-between px-4">
-					<div class="flex items-center gap-2.5">
-						<div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-lg">
-							<i class="fa-solid fa-cube text-sm"></i>
-						</div>
-						<span class="font-bold text-[15px] tracking-wide text-slate-800">CMS Upgrade</span>
-					</div>
-					<button id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition p-1" title="메뉴 접기">
-						<i class="fa-solid fa-angles-left"></i>
+				<div class="p-5 border-b border-sidebar-border flex items-center justify-between">
+					<a href="dashboard.html" class="flex items-center gap-2">
+						<img src="img-logo.png" alt="로고" class="h-6 object-contain" />
+						<span class="logo-text text-sm font-semibold text-slate-700 tracking-wide">관리시스템</span>
+					</a>
+					<button type="button" id="sidebar-toggle" class="text-slate-400 hover:text-slate-600 transition" title="메뉴 접기">
+						<i class="fa-solid fa-angles-left text-xs"></i>
 					</button>
 				</div>
 
-				<!-- Navigation Menu List -->
-				<div class="flex-1 overflow-y-auto p-4 space-y-6">
-					<!-- Site & Template Selection -->
-					<div class="space-y-1">
-						<label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 block">사이트 및 국문</label>
-						<select class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-3 text-xs font-semibold text-slate-700 outline-none focus:border-primary-500 cursor-pointer">
-							<option>한국고용정보원 - 국문</option>
-							<option>한국고용정보원 - 영문</option>
-							<option>기관소개 사이트</option>
-						</select>
-					</div>
-
-					<div class="space-y-2">
-						<label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 block">메인 관리</label>
+				<!-- Sidebar Content -->
+				<div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+					<!-- Favorites -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-star text-amber-400"></i>
+							<span>즐겨찾기</span>
+						</div>
 						<ul class="space-y-1">
 							<li>
-								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
-									<i class="fa-solid fa-chart-line w-5 text-center text-slate-400"></i>
-									<span>운영 대시보드</span>
-								</a>
-							</li>
-							<li>
-								<a href="untydata-list.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
-									<i class="fa-solid fa-database w-5 text-center text-slate-400"></i>
-									<span>자료 통합 관리</span>
+								<a href="#" class="flex items-center px-3 py-2 text-xs font-medium text-slate-600 hover:bg-sidebar-hover rounded-lg transition">
+									팝업/배너 관리 &gt; 프로모션 영역 관리
 								</a>
 							</li>
 						</ul>
 					</div>
 
-					<!-- AI & Chatbot Section -->
-					<div class="space-y-2">
-						<label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase px-3 block">지능형 서비스</label>
+					<hr class="border-sidebar-border">
+
+					<!-- GNB Menu -->
+					<div>
+						<div class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+							메뉴 탐색
+						</div>
 						<ul class="space-y-1">
 							<li>
-								<a href="doc-search.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
-									<i class="fa-solid fa-magnifying-glass-chart w-5 text-center text-slate-400"></i>
-									<span>지능형 공문서 검색</span>
+								<a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-line w-5 text-center text-slate-400"></i>
+									<span>대시보드</span>
 								</a>
 							</li>
 							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-sliders w-5 text-center text-slate-400"></i>
+											<span>운영</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">웹콘텐츠 관리</a></li>
+										<li>
+											<details class="group">
+												<summary class="flex items-center justify-between px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>팝업/배너 관리</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+													<li><a href="promotion-register.html" class="block px-3 py-1 text-[11px] hover:text-slate-900">프로모션 영역 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">레이어 팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업 관리</a></li>
+													<li><a href="#" class="block px-3 py-1 text-[11px] hover:text-slate-900">팝업존 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">설문조사 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">조직 관리</a></li>
+										<li><a href="#" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">일정관리</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-laptop-code w-5 text-center text-slate-400"></i>
+									<span>시스템</span>
+								</a>
+							</li>
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg cursor-pointer list-none">
+										<div class="flex items-center gap-3">
+											<i class="fa-solid fa-desktop w-5 text-center text-slate-400"></i>
+											<span>API Monitor</span>
+										</div>
+										<i class="fa-solid fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-6 space-y-1 border-l border-slate-100 pl-2">
+										<li><a href="api-monitor-dashboard_light.html?tab=overview" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">전체현황</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=traffic" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">트래픽 분석</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=log" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">장애이력</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=alert" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">알림 설정</a></li>
+										<li><a href="api-monitor-dashboard_light.html?tab=apiregister" class="block px-3 py-1.5 text-xs text-slate-500 hover:text-slate-900 transition">API 등록</a></li>
+									</ul>
+								</details>
+							</li>
+							<li>
 								<details open class="group">
-									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-primary-600 bg-primary-50 rounded-lg cursor-pointer list-none">
+									<summary class="flex items-center justify-between gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 bg-sidebar-active text-primary-600 rounded-lg cursor-pointer list-none">
 										<div class="flex items-center gap-3">
 											<i class="fa-solid fa-robot w-5 text-center text-primary-500"></i>
 											<span>Chatbot 관리</span>
@@ -152,25 +227,123 @@
 									</ul>
 								</details>
 							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-list-check w-5 text-center text-slate-400"></i>
+									<span>로그</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-sidebar-hover hover:text-slate-800 rounded-lg transition">
+									<i class="fa-solid fa-chart-pie w-5 text-center text-slate-400"></i>
+									<span>통계</span>
+								</a>
+							</li>
 						</ul>
+					</div>
+
+					<hr class="border-sidebar-border">
+
+					<!-- Site Management Section -->
+					<div>
+						<div class="px-3 mb-2 flex items-center text-xs font-semibold text-slate-400 uppercase tracking-wider gap-2">
+							<i class="fa-solid fa-globe"></i>
+							<span>사이트 관리</span>
+						</div>
+						<div class="px-3 mb-2">
+							<div class="relative">
+								<input type="text" placeholder="사이트 검색..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition">
+								<i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[10px] text-slate-400"></i>
+							</div>
+						</div>
+						<ul class="space-y-1 ml-2 text-xs">
+							<li>
+								<details open class="group">
+									<summary class="flex items-center justify-between px-3 py-1.5 text-slate-700 hover:bg-sidebar-hover rounded-lg cursor-pointer list-none font-medium">
+										<span class="truncate">한국고용정보원-국문</span>
+										<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+									</summary>
+									<ul class="mt-1 ml-3 space-y-1 text-slate-500 border-l border-slate-100 pl-2">
+										<li>
+											<details open class="group">
+												<summary class="flex items-center justify-between px-2 py-1 hover:text-slate-900 cursor-pointer list-none font-medium">
+													<span>테스트 메뉴</span>
+													<i class="fa-solid fa-chevron-down text-[8px] transition-transform group-open:rotate-180"></i>
+												</summary>
+												<ul class="mt-1 ml-3 space-y-1 text-slate-400 border-l border-slate-100 pl-2">
+													<li><a href="api-monitor-dashboard.html" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(기본)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(민원)</a></li>
+													<li><a href="#" class="block px-2 py-1 hover:text-slate-900">게시판 - 일반형(답글)</a></li>
+													<li><a href="untydata-list.html" class="block px-2 py-1 hover:text-slate-900">자료 통합 관리</a></li>
+												</ul>
+											</details>
+										</li>
+										<li><a href="doc-search.html" class="block px-2 py-1 hover:text-slate-900">지능형 공문서 검색</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">FX 이슈노트</a></li>
+										<li><a href="#" class="block px-2 py-1 hover:text-slate-900">환위험관리 가이드</a></li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<!-- Sidebar Footer User Profile -->
+				<div class="p-4 border-t border-sidebar-border bg-slate-50/50">
+					<div class="flex items-center gap-3">
+						<div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-semibold shadow-inner">
+							<i class="fa-solid fa-user-tie"></i>
+						</div>
+						<div class="flex-1 min-w-0">
+							<p class="text-sm font-semibold text-slate-800 truncate">홍길동</p>
+							<p class="text-xs text-slate-400 truncate">시스템관리자</p>
+						</div>
+						<div class="text-right">
+							<span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">60:00</span>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-2 mt-4">
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="시간연장">
+							<i class="fa-solid fa-clock-rotate-left text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">연장</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-slate-600 transition" title="정보수정">
+							<i class="fa-solid fa-user-gear text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">정보수정</span>
+						</button>
+						<button class="flex flex-col items-center justify-center p-2 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-600 hover:text-red-600 transition" title="로그아웃">
+							<i class="fa-solid fa-power-off text-xs mb-1"></i>
+							<span class="text-[9px] font-medium">로그아웃</span>
+						</button>
 					</div>
 				</div>
 			</aside>
 
-			<!-- Main Content Area -->
-			<main class="flex-1 flex flex-col min-w-0 bg-slate-50">
+			<!-- MAIN CONTENT AREA (기존 CMS 구조와 동일하게) -->
+			<div class="flex-1 flex flex-col overflow-hidden">
 				
-				<!-- Top Header Bar -->
-				<header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0">
+				<!-- Header (기존 CMS Top 헤더 구조 이식) -->
+				<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
 					<div class="flex items-center gap-4">
-						<h1 class="text-lg font-bold text-slate-800">챗봇 학습관리</h1>
-						<span class="text-xs text-slate-400">|</span>
-						<p class="text-xs text-slate-500">지능형 챗봇의 지식 데이터를 학습시키고 모니터링합니다.</p>
+						<button class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" onclick="history.back(); return false;">
+							<i class="fa-solid fa-arrow-left"></i>
+						</button>
+						<div class="flex flex-col">
+							<!-- Breadcrumb -->
+							<ol class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+								<li>사이트별 운영관리</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>한국고용정보원-국문</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li>Chatbot 관리</li>
+								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
+								<li class="text-slate-600 font-semibold">챗봇 학습관리</li>
+							</ol>
+						</div>
 					</div>
-					
-					<!-- Top Right Quick Actions -->
+
+					<!-- Top Bar Actions (AI봇 선택 필터와 함께 통합) -->
 					<div class="flex items-center gap-4">
-						<!-- Target AI Selector -->
 						<div class="flex items-center gap-2">
 							<span class="text-xs font-semibold text-slate-500">대상 AI 봇 :</span>
 							<select id="botSelector" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-800 outline-none transition cursor-pointer">
@@ -180,51 +353,65 @@
 								<option value="bot4">🤖 홈페이지 안내봇</option>
 							</select>
 						</div>
-						
-						<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-600" title="관리자 계정">
-							Admin
+						<div class="w-[1px] h-6 bg-slate-200"></div>
+						<div class="flex items-center gap-2">
+							<button class="px-3 py-1.5 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition shadow-sm flex items-center gap-1.5">
+								<i class="fa-solid fa-graduation-cap"></i>
+								<span>전체 대기열 학습시작</span>
+							</button>
 						</div>
 					</div>
 				</header>
 
-				<!-- Dashboard Content Body -->
-				<div class="flex-1 p-6 space-y-6 overflow-y-auto">
+				<!-- Scrollable Content Body (콘텐츠 영역) -->
+				<main class="flex-1 overflow-y-auto p-6 space-y-6">
 					
-					<!-- Top Status Info Bar (대시보드식 학습 현황 리포트) -->
+					<!-- Content Header Title Card -->
+					<div class="bg-white rounded-2xl p-6 border border-slate-200 flex items-center justify-between shadow-sm">
+						<div>
+							<h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+								<span>챗봇 지식 학습 관리</span>
+								<span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100">AI 운영</span>
+							</h2>
+							<p class="text-sm text-slate-400 mt-1">챗봇의 학습 소스(파일, 텍스트, 웹사이트 URL)를 등록하고 상태를 직관적으로 모니터링합니다.</p>
+						</div>
+					</div>
+
+					<!-- Top Status Info Bar (학습 현황 리포트) -->
 					<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 						<!-- Status Card 1 -->
-						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-							<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+							<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
 								<i class="fa-solid fa-server text-lg"></i>
 							</div>
 							<div>
-								<p class="text-[11px] text-slate-500 font-medium">전체 학습 데이터</p>
+								<p class="text-[11px] text-slate-400 font-medium">전체 학습 데이터</p>
 								<p class="text-lg font-bold text-slate-800">342건</p>
 							</div>
 						</div>
 						<!-- Status Card 2 -->
-						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-							<div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+							<div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
 								<i class="fa-solid fa-circle-check text-lg"></i>
 							</div>
 							<div>
-								<p class="text-[11px] text-slate-500 font-medium">학습 완료</p>
+								<p class="text-[11px] text-slate-400 font-medium">학습 완료</p>
 								<p class="text-lg font-bold text-slate-800">336건</p>
 							</div>
 						</div>
 						<!-- Status Card 3 -->
-						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-							<div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500 animate-pulse">
+						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+							<div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 animate-pulse">
 								<i class="fa-solid fa-arrows-spin text-lg"></i>
 							</div>
 							<div>
-								<p class="text-[11px] text-slate-500 font-medium">학습 대기/진행 중</p>
+								<p class="text-[11px] text-slate-400 font-medium">학습 대기/진행 중</p>
 								<p class="text-lg font-bold text-slate-800">6건</p>
 							</div>
 						</div>
 						<!-- Status Card 4 (용량 사용량 게이지) -->
-						<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-							<div class="flex items-center justify-between text-[11px] text-slate-500 font-medium mb-1">
+						<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+							<div class="flex items-center justify-between text-[11px] text-slate-400 font-medium mb-1">
 								<span>학습 스토리지 용량</span>
 								<span class="font-bold text-slate-700">62.07 MB / 1 GB</span>
 							</div>
@@ -238,7 +425,7 @@
 					<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 						
 						<!-- Left Side: Interactive Batch Data Registry Panel (12 cols 중 7) -->
-						<div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+						<div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 							
 							<!-- Panel Header with Integrated Tabs -->
 							<div class="px-5 pt-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -318,7 +505,7 @@
 									</div>
 								</div>
 
-								<!-- TAB 2: Text Multi-Insert Panel (여러 개의 텍스트 행 동적 입력 방식) -->
+								<!-- TAB 2: Text Multi-Insert Panel -->
 								<div id="panel-text" class="hidden space-y-4">
 									<div class="text-xs text-slate-500 bg-blue-50/60 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
 										<span>📌 여러 개의 텍스트 정보를 개별 행으로 생성하여 한 번에 학습시킬 수 있습니다.</span>
@@ -332,7 +519,7 @@
 										<!-- Row 1 -->
 										<div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative">
 											<div class="flex gap-2">
-												<input type="text" placeholder="데이터 제목 (예: 휴가 규정)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+												<input type="text" placeholder="데이터 제목 (예: 휴가 규정)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500 font-semibold">
 												<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
 											</div>
 											<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
@@ -340,7 +527,7 @@
 										<!-- Row 2 -->
 										<div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative">
 											<div class="flex gap-2">
-												<input type="text" placeholder="데이터 제목 (예: 경조사 지원금)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+												<input type="text" placeholder="데이터 제목 (예: 경조사 지원금)" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500 font-semibold">
 												<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
 											</div>
 											<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
@@ -378,7 +565,7 @@
 								
 								<div class="flex gap-2">
 									<button class="px-4 py-2 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 transition">
-										<i class="fa-solid fa-hourglass-start mr-1.5"></i>대기열에 임시 추가
+										<i class="fa-solid fa-hourglass-start mr-1.5"></i>대기열 임시추가
 									</button>
 									<button class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
 										<i class="fa-solid fa-graduation-cap mr-1.5"></i>즉시 학습시키기
@@ -388,7 +575,7 @@
 						</div>
 
 						<!-- Right Side: Unified Status Panel & Control Tower (12 cols 중 5) -->
-						<div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+						<div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
 							<div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
 								<div class="flex items-center gap-2">
 									<i class="fa-solid fa-desktop text-blue-600"></i>
@@ -447,8 +634,8 @@
 
 					</div>
 
-					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs (대폭 직관성 개선) -->
-					<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs -->
+					<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 						<!-- Table Header & Filters -->
 						<div class="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
 							<div class="flex items-center gap-2">
@@ -482,7 +669,7 @@
 							</div>
 						</div>
 
-						<!-- Table Content (Scrollable for responsive views) -->
+						<!-- Table Content -->
 						<div class="overflow-x-auto">
 							<table class="w-full border-collapse text-left text-xs">
 								<thead>
@@ -566,25 +753,52 @@
 						</div>
 					</div>
 
-				</div>
-			</main>
+				</main>
+				
+				<!-- Footer (기존 CMS 구조 이식) -->
+				<footer class="h-10 bg-slate-100 border-t border-slate-200 flex items-center justify-between px-6 z-10 text-[10px] text-slate-400">
+					<span>COPYRIGHT © KOREA EMPLOYMENT INFORMATION SERVICE. ALL RIGHTS RESERVED.</span>
+					<div class="flex gap-4">
+						<a href="#" class="hover:underline">이용약관</a>
+						<a href="#" class="hover:underline font-bold text-slate-500">개인정보처리방침</a>
+					</div>
+				</footer>
+			</div>
 		</div>
 
-		<!-- UI Interaction Mock Scripts (대표님의 직관성 체크를 위한 가벼운 모크 스크립트) -->
+		<!-- UI Interaction Mock Scripts -->
 		<script>
+			// 사이드바 접기/펼치기
+			document.addEventListener('DOMContentLoaded', function() {
+				const sidebar = document.getElementById('sidebar');
+				const sidebarToggle = document.getElementById('sidebar-toggle');
+				if (sidebar && sidebarToggle) {
+					const toggleSidebarIcon = sidebarToggle.querySelector('i');
+					sidebarToggle.addEventListener('click', function() {
+						sidebar.classList.toggle('collapsed');
+						if (sidebar.classList.contains('collapsed')) {
+							toggleSidebarIcon.classList.remove('fa-angles-left');
+							toggleSidebarIcon.classList.add('fa-angles-right');
+							sidebarToggle.setAttribute('title', '메뉴 펼치기');
+						} else {
+							toggleSidebarIcon.classList.remove('fa-angles-right');
+							toggleSidebarIcon.classList.add('fa-angles-left');
+							sidebarToggle.setAttribute('title', '메뉴 접기');
+						}
+					});
+				}
+			});
+
 			// 탭 전환 핸들러
 			function switchTab(type) {
-				// 탭 패널 전체 숨김
 				document.getElementById('panel-file').classList.add('hidden');
 				document.getElementById('panel-text').classList.add('hidden');
 				document.getElementById('panel-url').classList.add('hidden');
 				
-				// 탭 버튼 스타일 초기화
 				document.getElementById('tab-btn-file').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
 				document.getElementById('tab-btn-text').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
 				document.getElementById('tab-btn-url').className = 'px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition';
 
-				// 선택한 탭 활성화
 				document.getElementById('panel-' + type).classList.remove('hidden');
 				document.getElementById('tab-btn-' + type).className = 'active-tab px-4 py-2 border-b-2 font-bold transition';
 			}
@@ -596,7 +810,7 @@
 				newRow.className = 'p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 relative';
 				newRow.innerHTML = `
 					<div class="flex gap-2">
-						<input type="text" placeholder="데이터 제목" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500">
+						<input type="text" placeholder="데이터 제목" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500 font-semibold">
 						<button class="text-slate-400 hover:text-red-500 p-1" onclick="this.closest('.p-3').remove()"><i class="fa-solid fa-xmark"></i></button>
 					</div>
 					<textarea placeholder="학습시킬 텍스트 내용을 입력해주세요..." rows="2" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-blue-500"></textarea>
