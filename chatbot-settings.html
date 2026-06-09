@@ -1244,7 +1244,7 @@
 			});
 
 			// ===== 학습 데이터 저장 함수 =====
-			function saveLearningData() {
+			function saveLearningData(showAlert = true) {
 				if (!currentBotId) return;
 
 				const bot = getBotById(currentBotId);
@@ -1263,7 +1263,9 @@
 				};
 
 				updateBot(currentBotId, { learning: bot.learning });
-				showNotification('학습 자료가 저장되었습니다', 'success');
+				if (showAlert) {
+					showNotification('학습 자료가 저장되었습니다', 'success');
+				}
 			}
 
 			function updateLearningStatus(bot) {
@@ -1350,8 +1352,8 @@
 					errorFilter: document.getElementById('botErrorFilter').checked
 				});
 
-				// Save learning data
-				saveLearningData();
+				// Save learning data (without alert)
+				saveLearningData(false);
 
 				renderBotList();
 				showNotification('설정이 저장되었습니다', 'success');
