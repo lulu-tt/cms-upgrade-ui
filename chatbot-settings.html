@@ -807,7 +807,15 @@
 					welcomeMsg: '안녕하세요! 무엇을 도와드릴까요?',
 					contextMemory: true,
 					logging: true,
-					errorFilter: true
+					errorFilter: true,
+					learning: {
+						text: {
+							enabled: false,
+							content: '',
+							fileCount: 0,
+							lastUpdated: null
+						}
+					}
 				},
 				{
 					id: 'bot_hr',
@@ -822,7 +830,15 @@
 					welcomeMsg: '안녕하세요! HR 관련 궁금한 점이 있으신가요?',
 					contextMemory: true,
 					logging: true,
-					errorFilter: true
+					errorFilter: true,
+					learning: {
+						text: {
+							enabled: false,
+							content: '',
+							fileCount: 0,
+							lastUpdated: null
+						}
+					}
 				},
 				{
 					id: 'bot_support',
@@ -837,7 +853,15 @@
 					welcomeMsg: '기술 지원입니다. 문제를 설명해주시면 도와드리겠습니다.',
 					contextMemory: true,
 					logging: true,
-					errorFilter: true
+					errorFilter: true,
+					learning: {
+						text: {
+							enabled: false,
+							content: '',
+							fileCount: 0,
+							lastUpdated: null
+						}
+					}
 				}
 			];
 
@@ -943,6 +967,14 @@
 				document.getElementById('botContextMemory').checked = bot.contextMemory;
 				document.getElementById('botLogging').checked = bot.logging;
 				document.getElementById('botErrorFilter').checked = bot.errorFilter;
+
+				// Load learning data
+				if (bot.learning && bot.learning.text) {
+					document.getElementById('useTextLearning').checked = bot.learning.text.enabled;
+					document.getElementById('learningText').value = bot.learning.text.content || '';
+					document.getElementById('textLearningPanel').style.display = bot.learning.text.enabled ? 'block' : 'none';
+					updateLearningStatus(bot);
+				}
 
 				// Update chat panel
 				document.getElementById('chatBotName').textContent = bot.name;
@@ -1173,6 +1205,49 @@
 				document.getElementById('webLearningPanel').style.display = e.target.checked ? 'block' : 'none';
 			});
 
+			// ===== 학습 데이터 저장 함수 =====
+			function saveLearningData() {
+				if (!currentBotId) return;
+
+				const bot = getBotById(currentBotId);
+				if (!bot.learning) {
+					bot.learning = { text: { enabled: false, content: '', fileCount: 0, lastUpdated: null } };
+				}
+
+				const isTextEnabled = document.getElementById('useTextLearning').checked;
+				const textContent = document.getElementById('learningText').value;
+
+				bot.learning.text = {
+					enabled: isTextEnabled,
+					content: textContent,
+					fileCount: textContent.split('\n').length,
+					lastUpdated: new Date().toISOString()
+				};
+
+				updateBot(currentBotId, { learning: bot.learning });
+				showNotification('학습 자료가 저장되었습니다', 'success');
+			}
+
+			function updateLearningStatus(bot) {
+				if (bot.learning && bot.learning.text && bot.learning.text.lastUpdated) {
+					const lastDate = new Date(bot.learning.text.lastUpdated);
+					const formattedDate = lastDate.toLocaleString('ko-KR');
+					console.log(`📚 학습 자료 마지막 업데이트: ${formattedDate}`);
+				}
+			}
+
+			function clearLearningData() {
+				if (!currentBotId) return;
+				const confirmed = confirm('학습 자료를 모두 삭제하시겠습니까?');
+				if (confirmed) {
+					document.getElementById('learningText').value = '';
+					document.getElementById('useTextLearning').checked = false;
+					document.getElementById('textLearningPanel').style.display = 'none';
+					saveLearningData();
+					showNotification('학습 자료가 초기화되었습니다', 'info');
+				}
+			}
+
 			// 파일 업로드 이벤트
 			document.getElementById('textFileUpload').addEventListener('click', () => {
 				document.getElementById('textFileInput').click();
@@ -1184,10 +1259,37 @@
 					const reader = new FileReader();
 					reader.onload = (event) => {
 						document.getElementById('learningText').value = event.target.result;
+						showNotification(`"${file.name}" 파일이 로드되었습니다`, 'success');
+					};
+					reader.onerror = () => {
+						showNotification('파일 읽기 실패', 'error');
 					};
 					reader.readAsText(file);
 				}
 			});
+
+			// 학습 시작/초기화 버튼 이벤트
+			setTimeout(() => {
+				const learnBtn = document.querySelector('button:has(i.fa-brain)');
+				if (learnBtn) {
+					learnBtn.addEventListener('click', () => {
+						if (!currentBotId) {
+							alert('챗봇을 선택하세요');
+							return;
+						}
+						if (!document.getElementById('learningText').value) {
+							alert('학습할 텍스트를 입력하세요');
+							return;
+						}
+						saveLearningData();
+					});
+				}
+
+				const resetBtn = document.querySelector('button:has(i.fa-trash)');
+				if (resetBtn) {
+					resetBtn.addEventListener('click', clearLearningData);
+				}
+			}, 100);
 
 			document.getElementById('saveBotBtn').addEventListener('click', () => {
 				if (!currentBotId) {
@@ -1209,6 +1311,9 @@
 					logging: document.getElementById('botLogging').checked,
 					errorFilter: document.getElementById('botErrorFilter').checked
 				});
+
+				// Save learning data
+				saveLearningData();
 
 				renderBotList();
 				showNotification('설정이 저장되었습니다', 'success');
