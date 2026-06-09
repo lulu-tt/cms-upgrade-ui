@@ -80,7 +80,7 @@
 			::-webkit-scrollbar { width: 6px; height: 6px; }
 			::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
 
-			/* ── Panel & Form Layouts from chatbot-settings.html ── */
+			/* ── Panel & Form Layouts ── */
 			.panel {
 				background: var(--bg-card); border: 1px solid var(--border);
 				border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -393,7 +393,7 @@
 			<!-- MAIN CONTENT AREA -->
 			<div class="flex-1 flex flex-col overflow-hidden">
 				
-				<!-- Header (기존 CMS Top 헤더 구조 이식) -->
+				<!-- Header (chatbot-dashboard.html 스타일에 맞춰 간소화) -->
 				<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
 					<div class="flex items-center gap-4">
 						<button class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" onclick="history.back(); return false;">
@@ -402,10 +402,6 @@
 						<div class="flex flex-col">
 							<!-- Breadcrumb -->
 							<ol class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-								<li>사이트별 운영관리</li>
-								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
-								<li>한국고용정보원-국문</li>
-								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
 								<li>Chatbot 관리</li>
 								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
 								<li class="text-slate-600 font-semibold">챗봇 학습관리</li>
@@ -413,38 +409,43 @@
 						</div>
 					</div>
 
-					<!-- Top Bar Actions -->
-					<div class="flex items-center gap-4">
-						<div class="flex items-center gap-2">
-							<span class="text-xs font-semibold text-slate-500">대상 AI 봇 :</span>
-							<select id="botSelector" class="form-select" style="padding: 5px 28px 5px 10px; font-size:12px; border-radius:6px; width:auto;">
-								<option value="bot1">🤖 인사총무팀 AI 비서</option>
-								<option value="bot2" selected>🤖 테스트봇</option>
-								<option value="bot3">🤖 직원용 자료실 챗봇</option>
-								<option value="bot4">🤖 홈페이지 안내봇</option>
-							</select>
-						</div>
-						<div class="w-[1px] h-6 bg-slate-200"></div>
-						<div class="flex items-center gap-2">
-							<button class="px-3 py-1.5 text-xs font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition shadow-sm flex items-center gap-1.5">
-								<i class="fa-solid fa-graduation-cap"></i>
-								<span>전체 대기열 학습시작</span>
-							</button>
-						</div>
+					<!-- Top Bar Actions (즐겨찾기, 새로고침만 노출) -->
+					<div class="flex items-center gap-2">
+						<button class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" title="즐겨찾기">
+							<i class="fa-regular fa-star"></i>
+						</button>
+						<button class="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition" title="새로고침" onclick="window.location.reload();">
+							<i class="fa-solid fa-rotate-right"></i>
+						</button>
 					</div>
 				</header>
 
 				<!-- Scrollable Content Body -->
 				<main class="flex-1 overflow-y-auto p-6 space-y-6">
 					
-					<!-- Content Header Title Card (기존 테마 스타일화) -->
-					<div class="panel p-6 flex items-center justify-between">
+					<!-- Content Header Title Card (대표님이 전달해 주신 대시보드 타이틀 구조: 배경 없는 순수 텍스트) -->
+					<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2">
 						<div>
-							<h2 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-								<span>챗봇 지식 학습 관리</span>
-								<span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-medium border border-blue-100">AI 운영</span>
-							</h2>
-							<p class="text-sm text-slate-400 mt-1">챗봇의 학습 소스(파일, 텍스트, 웹사이트 URL)를 등록하고 상태를 직관적으로 모니터링합니다.</p>
+							<h2 class="text-2xl font-bold text-slate-800">챗봇 지식 학습 관리</h2>
+							<p class="text-sm text-slate-500 mt-1">챗봇의 학습 소스(파일, 텍스트, 웹사이트 URL)를 등록하고 상태를 직관적으로 모니터링합니다.</p>
+						</div>
+						
+						<!-- LNB/탑바에서 본문 타이틀 우측 영역으로 재배치된 대상 AI봇 및 대기열 실행 버튼 -->
+						<div class="flex items-center gap-3 shrink-0 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+							<div class="flex items-center gap-2">
+								<span class="text-xs font-semibold text-slate-500">대상 AI 봇 :</span>
+								<select id="botSelector" class="form-select" style="padding: 5px 28px 5px 10px; font-size:12px; border-radius:6px; width:auto; margin:0;">
+									<option value="bot1">🤖 인사총무팀 AI 비서</option>
+									<option value="bot2" selected>🤖 테스트봇</option>
+									<option value="bot3">🤖 직원용 자료실 챗봇</option>
+									<option value="bot4">🤖 홈페이지 안내봇</option>
+								</select>
+							</div>
+							<div class="w-[1px] h-6 bg-slate-200"></div>
+							<button class="px-3.5 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-primary-500/10">
+								<i class="fa-solid fa-graduation-cap"></i>
+								<span>전체 대기열 학습시작</span>
+							</button>
 						</div>
 					</div>
 
@@ -721,7 +722,7 @@
 
 					</div>
 
-					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs (기존 테이블 디자인 적용) -->
+					<!-- Bottom Area: Integrated Single Knowledge Base Table with Filter Tabs -->
 					<div class="panel">
 						<!-- Table Header & Filters -->
 						<div class="panel-header" style="background:var(--accent-blue-dim); justify-content: space-between; flex-wrap: wrap; gap: 12px;">
