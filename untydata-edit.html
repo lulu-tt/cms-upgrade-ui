@@ -648,11 +648,15 @@
 										<!-- 썸네일 업로드 영역 (기본 숨김) -->
 										<div id="thmbArea" class="hidden space-y-2 max-w-2xl">
 											<input type="hidden" name="atchFileTypeCd" id="thumbAtchFileTypeCd" value="T" />
-											<div class="border-2 border-dashed border-slate-200 hover:border-primary-400 rounded-2xl p-6 bg-slate-50/50 hover:bg-slate-50 transition cursor-pointer text-center group">
+											<div class="border-2 border-dashed border-slate-200 hover:border-primary-400 rounded-2xl p-6 bg-slate-50/50 hover:bg-slate-50 transition cursor-pointer text-center group" id="thumbnail-drop-zone">
 												<i class="fa-solid fa-image text-slate-300 group-hover:text-primary-500 text-3xl mb-2 transition"></i>
 												<p class="text-xs font-bold text-slate-600">썸네일 이미지 파일을 드래그하여 업로드하거나 클릭하여 선택하세요.</p>
 												<p class="text-[10px] text-slate-400 mt-1">허용 확장자: gif, bmp, jpg, png, jpeg, jfif, svg</p>
-												<input type="file" class="hidden" accept=".gif,.bmp,.jpg,.png,.jpeg,.jfif,.svg">
+												<input type="file" class="hidden" accept=".gif,.bmp,.jpg,.png,.jpeg,.jfif,.svg" id="thumbnail-file-input">
+											</div>
+											<!-- Selected File Display -->
+											<div id="thumbnail-file-list" class="space-y-2">
+												<!-- Files will be displayed here -->
 											</div>
 										</div>
 									</div>
@@ -1479,6 +1483,299 @@
 						}
 					}
 				});
+
+
+			// ========== 썸네일 생성 ==========
+			const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#06b6d4'];
+
+			function generateCanvasThumbnail(keyword) {
+				const canvas = document.createElement('canvas');
+				canvas.width = 355;
+				canvas.height = 355;
+				const ctx = canvas.getContext('2d');
+
+				const bgColor = colors[Math.floor(Math.random() * colors.length)];
+				ctx.fillStyle = bgColor;
+				ctx.fillRect(0, 0, 355, 355);
+
+				const gradient = ctx.createLinearGradient(0, 0, 355, 355);
+				gradient.addColorStop(0, bgColor);
+				gradient.addColorStop(1, adjustBrightness(bgColor, -20));
+				ctx.fillStyle = gradient;
+				ctx.fillRect(0, 0, 355, 355);
+
+				ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+				ctx.beginPath();
+				ctx.arc(177.5, 177.5, 100, 0, Math.PI * 2);
+				ctx.fill();
+
+				ctx.fillStyle = '#ffffff';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+				ctx.shadowBlur = 10;
+				ctx.shadowOffsetY = 2;
+
+				let fontSize = 48;
+				if (keyword.length > 10) fontSize = 36;
+				if (keyword.length > 15) fontSize = 28;
+				ctx.font = `bold ${fontSize}px "Noto Sans KR", sans-serif`;
+
+				ctx.fillText(keyword, 177.5, 160);
+
+				return canvas.toDataURL('image/png');
+			}
+
+			function adjustBrightness(hex, percent) {
+				const num = parseInt(hex.replace("#", ""), 16);
+				const amt = Math.round(2.55 * percent);
+				const R = Math.min(255, (num >> 16) + amt);
+				const G = Math.min(255, (num >> 8 & 0x00FF) + amt);
+				const B = Math.min(255, (num & 0x0000FF) + amt);
+				return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+			}
+
+			// Carousel state
+			window.thumbnailCarousel = {
+				images: [],
+				currentIndex: 0
+			};
+
+			const generateThumbnailBtn = document.getElementById('generate-thumbnail-btn');
+			if (generateThumbnailBtn) {
+				generateThumbnailBtn.addEventListener('click', async function() {
+					const content = getEditorContent();
+
+					if (!content) {
+						alert('본문 내용을 먼저 작성해주세요.');
+						return;
+					}
+
+					const btn = this;
+					const originalText = btn.innerHTML;
+					btn.innerHTML = '<i class="fa-solid fa-spinner text-white animate-spin"></i><span>생성 중...</span>';
+					btn.disabled = true;
+
+					try {
+						const keywordPrompt = `다음 내용에서 가장 중요한 핵심 키워드 1-2개를 추출하세요. 한글로 답변하세요. 최대 5자 이내의 단어만 사용하세요. 키워드만 나열하세요.\n\n내용:\n${content}`;
+						const keywordResult = await callOllama(keywordPrompt);
+						const keyword = keywordResult.split('\n')[0].trim().split(/[,，、]/)[0].trim().slice(0, 8);
+
+						if (!keyword) {
+							alert('키워드 추출 실패');
+							return;
+						}
+
+						// Unsplash API로 5개 이미지 검색
+						const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(keyword)}&w=355&h=355&fit=crop&count=5&client_id=i3yo7vsTMRB2B934Wf6my8fCWJLSIg5FuKgr2gY4kMg`;
+						const response = await fetch(unsplashUrl);
+
+						if (response.ok) {
+							const data = await response.json();
+							if (data.results && data.results.length > 0) {
+								window.thumbnailCarousel.images = data.results.map(r => r.urls.regular);
+								window.thumbnailCarousel.currentIndex = 0;
+								updateCarousel();
+								return;
+							}
+						}
+
+						// Unsplash 실패 시 Canvas 폴백 (5개)
+						console.warn('Unsplash 검색 실패, Canvas 썸네일 생성');
+						const canvasThumbnail = generateCanvasThumbnail(keyword);
+						window.thumbnailCarousel.images = [canvasThumbnail];
+						window.thumbnailCarousel.currentIndex = 0;
+						updateCarousel();
+
+					} catch (error) {
+						console.error('썸네일 생성 실패:', error);
+						alert('❌ 썸네일 생성 실패: ' + error.message);
+					} finally {
+						btn.innerHTML = originalText;
+						btn.disabled = false;
+					}
+				});
+			}
+
+			// Carousel navigation
+			function updateCarousel() {
+				const carousel = window.thumbnailCarousel;
+				const img = document.getElementById('carousel-image');
+				const placeholder = document.getElementById('carousel-placeholder');
+				const counter = document.getElementById('carousel-counter');
+				const dotsContainer = document.getElementById('carousel-dots');
+				const prevBtn = document.getElementById('carousel-prev');
+				const nextBtn = document.getElementById('carousel-next');
+				const textOverlay = document.getElementById('carousel-text-overlay');
+				const textElement = document.getElementById('carousel-text');
+
+				if (!carousel.images.length) return;
+
+				// Update image
+				img.src = carousel.images[carousel.currentIndex];
+				img.classList.remove('hidden');
+				placeholder.classList.add('hidden');
+
+				// Update text overlay with 자료명
+				const dataNm = document.getElementById('dataNm').value;
+				if (dataNm) {
+					textElement.textContent = dataNm;
+					textOverlay.classList.remove('hidden');
+				} else {
+					textOverlay.classList.add('hidden');
+				}
+
+				// Update counter
+				counter.textContent = `${carousel.currentIndex + 1} / ${carousel.images.length}`;
+
+				// Update dots
+				dotsContainer.innerHTML = carousel.images.map((_, idx) =>
+					`<button type="button" class="w-2 h-2 rounded-full transition ${
+						idx === carousel.currentIndex ? 'bg-purple-600' : 'bg-slate-300'
+					}" data-index="${idx}"></button>`
+				).join('');
+
+				// Attach dot click handlers
+				dotsContainer.querySelectorAll('button').forEach(btn => {
+					btn.addEventListener('click', () => {
+						carousel.currentIndex = parseInt(btn.dataset.index);
+						updateCarousel();
+					});
+				});
+
+				// Update buttons
+				prevBtn.disabled = carousel.currentIndex === 0;
+				nextBtn.disabled = carousel.currentIndex === carousel.images.length - 1;
+			}
+
+			document.getElementById('carousel-prev')?.addEventListener('click', () => {
+				if (window.thumbnailCarousel.currentIndex > 0) {
+					window.thumbnailCarousel.currentIndex--;
+					updateCarousel();
+				}
+			});
+
+			document.getElementById('carousel-next')?.addEventListener('click', () => {
+				if (window.thumbnailCarousel.currentIndex < window.thumbnailCarousel.images.length - 1) {
+					window.thumbnailCarousel.currentIndex++;
+					updateCarousel();
+				}
+			});
+
+			// Generate thumbnail with text overlay
+			async function generateThumbnailWithText(imageUrl, dataNm) {
+				return new Promise((resolve, reject) => {
+					const canvas = document.createElement('canvas');
+					const ctx = canvas.getContext('2d');
+					canvas.width = 355;
+					canvas.height = 355;
+
+					const img = new Image();
+					img.crossOrigin = 'anonymous';
+					img.onload = function() {
+						// Draw image
+						ctx.drawImage(img, 0, 0, 355, 355);
+
+						// Draw text overlay at bottom
+						if (dataNm) {
+							const overlayHeight = 60;
+							ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+							ctx.fillRect(0, 355 - overlayHeight, 355, overlayHeight);
+
+							ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
+							ctx.fillStyle = 'white';
+							ctx.textAlign = 'left';
+
+							// Word wrap text
+							const maxWidth = 320;
+							const lineHeight = 14;
+							const words = dataNm.split(' ');
+							let line = '';
+							let y = 355 - overlayHeight + 12;
+
+							for (let word of words) {
+								const testLine = line + word + ' ';
+								const metrics = ctx.measureText(testLine);
+								if (metrics.width > maxWidth && line) {
+									ctx.fillText(line, 10, y);
+									line = word + ' ';
+									y += lineHeight;
+								} else {
+									line = testLine;
+								}
+							}
+							if (line) {
+								ctx.fillText(line.trim(), 10, y);
+							}
+						}
+
+						canvas.toBlob((blob) => {
+							resolve(blob);
+						}, 'image/jpeg', 0.9);
+					};
+					img.onerror = reject;
+					img.src = imageUrl;
+				});
+			}
+
+			const applyThumbnailBtn = document.getElementById('apply-thumbnail-btn');
+			if (applyThumbnailBtn) {
+				applyThumbnailBtn.addEventListener('click', async function() {
+					if (!window.thumbnailCarousel.images.length) {
+						alert('❌ 생성된 썸네일이 없습니다.');
+						return;
+					}
+
+					const btn = this;
+					const originalText = btn.innerHTML;
+					btn.innerHTML = '<i class="fa-solid fa-spinner text-white animate-spin"></i><span>처리 중...</span>';
+					btn.disabled = true;
+
+					try {
+						const selectedImageUrl = window.thumbnailCarousel.images[window.thumbnailCarousel.currentIndex];
+						const dataNm = document.getElementById('dataNm').value;
+
+						// 1. "썸네일 있음" 라디오 버튼 선택
+						const thmbYnY = document.getElementById('thmbYnN');
+						if (thmbYnY) {
+							thmbYnY.checked = true;
+							thmbYnY.dispatchEvent(new Event('change'));
+						}
+
+						// 2. 썸네일 영역이 표시될 때까지 대기
+						await new Promise(resolve => setTimeout(resolve, 300));
+
+						// 3. 텍스트 오버레이가 있는 썸네일 생성 (Canvas)
+						const canvasBlob = await generateThumbnailWithText(selectedImageUrl, dataNm);
+
+						// 4. File 객체 생성
+						const file = new File([canvasBlob], 'thumbnail_355x355.jpg', { type: 'image/jpeg' });
+
+						// 5. 파일 입력에 할당
+						const fileInput = document.querySelector('#thmbArea input[type="file"]');
+						if (fileInput) {
+							const dataTransfer = new DataTransfer();
+							dataTransfer.items.add(file);
+							fileInput.files = dataTransfer.files;
+
+							// change 이벤트 트리거하여 UI 업데이트
+							fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+							fileInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+							alert('✅ 썸네일이 자동으로 적용되었습니다.\n\n"저장" 버튼을 클릭하면 저장됩니다.');
+						} else {
+							alert('✅ 썸네일이 생성되었습니다.\n\n(저장은 "저장" 버튼을 클릭할 때 처리됩니다)');
+						}
+
+					} catch (error) {
+						console.error('썸네일 적용 실패:', error);
+						alert('⚠️ 썸네일 생성 실패\n\n' + error.message);
+					} finally {
+						btn.innerHTML = originalText;
+						btn.disabled = false;
+					}
+				});
+			}
 			}
 
 			// 사이드바 접기/펼치기 토글 스크립트
@@ -1498,6 +1795,104 @@
 					sidebarToggle.setAttribute('title', '메뉴 접기');
 				}
 			});
+			// File input display handler
+			const thumbnailFileInput = document.getElementById('thumbnail-file-input');
+			const thumbnailFileList = document.getElementById('thumbnail-file-list');
+			const dropZone = document.getElementById('thumbnail-drop-zone');
+			const fileRegistry = new Map(); // Store file references for download
+
+			function getFileIcon(fileName) {
+				const ext = fileName.split('.').pop().toLowerCase();
+				const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+				const pdfExts = ['pdf'];
+
+				if (imageExts.includes(ext)) {
+					return { icon: 'fa-image', color: 'text-blue-500' };
+				} else if (pdfExts.includes(ext)) {
+					return { icon: 'fa-file-pdf', color: 'text-red-500' };
+				}
+				return { icon: 'fa-file', color: 'text-slate-500' };
+			}
+
+			window.downloadFile = function(fileId) {
+				const file = fileRegistry.get(fileId);
+				if (!file) return;
+
+				const url = URL.createObjectURL(file);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = file.name;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+			};
+
+			function displaySelectedFiles(files) {
+				thumbnailFileList.innerHTML = '';
+				fileRegistry.clear();
+				if (!files || files.length === 0) {
+					thumbnailFileList.innerHTML = '';
+					return;
+				}
+
+				for (let file of files) {
+					const fileId = Date.now() + Math.random();
+					fileRegistry.set(fileId, file);
+
+					const fileSize = (file.size / 1024).toFixed(2); // KB
+					const { icon, color } = getFileIcon(file.name);
+					const fileItem = document.createElement('div');
+					fileItem.className = 'flex items-center justify-between bg-red-50 border border-red-200 rounded-lg p-3';
+					fileItem.innerHTML = `
+						<div class="flex items-center gap-3 flex-1">
+							<i class="fa-solid ${icon} ${color} text-lg"></i>
+							<div class="flex-1 min-w-0">
+								<p class="text-xs font-semibold text-slate-700 truncate">${file.name}</p>
+								<p class="text-[10px] text-slate-500">${fileSize} KB</p>
+							</div>
+						</div>
+						<div class="flex items-center gap-2">
+							<button type="button" class="text-slate-500 hover:text-blue-600 transition p-1" title="다운로드" onclick="downloadFile(${fileId})">
+								<i class="fa-solid fa-download"></i>
+							</button>
+							<button type="button" class="text-slate-400 hover:text-red-600 transition p-1" onclick="this.closest('[class*=bg-red]').remove()">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+					`;
+					thumbnailFileList.appendChild(fileItem);
+				}
+			}
+
+			if (thumbnailFileInput) {
+				thumbnailFileInput.addEventListener('change', function() {
+					displaySelectedFiles(this.files);
+				});
+
+				// Drag and drop
+				dropZone.addEventListener('dragover', (e) => {
+					e.preventDefault();
+					dropZone.classList.add('border-primary-500', 'bg-primary-50');
+				});
+
+				dropZone.addEventListener('dragleave', () => {
+					dropZone.classList.remove('border-primary-500', 'bg-primary-50');
+				});
+
+				dropZone.addEventListener('drop', (e) => {
+					e.preventDefault();
+					dropZone.classList.remove('border-primary-500', 'bg-primary-50');
+					thumbnailFileInput.files = e.dataTransfer.files;
+					thumbnailFileInput.dispatchEvent(new Event('change', { bubbles: true }));
+				});
+
+				// Click to select
+				dropZone.addEventListener('click', () => {
+					thumbnailFileInput.click();
+				});
+			}
+
 			// Initialize AI Panel when DOM is loaded
 			document.addEventListener('DOMContentLoaded', () => {
 				initAIPanel();
@@ -1662,6 +2057,77 @@
 					</div>
 				</details>
 
+				<!-- Accordion Item 4: 썸네일 자동 생성 -->
+				<details class="group bg-white border border-slate-200 rounded-lg overflow-hidden hover:border-purple-300 transition">
+					<summary class="flex items-center justify-between px-4 py-3 bg-slate-50 group-open:bg-purple-50 cursor-pointer font-semibold text-xs text-slate-700 group-open:text-purple-700 transition">
+						<span class="flex items-center gap-2">
+							<i class="fa-solid fa-image text-purple-600 group-open:text-purple-700"></i>
+							썸네일 자동 생성
+						</span>
+						<i class="fa-solid fa-chevron-down text-[10px] transition-transform group-open:rotate-180"></i>
+					</summary>
+					<div class="p-4 border-t border-slate-100 space-y-3">
+						<p class="text-[11px] text-slate-500">본문 내용을 분석하여 355×355px 썸네일 이미지를 자동으로 생성합니다.</p>
+						<button type="button" class="w-full px-3 py-2 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition flex items-center justify-center gap-2" id="generate-thumbnail-btn">
+							<i class="fa-solid fa-wand-magic-sparkles"></i>
+							<span>썸네일 생성</span>
+						</button>
+
+						<!-- Result Preview Area -->
+						<div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+							<div class="text-[10px] font-semibold text-slate-600 flex items-center gap-1">
+								<i class="fa-solid fa-circle-check text-green-500"></i>
+								생성 결과
+							</div>
+
+							<!-- Thumbnail Carousel -->
+							<div class="bg-slate-50 rounded-lg p-3 space-y-3">
+								<label class="text-[10px] font-semibold text-slate-600">썸네일 선택 (좌우 화살표로 이동)</label>
+
+								<!-- Carousel Container -->
+								<div class="relative bg-white border-2 border-slate-200 rounded-lg overflow-hidden">
+									<div class="flex items-center justify-center h-80 bg-slate-100 relative">
+										<!-- Left Arrow -->
+										<button type="button" id="carousel-prev" class="absolute left-2 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white transition disabled:opacity-50">
+											<i class="fa-solid fa-chevron-left text-lg"></i>
+										</button>
+
+										<!-- Image Display -->
+										<div class="flex-1 flex items-center justify-center relative h-full w-full">
+											<img id="carousel-image" src="" alt="썸네일" class="w-full h-full object-cover hidden absolute">
+											<span id="carousel-placeholder" class="text-[12px] text-slate-400">생성된 이미지가 표시됩니다</span>
+
+											<!-- Text Overlay -->
+											<div id="carousel-text-overlay" class="absolute bottom-4 left-4 right-4 hidden">
+												<div class="bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-[11px] line-clamp-2" id="carousel-text">
+													자료명이 없습니다
+												</div>
+											</div>
+										</div>
+
+										<!-- Right Arrow -->
+										<button type="button" id="carousel-next" class="absolute right-2 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white transition disabled:opacity-50">
+											<i class="fa-solid fa-chevron-right text-lg"></i>
+										</button>
+
+										<!-- Image Counter -->
+										<div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-[10px] font-semibold">
+											<span id="carousel-counter">0 / 0</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Dot Indicators -->
+								<div class="flex justify-center gap-2" id="carousel-dots">
+									<!-- Dots will be generated by JavaScript -->
+								</div>
+
+								<!-- Apply Button -->
+								<button type="button" id="apply-thumbnail-btn" class="w-full px-2 py-2 text-[10px] font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded transition">선택한 이미지 적용</button>
+							</div>
+						</div>
+					</div>
+				</details>
 
 			</div>
 
