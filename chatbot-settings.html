@@ -422,6 +422,13 @@
 								<li><i class="fa-solid fa-chevron-right text-[8px]"></i></li>
 								<li class="text-slate-600 font-semibold">챗봇 설정관리</li>
 							</ol>
+							<!-- Ollama Status -->
+							<div class="flex items-center gap-1.5 text-xs mt-1.5">
+								<span id="ollama-status" class="inline-flex items-center gap-1">
+									<i class="fa-solid fa-circle text-red-500 text-[6px]"></i>
+									<span style="color: #64748b;">Ollama 확인 중...</span>
+								</span>
+							</div>
 						</div>
 					</div>
 
@@ -905,50 +912,97 @@
 				document.getElementById('chatSendBtn').disabled = true;
 
 				const bot = getBotById(currentBotId);
-				updateChatStatus('응답 대기 중...');
+				updateChatStatus('응답 생성 중...');
 
 				try {
+					// Ollama 서버 URL (localStorage에서 가져오기, 기본값: localhost:11434)
+					const ollamaUrl = localStorage.getItem('ollamaUrl') || 'http://localhost:11434';
+
+					// 프롬프트 구성
+					const prompt = bot.contextMemory
+						? buildContextPrompt(bot, text, chatHistory)
+						: bot.systemPrompt + '\n\n사용자 질문: ' + text + '\n\n답변:';
+
 					// Ollama API 호출
-					const response = await fetch('http://localhost:3000/api/generate', {
+					const controller = new AbortController();
+					const timeoutId = setTimeout(() => controller.abort(), (bot.timeout || 30) * 1000);
+
+					const response = await fetch(`${ollamaUrl}/api/generate`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
+						mode: 'cors',
+						credentials: 'omit',
+						signal: controller.signal,
 						body: JSON.stringify({
-							model: bot.model || 'gemma2',
-							prompt: bot.systemPrompt + '\n\n사용자: ' + text + '\n응답:',
+							model: bot.model || 'gemma4:e4b',
+							prompt: prompt,
+							stream: false,
 							temperature: bot.temperature || 0.7,
-							top_k: 40,
 							top_p: 0.9,
-							num_predict: bot.maxTokens || 512,
-							stream: false
+							num_predict: bot.maxTokens || 512
 						})
 					});
 
+					clearTimeout(timeoutId);
+
 					if (!response.ok) {
-						throw new Error(`HTTP ${response.status}`);
+						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 					}
 
 					const data = await response.json();
-					const botResponse = data.response || '응답을 생성하지 못했습니다.';
+					let botResponse = data.response || '응답을 생성하지 못했습니다.';
 
-					// 응답 정제 (프롬프트 제거)
-					const cleanedResponse = botResponse
-						.replace(/^.*?응답:\s*/s, '') // "응답:" 이후의 텍스트만
+					// 응답 정제
+					botResponse = botResponse
+						.replace(/^.*?답변:\s*/s, '') // "답변:" 이후의 텍스트만
+						.replace(/^.*?응답:\s*/s, '') // 또는 "응답:" 이후의 텍스트만
 						.trim()
-						.split('\n')[0]; // 첫 번째 줄만
+						.split('\n\n')[0]; // 첫 번째 문단만
 
-					addChatMessage(cleanedResponse, false);
+					// 대화 히스토리에 추가
+					if (bot.contextMemory) {
+						chatHistory.push({ role: 'user', content: text });
+						chatHistory.push({ role: 'bot', content: botResponse });
+						// 최근 10개만 유지
+						if (chatHistory.length > 20) {
+							chatHistory = chatHistory.slice(-20);
+						}
+					}
+
+					addChatMessage(botResponse, false);
 					updateChatStatus('');
 				} catch (error) {
-					const errorMsg = error.message.includes('localhost:3000')
-						? '연결 실패 - Ollama 서버를 확인하세요 (node proxy-server.js 실행)'
-						: error.message;
-					addChatMessage(`오류: ${errorMsg}`, false);
+					let errorMsg = '오류 발생';
+					if (error.name === 'AbortError') {
+						errorMsg = '응답 시간 초과 - Ollama 서버 응답이 느립니다.';
+					} else if (error.message.includes('Failed to fetch')) {
+						errorMsg = 'Ollama 서버에 연결할 수 없습니다. (localhost:11434)';
+					} else {
+						errorMsg = error.message;
+					}
+					addChatMessage(`⚠️ ${errorMsg}`, false);
 					updateChatStatus('');
 				} finally {
 					input.disabled = false;
 					document.getElementById('chatSendBtn').disabled = false;
 					input.focus();
 				}
+			}
+
+			function buildContextPrompt(bot, currentText, history) {
+				let prompt = bot.systemPrompt + '\n\n';
+
+				// 이전 대화 컨텍스트 추가
+				if (history && history.length > 0) {
+					prompt += '이전 대화:\n';
+					history.forEach(msg => {
+						prompt += `${msg.role === 'user' ? '사용자' : '챗봇'}: ${msg.content}\n`;
+					});
+					prompt += '\n';
+				}
+
+				prompt += `사용자: ${currentText}\n\n답변:`;
+				return prompt;
 			}
 
 			// ===== 채팅 이벤트 =====
@@ -1022,27 +1076,78 @@
 			});
 
 			document.getElementById('createBotBtn').addEventListener('click', () => {
-				const botName = prompt('새 챗봇의 이름을 입력하세요:');
-				if (!botName) return;
+				// Show modal form for creating new bot
+				const modal = document.createElement('div');
+				modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+				modal.innerHTML = `
+					<div style="background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+						<h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #1e293b;">새 챗봇 추가</h3>
+						<div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+							<div>
+								<label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">챗봇 이름 <span style="color: #dc2626;">*</span></label>
+								<input id="newBotName" type="text" placeholder="예: 고객지원 챗봇" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit;">
+							</div>
+							<div>
+								<label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">설명</label>
+								<input id="newBotDesc" type="text" placeholder="챗봇의 역할 설명" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit;">
+							</div>
+							<div>
+								<label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">AI 모델 <span style="color: #dc2626;">*</span></label>
+								<select id="newBotModel" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit;">
+									<option value="gemma4:e4b">Gemma4 e4b (추천)</option>
+									<option value="gemma2">Gemma 2 (7B)</option>
+									<option value="llama2">Llama 2 (7B)</option>
+									<option value="mistral">Mistral (7B)</option>
+									<option value="qwen2.5:7b">Qwen 2.5 (7B)</option>
+								</select>
+							</div>
+						</div>
+						<div style="display: flex; gap: 8px; justify-content: flex-end;">
+							<button id="cancelBtn" style="padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f1f5f9; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">취소</button>
+							<button id="confirmBtn" style="padding: 8px 16px; border-radius: 8px; background: #2563eb; color: white; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s;">추가</button>
+						</div>
+					</div>
+				`;
 
-				const newBot = createBot({
-					name: botName,
-					description: '새로운 챗봇',
-					active: true,
-					model: 'gemma2',
-					temperature: 0.7,
-					maxTokens: 512,
-					timeout: 30,
-					systemPrompt: '당신은 도움이 되는 AI 어시스턴트입니다.',
-					welcomeMsg: '안녕하세요! 무엇을 도와드릴까요?',
-					contextMemory: true,
-					logging: true,
-					errorFilter: true
+				document.body.appendChild(modal);
+
+				document.getElementById('confirmBtn').addEventListener('click', () => {
+					const name = document.getElementById('newBotName').value.trim();
+					const desc = document.getElementById('newBotDesc').value.trim();
+					const model = document.getElementById('newBotModel').value;
+
+					if (!name) {
+						alert('챗봇 이름을 입력하세요');
+						return;
+					}
+
+					const newBot = createBot({
+						name: name,
+						description: desc || '새로운 챗봇',
+						active: true,
+						model: model,
+						temperature: 0.7,
+						maxTokens: 512,
+						timeout: 30,
+						systemPrompt: '당신은 도움이 되는 AI 어시스턴트입니다.',
+						welcomeMsg: `안녕하세요! ${name}입니다. 무엇을 도와드릴까요?`,
+						contextMemory: true,
+						logging: true,
+						errorFilter: true
+					});
+
+					modal.remove();
+					selectBot(newBot.id);
+					renderBotList();
+					showNotification(`"${name}" 챗봇이 추가되었습니다`, 'success');
 				});
 
-				selectBot(newBot.id);
-				renderBotList();
-				showNotification('새 챗봇이 추가되었습니다', 'success');
+				document.getElementById('cancelBtn').addEventListener('click', () => {
+					modal.remove();
+				});
+
+				// Focus on name input
+				document.getElementById('newBotName').focus();
 			});
 
 			document.getElementById('deleteBtn').addEventListener('click', () => {
@@ -1145,6 +1250,9 @@
 				}
 			});
 		</script>
+
+		<!-- Ollama Integration Library -->
+		<script src="js/ollama-integration.js"></script>
 
 		<style>
 			@keyframes fadeIn {
